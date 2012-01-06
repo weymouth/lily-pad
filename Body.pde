@@ -26,7 +26,7 @@ class Body{
   final color bodyColor = #993333;
   float phi=0,dphi=0;
   int hx,hy;
-  boolean unsteady;
+  boolean unsteady,pressed;
   PVector xc,dxc;
 
   Body( float x, float y, Window window ){
@@ -53,10 +53,12 @@ class Body{
   }
   
   void translate( float dx, float dy ){
+    unsteady = true; // in case of external call
     dxc = new PVector(dx,dy);
     xc.add(dxc); 
   }
   void rotate( float dphi ){
+    unsteady = true; // in case of external call
     this.dphi = dphi;
     phi = phi+dphi;
   }
@@ -70,7 +72,8 @@ class Body{
   }
 
   void update(){
-    if(unsteady){
+    unsteady = false; // reset
+    if(pressed){
       this.translate( window.idx(mouseX-hx), window.idy(mouseY-hy) );
       hx = mouseX;
       hy = mouseY;
@@ -80,13 +83,13 @@ class Body{
   }
   void mousePressed(){
     if(distance( mouseX, mouseY )<1){
-      unsteady = true;
+      pressed = true;
       hx = mouseX;
       hy = mouseY;
     }
   }
   void mouseReleased(){
-    unsteady = false;
+    pressed = false;
   }
 }
 /********************************
