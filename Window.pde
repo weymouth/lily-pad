@@ -23,6 +23,7 @@ class Window{
   
   Window(){ this( 0., 0., 1., 1., 0, 0, width, height );}
   Window( int n, int m){ this( 1, 1, n-2, m-2, 0, 0, width, height );}
+  Window( int n0, int m0, int dn, int dm){this( n0, m0, dn, dm, 0, 0, width, height );}
   Window( int n0, int m0, int dn, int dm, int x0, int y0, int dx, int dy){
     this(n0-0.5,m0-0.5,dn,dm,x0,y0,dx,dy);}
   Window( int n0, float m0, int dn, float dm, int x0, int y0, int dx, int dy){
@@ -62,4 +63,3 @@ class Scale{
   float out( float in ){ return (in-inS)*r+outS;} 
   float in( float out ){ return (out-outS)/r+inS;}
 }
-
