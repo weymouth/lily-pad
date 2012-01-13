@@ -1,8 +1,38 @@
+/********************************
+BodyUnion class
+
+this class combines any two body instances by a union operator
+which `adds` bodies to the flow. other operations are possible.
+
+note that it is possble to get an arbitrary number of bodies by
+applying the union multiple times, as in the example.
+
+example code:
+BodyUnion body;
+void setup(){
+  size(400,400);
+  Window view = new Window(100,100);
+  body = new BodyUnion( new NACA(30,30,20,0.2,view),
+  new BodyUnion( new EllipseBody(70,30,15,view), new EllipseBody(30,70,15,view) ));
+}
+void draw(){
+  background(0);
+  body.update();
+  body.display();
+}
+void mousePressed(){body.mousePressed();}
+void mouseReleased(){body.mouseReleased();}
+********************************/
+
 class BodyUnion extends Body{
   Body a,b;
 
-  BodyUnion(a,b){ this.a = a; this.b = b;}
+  BodyUnion(Body a, Body b){ this.a = a; this.b = b;}
 
+  void display( color C, Window window ){
+    a.display(C,window);
+    b.display(C,window);
+  }
   void display(){a.display(); b.display();}
   
   float distance( float x, float y){ // in cells
@@ -25,7 +55,7 @@ class BodyUnion extends Body{
     return c.velocity(d,dt,x,y);
   }
 
-  void update(){a.update();b.update();}
+  void update(){a.update();b.update(); unsteady=a.unsteady|b.unsteady; }
   void mousePressed(){a.mousePressed();b.mousePressed();}
   void mouseReleased(){a.mouseReleased();b.mouseReleased();}
 }
