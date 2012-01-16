@@ -54,12 +54,10 @@ class Body{
   }
   
   void translate( float dx, float dy ){
-    unsteady = true; // in case of external call
     dxc = new PVector(dx,dy);
     xc.add(dxc); 
   }
   void rotate( float dphi ){
-    unsteady = true; // in case of external call
     this.dphi = dphi;
     phi = phi+dphi;
   }
@@ -73,15 +71,16 @@ class Body{
   }
 
   void update(){
-    unsteady = false; // reset
     if(pressed){
       this.translate( window.idx(mouseX-hx), window.idy(mouseY-hy) );
       hx = mouseX;
       hy = mouseY;
-    }else{
-      this.translate( 0, 0 );
     }
+    unsteady = (dxc.mag()!=0)|(dphi!=0);
+    dxc = new PVector(0,0);
+    dphi = 0;
   }
+  
   void mousePressed(){
     if(distance( mouseX, mouseY )<1){
       pressed = true;
