@@ -14,7 +14,7 @@ void setup(){
 }
 ************************************/
 class ConvexBody extends Body{
-  ArrayList coords;
+  ArrayList<PVector> coords;
   int n;
   PVector[] fcoords;
   ConvexBody box;
@@ -28,9 +28,9 @@ class ConvexBody extends Body{
     coords.add( new PVector( x, y ) );
 // remove concave points
     for ( int i = 0; i<coords.size() && coords.size()>3; i++ ){
-      PVector x1 = (PVector) coords.get(i);
-      PVector x2 = (PVector) coords.get((i+1)%coords.size());
-      PVector x3 = (PVector) coords.get((i+2)%coords.size());
+      PVector x1 = coords.get(i);
+      PVector x2 = coords.get((i+1)%coords.size());
+      PVector x3 = coords.get((i+2)%coords.size());
       PVector t1 = PVector.sub(x1,x2);
       PVector t2 = PVector.sub(x2,x3);
       float a = atan2(t1.y,t1.x)-atan2(t2.y,t2.x);
@@ -47,8 +47,7 @@ class ConvexBody extends Body{
     PVector mn = xc.get();
     PVector mx = xc.get();
     for ( int i = 0; i<n ; i++ ) {
-      fcoords[i] = new PVector();
-      fcoords[i] = ((PVector) coords.get(i)).get();
+      fcoords[i] = coords.get(i);
       mn.x = min(mn.x,fcoords[i].x);
       mn.y = min(mn.y,fcoords[i].y);
       mx.x = max(mx.x,fcoords[i].x);
@@ -70,15 +69,9 @@ class ConvexBody extends Body{
     fill(C); noStroke();
     beginShape();
     if(n==0) {
-      for ( int i = 0; i<coords.size(); i++ ){
-        PVector x = (PVector) coords.get(i);
-        vertex(window.px(x.x),window.py(x.y));
-      }
+      for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
     }else{
-      for ( int i = 0; i<n; i++ ){
-        PVector x = fcoords[i];
-        vertex(window.px(x.x),window.py(x.y));
-      }
+      for ( PVector x: fcoords ) vertex(window.px(x.x),window.py(x.y));
     }
     endShape(CLOSE);
   }
@@ -111,17 +104,13 @@ class ConvexBody extends Body{
   
   void translate( float dx, float dy ){
     super.translate(dx,dy);
-    for ( int i = 0; i<n; i++ ){
-      fcoords[i].add(dxc);
-    }
+    for ( PVector x: fcoords ) x.add(dxc);
     if(n>4) box.translate(dx,dy);
   }
   
   void rotate( float dphi ){
     super.rotate(dphi);
-    for ( int i = 0; i<n; i++ ){
-      fcoords[i] = rotate( fcoords[i] );
-    }
+    for ( PVector x: fcoords ) x = rotate(x);
     if(n>4) box.rotate(dphi);
   }
   PVector rotate( PVector x ){
