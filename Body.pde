@@ -110,8 +110,6 @@ class EllipseBody extends Body{
     ellipse(window.px(xc.x),window.py(xc.y),window.pdx(h*a),window.pdy(h));
   }
   
-  void rotate( float _dphi ){ return;} // no rotation!
-
   float distance( float x, float y){
     return (mag((x-xc.x)/a,y-xc.y)-h*0.5);
   }
