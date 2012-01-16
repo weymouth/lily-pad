@@ -2,21 +2,20 @@
 Emplements a closed convex body defined by an array of points
 
 example code:
-void setup(){
-  Body body = new Body(0,0,new Window(4,4,0,15,5,80,80));
-  body.add(0,3);
-  body.add(3,0);
+void setup() {
+  ConvexBody body = new ConvexBody(0,0,new Window(0,0,4,4));
+  body.add(0.5,2.5);
+  body.add(2.75,0.25);
   body.add(0,0);
   body.end();
-  rect(15,5,80,80);
   body.display();
-  println(body.distance(3.,1.));
+  println(body.distance(3.,1.)); // should be sqrt(1/2)
 }
 ************************************/
 class ConvexBody extends Body{
   ArrayList<PVector> coords;
   int n;
-  PVector[] fcoords;
+  PVector[] fcoords,orth;
   ConvexBody box;
 
   ConvexBody( float x, float y, Window window ){
@@ -53,6 +52,9 @@ class ConvexBody extends Body{
       mx.x = max(mx.x,fcoords[i].x);
       mx.y = max(mx.y,fcoords[i].y);
     }
+    orth = new PVector[n];
+    getOrth(); // get orthogonal projection of line segments
+
     // make the bounding box
     if(n>4){
       box = new ConvexBody(xc.x,xc.y,window);
@@ -63,6 +65,19 @@ class ConvexBody extends Body{
       box.end();
     }
   }
+
+  void getOrth(){    // get orthogonal projection to speed-up distance()
+    for( int i = 0; i<n ; i++ ) {
+      PVector x1 = fcoords[i];
+      PVector x2 = fcoords[(i+1)%n];
+      float l = PVector.sub(x1,x2).mag();
+      float sa = (x1.y-x2.y)/l;  // sin alpha
+      float ca = (x1.x-x2.x)/l;  // cos alpha
+      float o = x1.x*sa-x1.y*ca; // offset
+      orth[i] = new PVector(sa,ca,o);
+    }
+  }
+
 
   void display( color C, Window window ){ // note: can display while adding
 //    if(n>4) box.display(#FFCC00);
@@ -77,47 +92,33 @@ class ConvexBody extends Body{
   }
   
   float distance( float x, float y ){ // in cells
-/*  the distance from a line defined by two points
-  (x1,x2) and a third point (x0) is
-       d = |x0-x1|sin{arg{(x2-x1),(x0-x1)}}
-    the intersection (maxval) of the line distance 
-  functions defines the shape distance function */   
-    float dis = 0;
-    // check distance to bounding box
-    if(n>4) {
+    float dis = -1e10;
+    if(n>4) { // check distance to bounding box
       dis = box.distance(x,y);
       if(dis>2) return dis;
     }
-    // loop through lines
-    PVector x0 = new PVector(x,y);
-    for ( int i = 0; i<n; i++ ){
-      PVector x1 = fcoords[i];
-      PVector x2 = fcoords[(i+1)%n];
-      PVector t = PVector.sub(x2,x1);
-      PVector l = PVector.sub(x0,x1);
-      float a = atan2(l.y,l.x)-atan2(t.y,t.x);
-      float d = l.mag()*sin(a);
-      dis = (i==0)?d:max(d,dis);
-    }
+    // check distance to each line, choose max
+    for ( PVector o : orth ) dis = max(dis,x*o.x-y*o.y-o.z);
     return dis;
   }
   
   void translate( float dx, float dy ){
     super.translate(dx,dy);
     for ( PVector x: fcoords ) x.add(dxc);
+    for ( PVector o: orth    ) o.z += dx*o.x-dy*o.y; // adjust offset
     if(n>4) box.translate(dx,dy);
   }
   
   void rotate( float dphi ){
     super.rotate(dphi);
-    for ( PVector x: fcoords ) x = rotate(x);
+    float sa = sin(dphi), ca = cos(dphi);
+    for ( PVector x: fcoords ) rotate( x, sa, ca ); 
+    getOrth(); // get new orthogonal projection
     if(n>4) box.rotate(dphi);
   }
-  PVector rotate( PVector x ){
-    x.sub(xc);
-    PVector z = new PVector(cos(dphi)*x.x-sin(dphi)*x.y,
-                            sin(dphi)*x.x+cos(dphi)*x.y);
-    z.add(xc);
-    return z;
+  void rotate( PVector x , float sa, float ca ){
+    PVector z = PVector.sub(x,xc);
+    x.x = ca*z.x-sa*z.y+xc.x;
+    x.y = sa*z.x+ca*z.y+xc.y;
   }
 }
