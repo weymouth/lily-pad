@@ -27,13 +27,15 @@ void mouseReleased(){body.mouseReleased();}
 class BodyUnion extends Body{
   Body a,b;
 
-  BodyUnion(Body a, Body b){ this.a = a; this.b = b;}
+  BodyUnion(Body a, Body b){
+    super(a.xc.x,a.xc.y,a.window);  
+    this.a = a; this.b = b;
+  }
 
   void display( color C, Window window ){
     a.display(C,window);
     b.display(C,window);
   }
-  void display(){a.display(); b.display();}
   
   float distance( float x, float y){ // in cells
     return min(a.distance(x,y),b.distance(x,y));
@@ -43,11 +45,8 @@ class BodyUnion extends Body{
   }
 
   Body closer(float x, float y){
-    if(a.distance(x,y)<b.distance(x,y)){
-      return a;
-    }else{
-      return b;
-    }
+    if(a.distance(x,y)<b.distance(x,y)) return a;
+    else return b;
   }
   
   float velocity( int d, float dt, float x, float y ){

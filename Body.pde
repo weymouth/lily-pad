@@ -29,7 +29,6 @@ class Body{
   boolean unsteady,pressed;
   PVector xc,dxc;
 
-  Body(){this(0,0, new Window());}
   Body( float x, float y, Window window ){
     this.window = window;
     xc = new PVector(x,y);
