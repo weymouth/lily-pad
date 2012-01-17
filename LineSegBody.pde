@@ -27,11 +27,7 @@ class LineSegBody extends ConvexBody{
 //    fill(C); ellipse(window.px(xc.x),window.py(xc.y),3,3);
     stroke(C); noFill(); strokeWeight( 2 );
     beginShape();
-    if(n==0) {
-      for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
-    }else{
-      for ( PVector x: fcoords ) vertex(window.px(x.x),window.py(x.y));
-    }
+    for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
     endShape();
   }
   
@@ -45,8 +41,8 @@ class LineSegBody extends ConvexBody{
     dis = 1e10;
     for(int i=0; i<orth.length; i++){
       PVector o = orth[i];
-      PVector a = fcoords[i]; 
-      PVector b = fcoords[(i+1)%n];
+      PVector a = coords.get(i); 
+      PVector b = coords.get((i+1)%n);
       float d = x*o.x-y*o.y-o.z;          // norm dis to line
       float ta = (x-a.x)*o.y+(y-a.y)*o.x; // tang dis to start
       float tb = (x-b.x)*o.y+(y-b.y)*o.x; // tang dis to end

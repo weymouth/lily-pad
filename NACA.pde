@@ -33,15 +33,15 @@ class NACA extends ConvexBody{
   float[][] interp( Field a ){
     float[][] b = new float[2][m+1];
 
-    PVector x = (PVector) coords.get(0);
+    PVector x = coords.get(0);
     b[0][0] = a.interp(x.x,x.y); b[1][0] = b[0][0];
     for ( int i = 1; i<m; i++ ){
-      x = fcoords[i];
+      x = coords.get(i);
       b[0][i] = a.interp(x.x,x.y);
-      x = fcoords[n-i];
+      x = coords.get(n-i);
       b[1][i] = a.interp(x.x,x.y);
     }
-    x = (PVector) coords.get(m);
+    x = coords.get(m);
     b[0][m] = a.interp(x.x,x.y); b[1][m] = b[0][m];
     return b;
   }

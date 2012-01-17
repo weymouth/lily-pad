@@ -15,7 +15,7 @@ void setup() {
 class ConvexBody extends Body{
   ArrayList<PVector> coords;
   int n;
-  PVector[] fcoords,orth;
+  PVector[] orth;
   ConvexBody box;
 
   ConvexBody( float x, float y, Window window ){
@@ -42,21 +42,19 @@ class ConvexBody extends Body{
   
   void end(Boolean closed){
     n = coords.size();
-    fcoords = new PVector[n];
-    PVector mn = xc.get();
-    PVector mx = xc.get();
-    for ( int i = 0; i<n ; i++ ) {
-      fcoords[i] = coords.get(i);
-      mn.x = min(mn.x,fcoords[i].x);
-      mn.y = min(mn.y,fcoords[i].y);
-      mx.x = max(mx.x,fcoords[i].x);
-      mx.y = max(mx.y,fcoords[i].y);
-    }
     orth = new PVector[closed?n:n-1];
     getOrth(); // get orthogonal projection of line segments
 
     // make the bounding box
     if(n>4){
+      PVector mn = xc.get();
+      PVector mx = xc.get();
+      for ( PVector x: coords ) {
+        mn.x = min(mn.x,x.x);
+        mn.y = min(mn.y,x.y);
+        mx.x = max(mx.x,x.x);
+        mx.y = max(mx.y,x.y);
+      }
       box = new ConvexBody(xc.x,xc.y,window);
       box.add(mn.x,mn.y);
       box.add(mn.x,mx.y);
@@ -69,8 +67,8 @@ class ConvexBody extends Body{
 
   void getOrth(){    // get orthogonal projection to speed-up distance()
     for( int i = 0; i<orth.length ; i++ ) {
-      PVector x1 = fcoords[i];
-      PVector x2 = fcoords[(i+1)%n];
+      PVector x1 = coords.get(i);
+      PVector x2 = coords.get((i+1)%n);
       float l = PVector.sub(x1,x2).mag();
       float sa = (x1.y-x2.y)/l;  // sin alpha
       float ca = (x1.x-x2.x)/l;  // cos alpha
@@ -84,11 +82,7 @@ class ConvexBody extends Body{
 //    if(n>4) box.display(#FFCC00);
     fill(C); noStroke();
     beginShape();
-    if(n==0) {
-      for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
-    }else{
-      for ( PVector x: fcoords ) vertex(window.px(x.x),window.py(x.y));
-    }
+    for ( PVector x: coords ) vertex(window.px(x.x),window.py(x.y));
     endShape(CLOSE);
   }
   
@@ -105,15 +99,15 @@ class ConvexBody extends Body{
   
   void translate( float dx, float dy ){
     super.translate(dx,dy);
-    for ( PVector x: fcoords ) x.add(dxc);
-    for ( PVector o: orth    ) o.z += dx*o.x-dy*o.y; // adjust offset
+    for ( PVector x: coords ) x.add(dxc);
+    for ( PVector o: orth   ) o.z += dx*o.x-dy*o.y; // adjust offset
     if(n>4) box.translate(dx,dy);
   }
   
   void rotate( float dphi ){
     super.rotate(dphi);
     float sa = sin(dphi), ca = cos(dphi);
-    for ( PVector x: fcoords ) rotate( x, sa, ca ); 
+    for ( PVector x: coords ) rotate( x, sa, ca ); 
     getOrth(); // get new orthogonal projection
     if(n>4) box.rotate(dphi);
   }
