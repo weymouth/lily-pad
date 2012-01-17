@@ -22,6 +22,7 @@ void setup(){
 class VectorField{
   Field x,y;
   int n, m;
+  float CF=1./6., S=10.;  // QUICK parameters
 
   VectorField( int n, int m, float xval, float yval ){
     this.n = n;
@@ -101,6 +102,71 @@ class VectorField{
       line(0, 0,  b, -b);
     popMatrix();
   } 
+  
+   void AdvDif(VectorField u1, float dt, float nu) {
+    for ( int j=1; j<m-1; j++) {
+      for ( int i=1; i<n-1; i++) {
+        u1.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+x.a[i][j];
+        u1.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+y.a[i][j];
+      }
+    }   
+  }
+
+  float advection (Field b, int i, int j) {  
+    float uo, ue, vs, vn;
+    if (b.btype == 1) {
+      uo = 0.5*(x.a[i-1][j]+x.a[i][j]);
+      ue = 0.5*(x.a[i+1][j]+x.a[i][j]);
+      vs = 0.5*(y.a[i][j]+y.a[i-1][j]);
+      vn = 0.5*(y.a[i][j+1]+y.a[i-1][j+1]);
+    }
+    else {
+      uo = 0.5*(x.a[i][j-1]+x.a[i][j]);
+      ue = 0.5*(x.a[i+1][j-1]+x.a[i+1][j]);
+      vs = 0.5*(y.a[i][j-1]+y.a[i][j]);
+      vn = 0.5*(y.a[i][j]+y.a[i][j+1]);
+    }
+    return ((uo*bho(b, i, j, -1, 0, uo) - ue*bho(b, i, j, 1, 0, ue)) + (vs*bho(b, i, j, 0, -1, vs) - vn*bho(b, i, j, 0, 1, vn)));
+  }
+
+  float diffusion (Field b, int i, int j) {
+    return b.a[i+1][j] + b.a[i][j+1] - 4*b.a[i][j] + b.a[i-1][j] + b.a[i][j-1];
+  }
+
+  float bho(Field b, int i, int j, int d1, int d2, float uf) {
+    float bf =  0.5*(b.a[i+d1][j+d2]+b.a[i][j]); 
+    if (d1*uf<0){
+     i += d1; 
+     d1 = -d1;
+    }
+    if (d2*uf<0){
+     j += d2;
+     d2 = -d2;
+    } 
+    if ( i>n-2 || i<2 || j>m-2 || j<2 ) return bf;
+    float bc = b.a[i][j];
+    float bd = b.a[i+d1][j+d2];
+    float bu = b.a[i-d1][j-d2];
+    bf -= CF*(bd-2*bc+bu);
+    float b1 = bu+S*(bc-bu);
+    return med(bf, bc, med(bc, bd, b1));
+  }
+
+  float med(float a, float b, float c) {
+    return(max(min(a, b), min(max(a, b), c)));
+  }
+
+  float CFL(float nu) {
+    float b = abs(x.a[0][0])+abs(y.a[0][0]);
+    float c;
+    for ( int i=1; i<n-1; i++) {
+      for ( int j=1; j<m-1; j++) { 
+        c = abs(x.a[i][j])+abs(y.a[i][j]);
+        if (c>b) b=c;
+      }
+    }
+    return min(0.5/b,0.25/nu);
+  }
   
   void eq( VectorField b ){ x.eq(b.x); y.eq(b.y);}
   void eq( float b ){ x.eq(b); y.eq(b);}
