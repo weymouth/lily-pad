@@ -39,15 +39,7 @@ class LineSegBody extends ConvexBody{
     }
     // get dist to each line segment, choose min
     dis = 1e10;
-    for(int i=0; i<orth.length; i++){
-      PVector o = orth[i];
-      PVector a = coords.get(i); 
-      PVector b = coords.get((i+1)%n);
-      float d = x*o.x-y*o.y-o.z;          // norm dis to line
-      float ta = (x-a.x)*o.y+(y-a.y)*o.x; // tang dis to start
-      float tb = (x-b.x)*o.y+(y-b.y)*o.x; // tang dis to end
-      dis = min(dis,sqrt(sq(d)+sq(max(0,ta))+sq(max(0,-tb))));
-    }
+    for( OrthoNormal o: orth ) dis = min(dis,o.distance(x,y,false));
     return dis-1.5;
   }
 }

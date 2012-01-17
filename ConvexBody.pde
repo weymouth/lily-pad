@@ -15,7 +15,7 @@ void setup() {
 class ConvexBody extends Body{
   ArrayList<PVector> coords;
   int n;
-  PVector[] orth;
+  OrthoNormal orth[];
   ConvexBody box;
 
   ConvexBody( float x, float y, Window window ){
@@ -42,7 +42,7 @@ class ConvexBody extends Body{
   
   void end(Boolean closed){
     n = coords.size();
-    orth = new PVector[closed?n:n-1];
+    orth = new OrthoNormal[closed?n:n-1];
     getOrth(); // get orthogonal projection of line segments
 
     // make the bounding box
@@ -69,11 +69,7 @@ class ConvexBody extends Body{
     for( int i = 0; i<orth.length ; i++ ) {
       PVector x1 = coords.get(i);
       PVector x2 = coords.get((i+1)%n);
-      float l = PVector.sub(x1,x2).mag();
-      float sa = (x1.y-x2.y)/l;  // sin alpha
-      float ca = (x1.x-x2.x)/l;  // cos alpha
-      float o = x1.x*sa-x1.y*ca; // offset
-      orth[i] = new PVector(sa,ca,o);
+      orth[i] = new OrthoNormal(x1,x2);
     }
   }
 
@@ -93,14 +89,14 @@ class ConvexBody extends Body{
       if(dis>2) return dis;
     }
     // check distance to each line, choose max
-    for ( PVector o : orth ) dis = max(dis,x*o.x-y*o.y-o.z);
+    for ( OrthoNormal o : orth ) dis = max(dis,o.distance(x,y));
     return dis;
   }
   
   void translate( float dx, float dy ){
     super.translate(dx,dy);
     for ( PVector x: coords ) x.add(dxc);
-    for ( PVector o: orth   ) o.z += dx*o.x-dy*o.y; // adjust offset
+    for ( OrthoNormal o: orth   ) o.translate(dx,dy);
     if(n>4) box.translate(dx,dy);
   }
   
