@@ -14,7 +14,7 @@ void draw(){
 }
 ********************************/
 class NACA extends ConvexBody{
-  int m = 11;
+  int m = 100;
   NACA( float x, float y, float c, float t, Window window ){
     super(x,y,window);
     add(xc.x-c*0.25,xc.y);

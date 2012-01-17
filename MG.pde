@@ -48,7 +48,7 @@ class MG{
     if(divisible(x)){
       for( int i=0 ; i<itmx ; i++ ){
         x.plusEq(vCycle( A, r ));
-        if(r.inner(r)<1e-4) break;
+        if(r.inner(r)<1e-5) break;
       }
     }
   }

@@ -1,5 +1,5 @@
 /*******************************************
-Emplements a closed convex body defined by an array of points
+Implements a closed convex body defined by an array of points
 
 example code:
 void setup() {

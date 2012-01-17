@@ -130,5 +130,15 @@ class FloodPlot{
       text(a.substring(0,min(a.length(),5)),x.out(maxv),y1);
     }
   }
+  
+      void displayTime(float t){
+      PFont font = loadFont("Dialog.bold-14.vlw");
+      int x0 = window.x0, x1 = window.x0+window.dx;
+      int y0 = window.y0, y1 = window.y0+window.dy;
+      textFont(font);
+      textAlign(CENTER,BASELINE);
+      fill(255);
+      text("t = "+ nfs(t,2,2),0.5*(x0+x1),y1);
+    }
 }
 
