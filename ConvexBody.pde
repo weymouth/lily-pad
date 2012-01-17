@@ -40,7 +40,7 @@ class ConvexBody extends Body{
     }
   }
   
-  void end(){
+  void end(Boolean closed){
     n = coords.size();
     fcoords = new PVector[n];
     PVector mn = xc.get();
@@ -52,7 +52,7 @@ class ConvexBody extends Body{
       mx.x = max(mx.x,fcoords[i].x);
       mx.y = max(mx.y,fcoords[i].y);
     }
-    orth = new PVector[n];
+    orth = new PVector[closed?n:n-1];
     getOrth(); // get orthogonal projection of line segments
 
     // make the bounding box
@@ -65,9 +65,10 @@ class ConvexBody extends Body{
       box.end();
     }
   }
+  void end(){end(true);}
 
   void getOrth(){    // get orthogonal projection to speed-up distance()
-    for( int i = 0; i<n ; i++ ) {
+    for( int i = 0; i<orth.length ; i++ ) {
       PVector x1 = fcoords[i];
       PVector x2 = fcoords[(i+1)%n];
       float l = PVector.sub(x1,x2).mag();
