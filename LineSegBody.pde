@@ -25,7 +25,7 @@ class LineSegBody extends ConvexBody{
   void display( color C, Window window ){ // note: can display while adding
 //    if(n>4) box.display(#FFCC00);
 //    fill(C); ellipse(window.px(xc.x),window.py(xc.y),3,3);
-    stroke(C); noFill(); strokeWeight( 2 );
+    stroke(C); noFill(); strokeWeight(window.pdx(1.5));
     beginShape();
     for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
     endShape();

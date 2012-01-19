@@ -17,8 +17,34 @@ class GenMotionBody extends LineSegBody{
     end();
   }
   
+  // translation and rotation are done through with new coord update
+  void translate( float dx, float dy ){ return;}
+  void rotate( float dphi ){ return;}
+  
+  int closest( float x, float y ){
+    int j=0; 
+    float dis = orth[j].distance(x,y,false);
+    for( int i=1; i<n-1; i++ ){
+      float d = orth[i].distance(x,y,false);
+      if(d<dis) {j=i; dis=d;}
+    }
+    return j;
+  }
+  
+  float velocity( int d, float dt, float x, float y ){
+    if(distance(x,y)>2) return 0; 
+    // identify the nearest segment
+    int i = closest(x,y);
+    // get tangent coordinate of point (0<s<1)
+    float s = orth[i].tanCoord(x,y);
+    // get end point velocities
+    PVector dx0 = coordsDx.get(i), dx1 = coordsDx.get(i+1);
+    // interpolate requested component
+    if(d==1) return ((1.-s)*dx0.x+s*dx1.x)/dt;
+    else     return ((1.-s)*dx0.y+s*dx1.y)/dt;
+  }
+
   void update( float[] x, float[] y ){
-    update();
     for( int i=0; i<n; i++ ) {
       PVector x0 = coords.get(i);
       PVector x1 = new PVector(x[i],y[i]);
@@ -27,25 +53,6 @@ class GenMotionBody extends LineSegBody{
     }
     end();
     unsteady = true;
-  }
-  
-  int closest( float x, float y ){
-    int j=0; 
-    float dis = orth[j].distance(x,y);
-    for( int i=1; i<n-1; i++ ){
-      float d = orth[i].distance(x,y);
-      if(d<dis) {j=i; dis=d;}
-    }
-    return j;
-  }
-    
-  float velocity( int d, float dt, float x, float y ){
-    float velo = super.velocity(d,dt,x,y);
-    // add the velocity of the nearest segment
-    int i = closest(x,y);
-    PVector dx0 = coordsDx.get(i), dx1 = coordsDx.get(i+1);
-    if(d==1) return velo+0.5*(dx0.x+dx1.x)/dt;
-    else     return velo+0.5*(dx0.y+dx1.y)/dt;
   }
 }
 
