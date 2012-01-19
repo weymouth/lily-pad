@@ -18,7 +18,7 @@ class GenMotionBody extends LineSegBody{
   }
   
   void update( float[] x, float[] y ){
-    super.update();
+    update();
     for( int i=0; i<n; i++ ) {
       PVector x0 = coords.get(i);
       PVector x1 = new PVector(x[i],y[i]);
@@ -42,9 +42,10 @@ class GenMotionBody extends LineSegBody{
   float velocity( int d, float dt, float x, float y ){
     float velo = super.velocity(d,dt,x,y);
     // add the velocity of the nearest segment
-    PVector dx = coordsDx.get(closest(x,y));
-    if(d==1) return velo+dx.x/dt;
-    else     return velo+dx.y/dt;
+    int i = closest(x,y);
+    PVector dx0 = coordsDx.get(i), dx1 = coordsDx.get(i+1);
+    if(d==1) return velo+0.5*(dx0.x+dx1.x)/dt;
+    else     return velo+0.5*(dx0.y+dx1.y)/dt;
   }
 }
 
