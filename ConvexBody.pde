@@ -13,8 +13,6 @@ void setup() {
 }
 ************************************/
 class ConvexBody extends Body{
-  ArrayList<PVector> coords;
-  int n;
   OrthoNormal orth[];
   ConvexBody box;
 

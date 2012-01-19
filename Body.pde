@@ -26,6 +26,8 @@ class Body{
   final color bodyColor = #993333;
   float phi=0,dphi=0;
   int hx,hy;
+  ArrayList<PVector> coords;
+  int n;
   boolean unsteady,pressed;
   PVector xc,dxc;
 

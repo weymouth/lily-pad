@@ -32,9 +32,15 @@ class BodyUnion extends Body{
     this.a = a; this.b = b;
   }
 
+
   void display( color C, Window window ){
     a.display(C,window);
     b.display(C,window);
+  }
+
+  void display(){
+    a.display();
+    b.display();
   }
   
   float distance( float x, float y){ // in cells

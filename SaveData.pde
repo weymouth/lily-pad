@@ -10,24 +10,24 @@ Saves data to a text file with customizable header
 ***********************************/
  
 class SaveData{
-  PVector[] coord;
+  ArrayList<PVector> coords;
   PrintWriter output;
   int n;
   
-  SaveData(String name, PVector[] coord, int resolution, int xLengths, int yLengths, int zoom){
+  SaveData(String name, ArrayList<PVector> coords, int resolution, int xLengths, int yLengths, int zoom){
     output = createWriter(name);
-    this.coord = coord;
-    n = coord.length;
+    this.coords = coords;
+    n = coords.size();
     output.println("%% Pressure distribution along the foil using processing viscous simulation");
     output.print("% xcoord = [");
     for(int i=0; i<n; i++){
-      output.print(coord[i].x +" ");
+      output.print(coords.get(i).x +" ");
     }
     output.println("];");
     
     output.print("% ycoord = [");
     for(int i=0; i<n; i++){
-      output.print(coord[i].y +" ");
+      output.print(coords.get(i).y +" ");
     }
     output.println("];");
   
@@ -42,7 +42,7 @@ class SaveData{
   void addData(float t, Field a){
     output.print(t + " ");
     for(int i=0; i<n; i++){
-      output.print(a.linear( coord[i].x, coord[i].y ) +" ");
+      output.print(a.linear( coords.get(i).x, coords.get(i).y ) +" ");
     }
     output.println(";");
   }
