@@ -5,26 +5,28 @@ Example code:
 
 import processing.video.*;
 boolean recording=true;
-int Time =10;
+int Time =4;
 MovieMaker mm; 
 SaveData dat;
 AudreyTest test;
 
 void setup(){
-  int resolution = 64, xLengths=5, yLengths=3, zoom = 2;
-  float xStart = 1.7, yDist = 0.06;
+  int resolution = 128, xLengths=5, yLengths=3, zoom = 1;
+  float xStart = 1, yDist = 0.06;
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
-  mm = new MovieMaker(this, width, height, "foil_QUICK_1000_ eps2_o2.mov", 30);
-  dat = new SaveData("pressure_QUICK_1000_eps2_o2.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);
+  mm = new MovieMaker(this, width, height, "foil_d006D01Re500.mov", 30);
+  dat = new SaveData("pressure_d006D01Re500.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);
 }
 
 void draw(){
   if(test.t<Time){
   test.update();
+  if(test.t>-2*Time){
   test.display();
-    if(recording){
+    if(recording){      
     mm.addFrame();
     dat.addData(test.t, test.flow.p);
+      }
     }
   }
   if(test.t>=Time){
@@ -44,9 +46,9 @@ void keyPressed(){
 
 class AudreyTest{
   final int n,m, resolution, NT=1;
-  float dt = 2.5, t, t0, Re=1000, cDiameter = 0.5;
+  float dt = 2.5, t, t0, Re=500, cDiameter = 0.5;
   boolean QUICK = true, order2 = true;
-  BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2; NACA foil;
+  BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2;
   
   AudreyTest( int resolution, int xLengths, int yLengths, float xStart , float yDist, float zoom){
     n = xLengths*resolution+2;
@@ -57,6 +59,7 @@ class AudreyTest{
     float yStart = yLengths*yFoil-yDist-0.06-0.5*cDiameter;
     
     t0 = xStart-xFoil*xLengths;
+    t=t0;
 
     int w = int(zoom*(n-2)), h = int(zoom*(m-2));
     size(w,h);
@@ -65,7 +68,6 @@ class AudreyTest{
     window = new Window(n/6,m/5,n/2,m/2);
     window2 = new Window(n/6,m/5,n/2,m/2);
 
-    foil =  new NACA(xFoil*n,yFoil*m,resolution,0.12,window);
     body = new BodyUnion( new NACA(xFoil*n,yFoil*m,resolution,0.12,window), new EllipseBody(xStart*resolution,yStart*resolution,cDiameter*resolution,window));
 
     flow = new BDIM(n,m,dt,body,(float) resolution/Re,QUICK);
@@ -93,11 +95,11 @@ class AudreyTest{
   }
   
   void display(){
-    flood.display(flow.u.vorticity());
-    body.display();
-    flood.displayTime(t);
-//    flood2.display(flow.p);
-//    foil.display(window2);
-//    flood2.displayTime(t);
+//    flood.display(flow.u.vorticity());
+//    body.display();
+//    flood.displayTime(t);
+    flood2.display(flow.p);
+    body.display(window2);
+    flood2.displayTime(t);
   }
 }

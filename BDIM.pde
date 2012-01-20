@@ -8,7 +8,7 @@ solve the BDIM equation for velocity and pressure
 class BDIM{
   int n,m; // number of cells in uniform grid
   float dt, nu, eps=2.0; // time resolution
-  VectorField u,del,c,u0,c2,ub;
+  VectorField u,del,c,u0,c2,ub,wn;
   Field p;
   boolean QUICK;
 
@@ -24,6 +24,7 @@ class BDIM{
     del = new VectorField(n,m,1,1);
     c = new VectorField(del);
     c2 = new VectorField(c);
+    wn = new VectorField(n,m,1,1);
     
     u.x.gradientExit = false;
 
@@ -86,6 +87,7 @@ class BDIM{
   void get_coeffs( Body body ){
     get_del(body);
     get_ub(body);
+    get_wn(body);
     c.eq(del);
     c.timesEq(dt);
     c2.eq(c);
@@ -101,6 +103,15 @@ class BDIM{
         ub.x.a[i][j] = body.velocity(1,dt,(float)(i-0.5),j)*(1.-del.x.a[i][j]);
         ub.y.a[i][j] = body.velocity(2,dt,i,(float)(j-0.5))*(1.-del.y.a[i][j]);
     }}
+  }
+  
+  void get_wn(Body body){
+   /* wall normal direction of the closest body point */
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+        wn.x.a[i][j] = body.WallNormal(1,(float)(i-0.5),j);
+        wn.y.a[i][j] = body.WallNormal(2,i,(float)(j-0.5));
+    }}   
   }
   
   void get_del( Body body ){

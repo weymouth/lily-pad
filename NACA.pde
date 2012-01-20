@@ -13,7 +13,7 @@ void draw(){
   foil.rotate(0.01);
 }
 ********************************/
-class NACA extends ConvexBody{
+class NACA extends Body{
   int m = 100;
   NACA( float x, float y, float c, float t, Window window ){
     super(x,y,window);

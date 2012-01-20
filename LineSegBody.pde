@@ -14,7 +14,7 @@ void setup(){
 }
 ********************************/
 
-class LineSegBody extends ConvexBody{
+class LineSegBody extends Body{
 
   LineSegBody( float x, float y, Window window ){super(x,y,window);}
   

@@ -44,7 +44,7 @@ public class PoissonMatrix {
       float sumd = lower.x.a[i][j]+lower.x.a[i+1][j]
                   +lower.y.a[i][j]+lower.y.a[i][j+1];
       diagonal.a[i][j] = -sumd;
-      if(sumd!=0) inv.a[i][j] = -1./sumd;
+      if(sumd>1e-5) inv.a[i][j] = -1./sumd;
     }}
   }
 
