@@ -4,14 +4,22 @@
  this is the parent of all the body classes
  
  it defines the position and motion of a body
- centriod and the basic operations on a body.
+ centroid and the basic operations on a body 
+ defined by an array of points
  
  example code:
  Body body;
  void setup(){
- size(400,400);
- body = new Body(10,50,new Window(100,100));
- }
+  size(400,400);
+  body = new Body(0,0,new Window(0,0,4,4));
+  body.add(0.5,2.5);
+  body.add(2.75,0.25);
+  body.add(0,0);
+  body.end();
+  body.display();
+  println(body.distance(3.,1.)); // should be sqrt(1/2)
+}
+ 
  void draw(){
  background(0);
  body.update();
@@ -123,13 +131,12 @@ class Body {
     return window.pdx(distance( x, y ));
   }
     
-  float WallNormal(int d, float x, float y  ){
-    PVector wnormal = new PVector(1,1);
+  PVector WallNormal(float x, float y  ){
+    PVector wnormal = new PVector(0,0);
     float dis = -1e10;
     float dis2 = -1e10;
     if(n>4) { // check distance to bounding box
-//      dis = box.distance(x,y);
-      if( box.distance(x,y)>3) return 0;
+      if( box.distance(x,y)>3) return wnormal;
     }
     // check distance to each line, choose max
     for ( OrthoNormal o : orth ){
@@ -140,8 +147,7 @@ class Body {
        wnormal.y=o.ny;
      }
     }
-   if (d==1) return wnormal.x;
-   else      return wnormal.y;
+    return wnormal;
   }
 
 
@@ -230,11 +236,10 @@ class EllipseBody extends Body {
     return (mag((x-xc.x)/a, y-xc.y)-h*0.5);
   }
 
-  float WallNormal(int d, float x, float y) {
+  PVector WallNormal(float x, float y) {
     PVector wnormal = new PVector((x-xc.x)*sq(h*a), (y-xc.y)*sq(h));
     wnormal.normalize(); 
-    if (d==1) return wnormal.x;
-    else      return wnormal.y;
+    return wnormal;
   }
 }
 
