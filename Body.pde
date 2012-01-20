@@ -72,7 +72,7 @@ class Body {
         mx.x = max(mx.x,x.x);
         mx.y = max(mx.y,x.y);
       }
-      box = new ConvexBody(xc.x,xc.y,window);
+      box = new Body(xc.x,xc.y,window);
       box.add(mn.x,mn.y);
       box.add(mn.x,mx.y);
       box.add(mx.x,mx.y);
