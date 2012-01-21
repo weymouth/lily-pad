@@ -24,7 +24,7 @@ class GenMotionBody extends LineSegBody{
   int closest( float x, float y ){
     int j=0; 
     float dis = orth[j].distance(x,y,false);
-    for( int i=1; i<n-1; i++ ){
+    for( int i=1; i<orth.length; i++ ){
       float d = orth[i].distance(x,y,false);
       if(d<dis) {j=i; dis=d;}
     }
@@ -32,7 +32,7 @@ class GenMotionBody extends LineSegBody{
   }
   
   float velocity( int d, float dt, float x, float y ){
-    if(distance(x,y)>2) return 0; 
+    if(box.distance(x,y)>3) return 0; 
     // identify the nearest segment
     int i = closest(x,y);
     // get tangent coordinate of point (0<s<1)
