@@ -55,9 +55,9 @@ class BodyUnion extends Body{
     else return b;
   }
   
-  float WallNormal(int d, float x, float y){
+  PVector WallNormal(float x, float y){
    Body c = closer(x,y);
-   return c.WallNormal(d,x,y); 
+   return c.WallNormal(x,y); 
   }
   
   float velocity( int d, float dt, float x, float y ){
