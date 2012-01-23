@@ -188,8 +188,6 @@ class Body {
       hy = mouseY;
     }
     unsteady = (dxc.mag()!=0)|(dphi!=0);
-    dxc = new PVector(0, 0);
-    dphi = 0;
   }
 
   void mousePressed() {
@@ -201,6 +199,8 @@ class Body {
   }
   void mouseReleased() {
     pressed = false;
+    dxc.set(0, 0, 0);
+    dphi = 0;
   }
 }
 /********************************
