@@ -15,7 +15,8 @@ void setup(){
 ********************************/
 
 class LineSegBody extends Body{
-
+  float thk=5;
+  
   LineSegBody( float x, float y, Window window ){super(x,y,window);}
   
   void add( float x, float y ){coords.add( new PVector( x, y ) );}
@@ -23,9 +24,7 @@ class LineSegBody extends Body{
   void end(){super.end(false);}
   
   void display( color C, Window window ){ // note: can display while adding
-//    if(n>4) box.display(#FFCC00);
-//    fill(C); ellipse(window.px(xc.x),window.py(xc.y),3,3);
-    stroke(C); noFill(); strokeWeight(window.pdx(1.5));
+    stroke(C); noFill(); strokeWeight(window.pdx(thk));
     beginShape();
     for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
     endShape();
@@ -35,12 +34,12 @@ class LineSegBody extends Body{
     float dis = -1e10;
     if(n>4) { // check distance to bounding box
       dis = box.distance(x,y);
-      if(dis>2) return dis;
+      if(dis>3) return dis;
     }
     // get dist to each line segment, choose min
     dis = 1e10;
     for( OrthoNormal o: orth ) dis = min(dis,o.distance(x,y,false));
-    return dis-1.5;
+    return dis-0.5*thk;
   }
 }
 
