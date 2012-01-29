@@ -2,11 +2,18 @@
  Body class
  
  this is the parent of all the body classes
+
+ it defines the position and motion of a convex body. 
  
- it defines the position and motion of a body
- centroid and the basic operations on a body 
- defined by an array of points
+ points added to the body shape must be added clockwise 
+ so that the convexity can be tested.
  
+ basic operations such as translations and rotations are
+ applied to the centroid and the array of points. 
+ 
+ the update function checks for mouse user interaction and
+ updates the `unsteady' flag.
+  
  example code:
  Body body;
  void setup(){
@@ -210,7 +217,7 @@ class Body {
  ********************************/
 class EllipseBody extends Body {
   float h, a; // height and aspect ratio of ellipse
-  int m = 100;
+  int m = 40;
 
   EllipseBody( float x, float y, float d, Window window ) { 
     this(x, y, d, 1.0, window);
@@ -219,16 +226,16 @@ class EllipseBody extends Body {
     super(x, y, window);
     h = _h; 
     a = _a;
+    float dx = 0.5*h*a, dy = 0.5*h;
     for( int i=0; i<m; i++ ){
-      float theta = TWO_PI*i/((float)m);
-      add(xc.x+h*a*cos(theta),xc.y+h*sin(theta));      
+      float theta = -TWO_PI*i/((float)m);
+      add(xc.x+dx*cos(theta),xc.y+dy*sin(theta));      
     }
-    end(); // finalizes shape
+    end(); // finalize shape
   }
 
   void display( color C, Window window ) {
-    fill(C);
-    noStroke();
+    fill(C); noStroke();
     ellipse(window.px(xc.x), window.py(xc.y), window.pdx(h*a), window.pdy(h));
   }
 
@@ -241,5 +248,7 @@ class EllipseBody extends Body {
     wnormal.normalize(); 
     return wnormal;
   }
+  
+  void rotate(float dphi){return;}// no rotation
 }
 
