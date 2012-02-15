@@ -15,6 +15,8 @@ void draw(){
 ********************************/
 class NACA extends Body{
   int m = 100;
+  float c;
+  
   NACA( float x, float y, float c, float t, Window window ){
     super(x,y,window);
     add(xc.x-c*0.25,xc.y);
@@ -28,6 +30,7 @@ class NACA extends Body{
       add(xc.x+c*(xx-0.25),xc.y-t*c*offset(xx));
     }
     end(); // finalizes shape
+    this.c = c;
   }
   
   float[][] interp( Field a ){

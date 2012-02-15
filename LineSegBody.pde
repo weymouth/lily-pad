@@ -34,7 +34,7 @@ class LineSegBody extends Body{
     float dis = -1e10;
     if(n>4) { // check distance to bounding box
       dis = box.distance(x,y);
-      if(dis>3) return dis;
+      if(dis>3+thk) return dis;
     }
     // get dist to each line segment, choose min
     dis = 1e10;
