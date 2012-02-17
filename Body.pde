@@ -209,6 +209,16 @@ class Body {
     dxc.set(0, 0, 0);
     dphi = 0;
   }
+
+  PVector pressForce ( Field p ){
+    PVector pv = new PVector(0,0);
+    for( OrthoNormal o: orth ){
+      float pdl = p.linear( o.cen.x, o.cen.y )*o.l;
+      pv.add(pdl*o.nx,pdl*o.ny,0);
+    }
+    return pv;
+  }
+
 }
 /********************************
  EllipseBody class
@@ -250,5 +260,10 @@ class EllipseBody extends Body {
   }
   
   void rotate(float dphi){return;}// no rotation
+
+  PVector pressForce ( Field p ){
+    PVector pv = super.pressForce(p);
+    return PVector.div(pv,h);
+  }
 }
 

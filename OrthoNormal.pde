@@ -2,6 +2,7 @@
 
 class OrthoNormal{
   float l,nx,ny,tx,ty,off,t1,t2;
+  PVector cen;
 
   OrthoNormal(){ this(new PVector(0,0), new PVector(0,1));}
   OrthoNormal(PVector x1, PVector x2 ){ // set the ortho-normal values based on two points
@@ -12,6 +13,8 @@ class OrthoNormal{
     t2 = x2.x*tx+x2.y*ty;  // tangent location of point 2
     nx = -ty; ny = tx;     // normal vector
     off = x1.x*nx+x1.y*ny; // normal offset
+    cen = PVector.add(x1,x2); // centriod
+    cen.div(2.);
   }
 
   float distance( float x, float y, Boolean projected){ // distance function
@@ -32,6 +35,7 @@ class OrthoNormal{
     t1 += dx*tx+dy*ty;
     t2 += dx*tx+dy*ty;
     off += dx*nx+dy*ny;
+    cen.add(dx,dy,0);
   }
 
   void print(){
