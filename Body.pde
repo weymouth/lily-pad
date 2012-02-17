@@ -250,11 +250,11 @@ class EllipseBody extends Body {
   }
 
   float distance( float x, float y) {
-    return (mag((x-xc.x)/a, y-xc.y)-h*0.5);
+    return (1-0.5*h/mag((x-xc.x)/a, y-xc.y))*mag(x-xc.x, y-xc.y);
   }
 
   PVector WallNormal(float x, float y) {
-    PVector wnormal = new PVector((x-xc.x)*sq(h*a), (y-xc.y)*sq(h));
+    PVector wnormal = new PVector((x-xc.x)/a, (y-xc.y)*a);
     wnormal.normalize(); 
     return wnormal;
   }
