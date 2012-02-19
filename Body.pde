@@ -250,7 +250,8 @@ class EllipseBody extends Body {
   }
 
   float distance( float x, float y) {
-    return (1-0.5*h/(1e-10+mag((x-xc.x)/a, y-xc.y)))*mag(x-xc.x, y-xc.y);
+    if(x==xc.x & y==xc.y) return -0.5*h*a;
+    return (1-0.5*h/mag((x-xc.x)/a, y-xc.y))*mag(x-xc.x, y-xc.y);
   }
 
   PVector WallNormal(float x, float y) {
