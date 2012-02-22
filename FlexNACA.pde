@@ -4,7 +4,7 @@ FlexNACA: NACA foil with superimposed traveling wave motions
 
 Adding the wave to the body makes it non-convex and adds divergence to the body velocity.
 Therefore a second geom "orig" is used to hold the original NACA coords.
-Transformations are applied to the distance and normal calculations on this convex geom.
+Transformations are applied to the distance and normal calculations on the convex original geom.
 The divergence free wave velocity is use for the body velocity field.
 
 ********************************/
@@ -50,7 +50,7 @@ class FlexNACA extends NACA{
     else return v+hdot(x); 
   }
   
-  void translate( float dx, float dy ){ // translate both geoms
+  void translate( float dx, float dy ){ // translate both geoms and wave
     super.translate(dx,dy);
     orig.translate(dx,dy);
     x0+=dx;
@@ -69,16 +69,16 @@ class FlexNACA extends NACA{
    The amplitude envelope is polynomial. 
    The time and space derivatives are needed for the transforms above. */
   float Ax( float x){
-    float amp = 0;
-    for (int i=0; i<a.length; i++) amp += a[i]*pow((x-x0)/c,i);
+    float amp = a[0];
+    for (int i=1; i<a.length; i++) amp += a[i]*pow((x-x0)/c,i);
     return amp;
   }
   float arg( float x)   { return k*(x-x0)-omega*time; }
   float h( float x )    { return Ax(x)*sin(arg(x)); }
   float hdot( float x ) { return -Ax(x)*omega*cos(arg(x)); }
   float dhdx( float x ) { // = A k cos + dA/dx sin
-    float amp = 0; // dAdx
-    for (int i=1; i<a.length; i++) amp += a[i]*(float)i/c*pow((x-x0)/c,i-1);
+    float amp = a[1]/c; // dAdx
+    for (int i=2; i<a.length; i++) amp += a[i]*(float)i/c*pow((x-x0)/c,i-1);
     return Ax(x)*k*cos(arg(x))+amp*sin(arg(x)); 
   }  
 }
