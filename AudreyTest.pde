@@ -68,7 +68,7 @@ class AudreyTest{
     window = new Window(n/6,m/5,n/2,m/2);
     window2 = new Window(n/6,m/5,n/2,m/2);
 
-    body = new BodyUnion( new NACA(xFoil*n,yFoil*m,resolution,0.12,window), new EllipseBody(xStart*resolution,yStart*resolution,cDiameter*resolution,window));
+    body = new BodyUnion( new NACA(xFoil*n,yFoil*m,resolution,0.12,window), new CircleBody(xStart*resolution,yStart*resolution,cDiameter*resolution,window));
 
     flow = new BDIM(n,m,dt,body,(float) resolution/Re,QUICK);
 

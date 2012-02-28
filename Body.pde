@@ -229,9 +229,6 @@ class EllipseBody extends Body {
   float h, a; // height and aspect ratio of ellipse
   int m = 40;
 
-  EllipseBody( float x, float y, float d, Window window ) { 
-    this(x, y, d, 1.0, window);
-  }
   EllipseBody( float x, float y, float _h, float _a, Window window) {
     super(x, y, window);
     h = _h; 
@@ -267,6 +264,23 @@ class EllipseBody extends Body {
   PVector pressForce ( Field p ){
     PVector pv = super.pressForce(p);
     return PVector.div(pv,h);
+  }
+}
+/* CircleBody
+  simplified rotation and distance function */
+class CircleBody extends EllipseBody {
+
+  CircleBody( float x, float y, float d, Window window ){
+    super(x, y, d, 1.0, window);
+  }
+
+  float distance( float x, float y){
+    return mag(x-xc.x,y-xc.y)-0.5*h;
+  }
+
+  void rotate(float _dphi){
+    dphi = _dphi;
+    phi = phi+dphi;
   }
 }
 
