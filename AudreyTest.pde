@@ -11,7 +11,7 @@ SaveData dat;
 AudreyTest test;
 
 void setup(){
-  int resolution = 128, xLengths=5, yLengths=3, zoom = 1;
+  int resolution = 64, xLengths=5, yLengths=3, zoom = 1;
   float xStart = 1, yDist = 0.06;
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
   mm = new MovieMaker(this, width, height, "foil_d006D01Re500.mov", 30);
@@ -46,7 +46,7 @@ void keyPressed(){
 
 class AudreyTest{
   final int n,m, resolution, NT=1;
-  float dt = 2.5, t, t0, Re=500, cDiameter = 0.5;
+  float dt = 2.5, t, t0, Re=50000, cDiameter = 0.5;
   boolean QUICK = true, order2 = true;
   BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2;
   
@@ -87,6 +87,7 @@ class AudreyTest{
      dt = flow.checkCFL();
      flow.dt = dt;}
      body.b.translate(dt,0);
+     body.update();
      flow.update(body);
      if (order2) {flow.update2(body);}
     print("t="+nfs(t,2,2)+";  ");

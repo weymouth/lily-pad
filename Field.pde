@@ -273,6 +273,20 @@ class Field{
       a[i][j] += b;
     }}
   }
+  Field minus( Field b ){
+    Field c = new Field(this);
+    for( int i=0; i<n; i++){
+    for( int j=0; j<m; j++){
+      c.a[i][j] -= b.a[i][j];
+    }}
+    return c;
+  }
+  void minusEq( Field b ){
+    for( int i=0; i<n; i++){
+    for( int j=0; j<m; j++){
+      a[i][j] -= b.a[i][j];
+    }}
+  }
   Field inv(){
     Field c = new Field(this);
     for( int i=0; i<n; i++){

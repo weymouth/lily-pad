@@ -43,6 +43,16 @@ class VectorField{
     y.setBC(); 
   }
 
+  VectorField normalGrad(VectorField wnx, VectorField wny){
+    VectorField g = new VectorField(n,m,0,0);
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+      g.x.a[i][j] = 0.5*(wnx.x.a[i][j]*(x.a[i+1][j]-x.a[i-1][j])+wny.x.a[i][j]*(x.a[i][j+1]-x.a[i][j-1]));
+      g.y.a[i][j] = 0.5*(wnx.y.a[i][j]*(y.a[i+1][j]-y.a[i-1][j])+wny.y.a[i][j]*(y.a[i][j+1]-y.a[i][j-1]));
+    }}
+    return g; 
+  }
+
   Field divergence (){
     // returns div{this} for unit cells
     Field d = new Field( n, m );
@@ -168,11 +178,43 @@ class VectorField{
     return min(0.5/b,0.25/nu);
   }
   
+    VectorField times( VectorField b){
+    VectorField g = new VectorField(this);
+    g.timesEq(b);
+    return g;
+  }
+  
+  VectorField times( float b){
+    VectorField g = new VectorField(this);
+    g.timesEq(b);
+    return g;
+  }
+  
+  VectorField plus( VectorField b){
+    VectorField g = new VectorField(this);
+    g.plusEq(b);
+    return g;
+  }
+  
+  VectorField minus( VectorField b){
+    VectorField g = new VectorField(this);
+    g.minusEq(b);
+    return g;
+  }
+  
+  VectorField plus( float b){
+    VectorField g = new VectorField(this);
+    g.plusEq(b);
+    return g;
+  }  
+  
   void eq( VectorField b ){ x.eq(b.x); y.eq(b.y);}
   void eq( float b ){ x.eq(b); y.eq(b);}
   void timesEq( VectorField b ){ x.timesEq(b.x); y.timesEq(b.y);}
   void timesEq( float b ){ x.timesEq(b); y.timesEq(b);}
   void plusEq( VectorField b ){ x.plusEq(b.x); y.plusEq(b.y);}
+  void plusEq( float b ){ x.plusEq(b); y.plusEq(b);}  
+  void minusEq( VectorField b ){ x.minusEq(b.x); y.minusEq(b.y);}  
   void advect( float dt, VectorField b ){ x.advect(dt,b); y.advect(dt,b);}
   void advect( float dt, VectorField b, VectorField b0 ){ x.advect(dt,b,b0); y.advect(dt,b,b0);}
 }
