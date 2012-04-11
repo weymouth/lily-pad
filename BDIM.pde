@@ -10,7 +10,7 @@ class BDIM{
   float dt, nu, eps=2.0; // time resolution
   VectorField u,del,del1,c,u0,u1,c2,ub,wnx,wny,distance;
   Field p;
-  boolean QUICK;
+  boolean QUICK, mu1=true;
 
   BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){
     this.n = n; this.m = m;
@@ -47,7 +47,7 @@ class BDIM{
     u1.eq(u.minus(ub));
     u.timesEq(del);
     u.minusEq(ub.times(del.plus(-1)));
-    u.plusEq(del1.times(u1.normalGrad(wnx,wny)));  // first order correction
+    if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));  // first order correction
     u.setBC();
     p = u.project(c,p);
   }
@@ -63,7 +63,7 @@ class BDIM{
       u1.eq(u.minus(ub));
       u.timesEq(del);
       u.minusEq(ub.times(del.plus(-1)));
-      u.plusEq(del1.times(u1.normalGrad(wnx,wny)));   // first order correction
+      if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));   // first order correction
       u.setBC();
       p = u.project(c,p);
       u.plusEq(u0);
@@ -80,7 +80,7 @@ class BDIM{
       u.plusEq(dp);
       u.timesEq(del);
       u.minusEq(ub.times(del.plus(-1)));
-      u.plusEq(del1.times(u1.normalGrad(wnx,wny)));
+      if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));
       u.setBC();
       p = u.project(c2,p);
     }
