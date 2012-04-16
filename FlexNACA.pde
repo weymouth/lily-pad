@@ -42,7 +42,9 @@ class FlexNACA extends NACA{
   PVector WallNormal(float x, float y  ){ // shift y and adjust orig normal
     PVector n = orig.WallNormal(x,y-h(x));
     n.x -= dhdx(x)*n.y;
-    return PVector.div(n,n.mag());
+    float m = n.mag();
+    if(m>0) return PVector.div(n,m);
+    else return n;
   }
   float velocity( int d, float dt, float x, float y ){ // use wave velocity
     float v = super.velocity(d,dt,x,y);
