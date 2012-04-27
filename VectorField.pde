@@ -64,6 +64,17 @@ class VectorField{
     return d;
   }
 
+  Field ke (){
+    // returns {this}.{this} for unit cells
+    Field d = new Field( n, m );
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+      d.a[i][j] = (sq(x.a[i+1][j]+x.a[i][j]-2.0)+
+                   sq(y.a[i][j+1]+y.a[i][j]))*0.25;
+    }}
+    return d;
+  }
+
   Field vorticity (){
     Field d = new Field( n, m );
     for ( int i=1 ; i<n-1 ; i++ ) {

@@ -59,13 +59,14 @@ class FlexNACA extends NACA{
   }
   void rotate( float dphi ){} // no rotation
 
-  void update(float dt) { // update time and coords
-    for ( PVector x: coords ) x.y -= h(x.x);
-    time += dt;
+  void update(float time) { // update time and coords
+    for ( int i=0; i<coords.size(); i++ ) coords.set(i,orig.coords.get(i).get());
+    this.time = time;
     for ( PVector x: coords ) x.y += h(x.x);
     getOrth();
     unsteady = true;
   }
+  
 
 /* The wave is given by h = A(x)*sin(k*x-omega*t)
    The amplitude envelope is polynomial. 
