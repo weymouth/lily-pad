@@ -59,14 +59,14 @@ class BDIM{
           u = del*(u0(x0)-0.5*dt*(grad(p*(x0))+grad(p)))+ub  */
     VectorField us = new VectorField(u); // set u*=u from O(dt) update()
     if(QUICK){
-      us.AdvDif(u, dt, nu);
+      u0.AdvDif(u, dt, nu);
       u1.eq(u.minus(ub));
       u.timesEq(del);
       u.minusEq(ub.times(del.plus(-1)));
       if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));   // first order correction
       u.setBC();
       p = u.project(c,p);
-      u.plusEq(u0);
+      u.plusEq(us);
       u.timesEq(0.5); 
     }
     else{
