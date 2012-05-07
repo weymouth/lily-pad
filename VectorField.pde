@@ -127,8 +127,8 @@ class VectorField{
    void AdvDif(VectorField u1, float dt, float nu) {
     for ( int j=1; j<m-1; j++) {
       for ( int i=1; i<n-1; i++) {
-        u1.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+x.a[i][j];
-        u1.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+y.a[i][j];
+        u1.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+u1.x.a[i][j];
+        u1.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+u1.y.a[i][j];
       }
     }   
   }

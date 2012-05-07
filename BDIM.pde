@@ -59,7 +59,8 @@ class BDIM{
           u = del*(u0(x0)-0.5*dt*(grad(p*(x0))+grad(p)))+ub  */
     VectorField us = new VectorField(u); // set u*=u from O(dt) update()
     if(QUICK){
-      u0.AdvDif(u, dt, nu);
+      u.eq(u0);
+      us.AdvDif(u, dt, nu);
       u1.eq(u.minus(ub));
       u.timesEq(del);
       u.minusEq(ub.times(del.plus(-1)));
