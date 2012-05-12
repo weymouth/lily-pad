@@ -74,6 +74,7 @@ class Field{
       g.x.a[i][j] = a[i][j]-a[i-1][j];
       g.y.a[i][j] = a[i][j]-a[i][j-1];
     }}
+    g.setBC(); // issues?
     return g;
   }
 

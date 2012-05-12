@@ -124,13 +124,15 @@ class VectorField{
     popMatrix();
   } 
   
-   void AdvDif(VectorField u1, float dt, float nu) {
-    for ( int j=1; j<m-1; j++) {
+   void AdvDif(VectorField u0, float dt, float nu) {
+     VectorField v = new VectorField(this);
+     for ( int j=1; j<m-1; j++) {
       for ( int i=1; i<n-1; i++) {
-        u1.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+u1.x.a[i][j];
-        u1.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+u1.y.a[i][j];
+        v.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+u0.x.a[i][j];
+        v.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+u0.y.a[i][j];
       }
-    }   
+    }
+    this.eq(v);   
   }
 
   float advection (Field b, int i, int j) {  

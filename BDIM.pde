@@ -1,9 +1,39 @@
 /*********************************************************
 solve the BDIM equation for velocity and pressure
-  assuming a stationary body and single phase uniform flow
+  assuming a single phase
 
-   u = del*[u0-dt*(u0.grad{u0}+f_grav)]+(1-del)*U
+  u = del*F+[1-del]*u_b+del_1*ddn(F-u_b)
+  
+  where 
+    del is the zeroth moment of the smoothing kernel
+    del_1 is the first moment (zero if mu1=false)
+    u_b is the body velocity
+    F is the fluid equation of motion:
+    if(QUICK):
+      F(u) = u(t)+\int_t^{t+dt} grad(u*u)+\mu*laplace(u)-grad(p) \d t
+    else(SEMI-LAGRANGIAN)
+      F(u) = u(t,x(t))-\int_t^{t+dt} grad(p) \d t
+      
+    where x(t) is the back-casted location of the grid points
+      x(t) = x-\int_t^{t+dt} u \d t
 
+Example code:
+
+BDIM flow;
+CircleBody body;
+void setup(){
+  size(400,400); 
+  int n=(int)pow(2,6)+2; // multigrid solver needs n = power of 2 
+  Window view = new Window(n,n);
+  body = new CircleBody(n/3,n/2,n/8,view);
+  flow = new BDIM(n,n,1.5,body);
+}
+void draw(){
+  flow.update();  // project
+  flow.update2(); // correct
+  flow.u.vorticity().display(-0.75,0.75);
+  body.display();
+}
 *********************************************************/
 class BDIM{
   int n,m; // number of cells in uniform grid
@@ -19,7 +49,6 @@ class BDIM{
     this.QUICK=QUICK;
     u = new VectorField(n,m,1,0);
     u0 = new VectorField(n,m,0,0);
-    u1 = new VectorField(n,m,0,0);
     p = new Field(n,m);
     ub  = new VectorField(n,m,0,0);
     distance =  new VectorField(n, m, 10, 10);    
@@ -38,64 +67,50 @@ class BDIM{
   BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,1,false);}
   
   void update(){
-    /* O(dt,dx^2) BDIM update
-          x0 = x-dt*u0
-          u = del*(u0(x0)-dt*grad(p))+ub  */
+    // O(dt,dx^2) BDIM projection step:
     u0.eq(u);
-    if(QUICK) u0.AdvDif(u,dt,nu);
-    else u.advect(dt,u0);
-    u1.eq(u.minus(ub));
-    u.timesEq(del);
-    u.minusEq(ub.times(del.plus(-1)));
-    if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));  // first order correction
-    u.setBC();
-    p = u.project(c,p);
+    VectorField F = new VectorField(u);
+    if(QUICK) F.AdvDif( u0, dt, nu );
+    else F.advect( dt, u0 );
+    updateUP( F, c );
   }
   
   void update2(){
-    /* O(dt^2,dt^2) BDIM update
-          u* from O(dt) update()
-          x0 = x-0.5*dt*(u*+u0(x-dt*u*))
-          u = del*(u0(x0)-0.5*dt*(grad(p*(x0))+grad(p)))+ub  */
-    VectorField us = new VectorField(u); // set u*=u from O(dt) update()
+    // O(dt^2,dt^2) BDIM correction step:
+    VectorField us = new VectorField(u), F = new VectorField(u);
     if(QUICK){
-      u.eq(u0);
-      us.AdvDif(u, dt, nu);
-      u1.eq(u.minus(ub));
-      u.timesEq(del);
-      u.minusEq(ub.times(del.plus(-1)));
-      if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));   // first order correction
-      u.setBC();
-      p = u.project(c,p);
-      u.plusEq(us);
-      u.timesEq(0.5); 
+      F.AdvDif( u0, dt, nu );
+      updateUP( F, c );
+      u.plusEq(us); 
+      u.timesEq(0.5); // c=del*dt; u,p are in/out;
     }
     else{
-      u.eq(u0);                            // reset u
-      VectorField dp = p.gradient();
-      dp.setBC();
-      u.advect(dt,us,u0);  // O(dt^2) advect for both u0
-      u1.eq(u.minus(ub));
-      dp.advect(dt,us,u0); // ... and grad(p)
-      dp.timesEq(-0.5*dt);
-      u.plusEq(dp);
-      u.timesEq(del);
-      u.minusEq(ub.times(del.plus(-1)));
-      if(mu1) u.plusEq(del1.times(u1.normalGrad(wnx,wny)));
-      u.setBC();
-      p = u.project(c2,p);
+      F.eq(u0.minus(p.gradient().times(0.5*dt)));
+      F.advect(dt,us,u0); 
+      updateUP( F, c2 );
     }
+  }
+  
+  void updateUP( VectorField R, VectorField coeff ){
+/*  Seperate out the pressure from the forcing
+      del*F = del*R+coeff*gradient(p)
+    Approximate update (dropping ddn(grad(p)))
+      u = del*R+coeff*gradient(p)+[1-del]*u_b+del_1*ddn(R-u_b)
+    Take the divergence
+      div(u) = div(coeff*gradient(p)+stuff) = 0
+    u.project solves this equation for p and then projects onto u
+*/
+    u.eq(del.times(R).minus(ub.times(del.plus(-1))));
+    if(mu1) u.plusEq(del1.times((R.minus(ub)).normalGrad(wnx,wny)));
+    u.setBC();
+    p = u.project(coeff,p);    
   }
 
   void update( Body body ){
-    if(body.unsteady||QUICK){get_coeffs(body);}else{ub.eq(0.);}
+    if(body.unsteady){get_coeffs(body);}else{ub.eq(0.);}
     update();
   }
-
-  void update2( Body body ){
-    if(body.unsteady||QUICK){get_coeffs(body);}else{ub.eq(0.);}
-    update2();
-  }
+  void update2( Body body ){update2();} // don't need to get coeffs again
 
   void get_coeffs( Body body ){
     get_dist(body);
