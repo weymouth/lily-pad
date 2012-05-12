@@ -5,7 +5,7 @@ solve the BDIM equation for velocity and pressure
   u = del*F+[1-del]*u_b+del_1*ddn(F-u_b)
   
   where 
-    del is the zeroth moment of the smoothing kernel
+    del is the zeroth moment of the smoothing kernel integral
     del_1 is the first moment (zero if mu1=false)
     u_b is the body velocity
     F is the fluid equation of motion:
@@ -40,16 +40,20 @@ class BDIM{
   float dt, nu, eps=2.0; // time resolution
   VectorField u,del,del1,c,u0,u1,c2,ub,wnx,wny,distance;
   Field p;
-  boolean QUICK, mu1=true;
+  boolean QUICK, mu1=true, adaptive=false;
 
   BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){
     this.n = n; this.m = m;
     this.dt = dt;
     this.nu=nu;
     this.QUICK=QUICK;
+
     u = new VectorField(n,m,1,0);
+    u.x.gradientExit = true;
     u0 = new VectorField(n,m,0,0);
     p = new Field(n,m);
+    if(dt==0) setDt(); // adaptive time stepping for O(2) QUICK
+
     ub  = new VectorField(n,m,0,0);
     distance =  new VectorField(n, m, 10, 10);    
     del = new VectorField(n,m,1,1);
@@ -58,10 +62,7 @@ class BDIM{
     c2 = new VectorField(c);
     wnx = new VectorField(n,m,0,0);
     wny = new VectorField(n,m,0,0);
-    
-    u.x.gradientExit = true;
-
-    get_coeffs(body);    
+    get_coeffs(body);
   }
   
   BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,1,false);}
@@ -83,6 +84,7 @@ class BDIM{
       updateUP( F, c );
       u.plusEq(us); 
       u.timesEq(0.5); // c=del*dt; u,p are in/out;
+      if(adaptive) dt = checkCFL();
     }
     else{
       F.eq(u0.minus(p.gradient().times(0.5*dt)));
@@ -203,5 +205,10 @@ class BDIM{
   
   float checkCFL() { 
     return min(u.CFL(nu), 1);
+  }
+  
+  void setDt(){
+    dt = checkCFL();
+    if(QUICK) adaptive = true;
   }
 }
