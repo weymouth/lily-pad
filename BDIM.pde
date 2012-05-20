@@ -1,6 +1,5 @@
 /*********************************************************
 solve the BDIM equation for velocity and pressure
-  assuming a single phase
 
   u = del*F+[1-del]*u_b+del_1*ddn(F-u_b)
   
@@ -10,9 +9,9 @@ solve the BDIM equation for velocity and pressure
     u_b is the body velocity
     F is the fluid equation of motion:
     if(QUICK):
-      F(u) = u(t)+\int_t^{t+dt} grad(u*u)+\mu*laplace(u)-grad(p) \d t
+      F(u) = u(t)+\int_t^{t+dt} grad(u*u)+\mu*laplace(u)+g-grad(p)/rho \d t
     else(SEMI-LAGRANGIAN)
-      F(u) = u(t,x(t))-\int_t^{t+dt} grad(p) \d t
+      F(u) = u(t,x(t))+\int_t^{t+dt} g-grad(p)/rho \d t
       
     where x(t) is the back-casted location of the grid points
       x(t) = x-\int_t^{t+dt} u \d t
@@ -37,8 +36,8 @@ void draw(){
 *********************************************************/
 class BDIM{
   int n,m; // number of cells in uniform grid
-  float dt, nu, eps=2.0; // time resolution
-  VectorField u,del,del1,c,u0,u1,c2,ub,wnx,wny,distance;
+  float dt, nu, eps=2.0, g=0;
+  VectorField u,del,del1,c,u0,ub,wnx,wny,distance,rhoi;
   Field p;
   boolean QUICK, mu1=true, adaptive=false;
 
@@ -58,8 +57,8 @@ class BDIM{
     distance =  new VectorField(n, m, 10, 10);    
     del = new VectorField(n,m,1,1);
     del1 = new VectorField(n,m,0,0);
+    rhoi = new VectorField(del);
     c = new VectorField(del);
-    c2 = new VectorField(c);
     wnx = new VectorField(n,m,0,0);
     wny = new VectorField(n,m,0,0);
     get_coeffs(body);
@@ -83,13 +82,13 @@ class BDIM{
       F.AdvDif( u0, dt, nu );
       updateUP( F, c );
       u.plusEq(us); 
-      u.timesEq(0.5); // c=del*dt; u,p are in/out;
+      u.timesEq(0.5);
       if(adaptive) dt = checkCFL();
     }
     else{
-      F.eq(u0.minus(p.gradient().times(0.5*dt)));
+      F.eq(u0.minus(p.gradient().times(rhoi.times(0.5*dt))));
       F.advect(dt,us,u0); 
-      updateUP( F, c2 );
+      updateUP( F, c.times(0.5) );
     }
   }
   
@@ -102,6 +101,7 @@ class BDIM{
       div(u) = div(coeff*gradient(p)+stuff) = 0
     u.project solves this equation for p and then projects onto u
 */
+    R.y.plusEq(g*dt);
     u.eq(del.times(R).minus(ub.times(del.plus(-1))));
     if(mu1) u.plusEq(del1.times((R.minus(ub)).normalGrad(wnx,wny)));
     u.setBC();
@@ -120,10 +120,7 @@ class BDIM{
     get_del1();
     get_ub(body);
     get_wn(body);
-    c.eq(del);
-    c.timesEq(dt);
-    c2.eq(c);
-    c2.timesEq(0.5);
+    c.eq(del.times(rhoi.times(dt)));
   }
   
   void get_ub( Body body ){

@@ -90,7 +90,7 @@ class VectorField{
          div{coeffs*grad{p}} = div{u}  (1)
          u -= coeffs*grad{p}           (2)
        and returns the field p. all FDs are on unit cells */
-    p = MGsolver( 10, new PoissonMatrix(coeffs), p , this.divergence() );
+    p = MGsolver( 20, new PoissonMatrix(coeffs), p , this.divergence() );
     p.plusEq(-1*p.sum()/(float)((n-2)*(m-2)));
     VectorField dp = p.gradient();
     x.plusEq(coeffs.x.times(dp.x.times(-1)));
@@ -191,7 +191,7 @@ class VectorField{
     return min(0.5/b,0.25/nu);
   }
   
-    VectorField times( VectorField b){
+  VectorField times( VectorField b){
     VectorField g = new VectorField(this);
     g.timesEq(b);
     return g;
@@ -220,6 +220,12 @@ class VectorField{
     g.plusEq(b);
     return g;
   }  
+
+  VectorField inv(){ 
+    VectorField g = new VectorField(this);
+    g.invEq();
+    return g;
+  }
   
   void eq( VectorField b ){ x.eq(b.x); y.eq(b.y);}
   void eq( float b ){ x.eq(b); y.eq(b);}
@@ -230,5 +236,6 @@ class VectorField{
   void minusEq( VectorField b ){ x.minusEq(b.x); y.minusEq(b.y);}  
   void advect( float dt, VectorField b ){ x.advect(dt,b); y.advect(dt,b);}
   void advect( float dt, VectorField b, VectorField b0 ){ x.advect(dt,b,b0); y.advect(dt,b,b0);}
+  void invEq(){ x.invEq(); y.invEq();}  
 }
 

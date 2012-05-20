@@ -149,4 +149,7 @@ class SharpField extends Field{
     }
   return s;
   }
+
+  void display(){ super.display( 0, 1 ); }
+
 }
