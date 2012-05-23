@@ -95,7 +95,7 @@ class BDIM{
   void updateUP( VectorField R, VectorField coeff ){
 /*  Seperate out the pressure from the forcing
       del*F = del*R+coeff*gradient(p)
-    Approximate update (dropping ddn(grad(p)))
+    Approximate update (dropping ddn(grad(p))) which doesn't affect the accuracy of the velocity
       u = del*R+coeff*gradient(p)+[1-del]*u_b+del_1*ddn(R-u_b)
     Take the divergence
       div(u) = div(coeff*gradient(p)+stuff) = 0
@@ -188,7 +188,7 @@ class BDIM{
     } else if( d >= eps ){
       return 1;
     } else{
-      return 0.5*(1.+d/eps*(2.-abs(d/eps)));
+      return 0.5*(1.+d/eps+sin(PI*d/eps)/PI);
     } 
   }
   
@@ -196,7 +196,7 @@ class BDIM{
     if( abs(d) >= eps){
       return 0;
     } else{
-        return 1./3.*(1.-sq(d/eps)*(3-2*abs(d/eps)));
+        return 0.25*(eps-sq(d)/eps)-1/TWO_PI*(d*sin(d*PI/eps)+eps/PI*(1+cos(d*PI/eps)));
     } 
   }
   
