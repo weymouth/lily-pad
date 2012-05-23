@@ -36,6 +36,7 @@ class TwoPhase extends BDIM{
   }
 
   void update(){
+    f.strang = (f.strang+1)%2; // strang operator splitting
     getRhoCoeffs();
     f0.eq(f);
     f.advect( dt, u0 );
