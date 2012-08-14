@@ -30,7 +30,7 @@ class InlineFoilTest {
   FloodPlot flood, flood2; 
   Window window;
 
-  InlineFoilTest( int resolution, int xLengths, int yLengths, int xStart, float zoom, int Re) {
+  InlineFoilTest( int resolution, int xLengths, int yLengths, int xStart, float zoom, int Re, boolean QUICK) {
     this.resolution = resolution;
     n = xLengths*resolution+2;
     m = yLengths*resolution+2;
@@ -40,7 +40,7 @@ class InlineFoilTest {
     window = new Window(n, m);
 
     foil = new NACA(xStart*resolution, m/2, resolution*chord, .12, window);
-    flow = new BDIM(n, m, dt, foil, (float)resolution/Re, true);
+    flow = new BDIM(n, m, dt, foil, (float)resolution/Re, QUICK);
 
     flood = new FloodPlot(window);
     flood.range = new Scale(-1, 1);

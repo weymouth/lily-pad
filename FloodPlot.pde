@@ -28,7 +28,7 @@ class FloodPlot{
   Scale range = new Scale(0,1);
   Scale hue = new Scale(200,0);
   Scale sat = new Scale(1,1);
-  boolean sequential=false,legendOn=false;
+  boolean sequential=false,legendOn=false,dark=true;
 
   FloodPlot( Window window ){
     this.window = window;
@@ -50,11 +50,13 @@ class FloodPlot{
     if(sequential){          // blend hue and saturation
       return color(hue.out(i),sat.out(i),1);
     } 
-    else if(i<0.5) {       // blend from low end to black
-      return color(hue.outS,sat.outS,1-2*i);
+    else if(i<0.5) {       // blend from low end to black/white
+      if (dark) {return color(hue.outS,sat.outS,1-2*i);}
+      else {return color(hue.outS,(0.5-i)*2,1);}
     } 
-    else {                 // blend from high end to black
-      return color(hue.outE,sat.outE,2*i-1);
+    else {                 // blend from high end to black/white
+      if (dark) {return color(hue.outE,sat.outE,2*i-1);}
+      else {return color(hue.outE,(i-0.5)*2,1);}
     }
   } 
 
@@ -81,6 +83,11 @@ class FloodPlot{
   void setLegend(String title){
     legend = new LegendPlot(this,title);
     legendOn = true;
+  }
+  void setColorMode(int mode){
+    if (mode==1){dark = false;}
+    if (mode==2){sequential = true;}
+    if (legendOn){legend.setColorMode(mode);}
   }
   class LegendPlot extends FloodPlot{
     String title;
@@ -113,7 +120,11 @@ class FloodPlot{
       Scale x = new Scale(low,high,x0,x1);
 
       textFont(font);
+      if (dark){
       fill((sequential)?0:360,.75);
+      }else{
+        fill(#000000);
+      }
       textAlign(RIGHT,CENTER);
       text(title,x0,0.5*(y0+y1));
       textAlign(CENTER,BASELINE);
