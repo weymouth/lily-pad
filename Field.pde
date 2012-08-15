@@ -74,6 +74,7 @@ class Field{
       g.x.a[i][j] = a[i][j]-a[i-1][j];
       g.y.a[i][j] = a[i][j]-a[i][j-1];
     }}
+    g.setBC(); // issues?
     return g;
   }
 
@@ -233,18 +234,8 @@ class Field{
     }}
     return c;
   }
-  void timesEq( float b ){
-    for( int i=0; i<n; i++){
-    for( int j=0; j<m; j++){
-      a[i][j] *= b;
-    }}
-  }
-  void timesEq( Field b ){
-    for( int i=0; i<n; i++){
-    for( int j=0; j<m; j++){
-      a[i][j] *= b.a[i][j];
-    }}
-  }
+  void timesEq( float b ){ eq(times(b)); }
+  void timesEq( Field b ){ eq(times(b)); }
   Field plus( float b ){
     Field c = new Field(this);
     for( int i=0; i<n; i++){
@@ -261,18 +252,8 @@ class Field{
     }}
     return c;
   }
-  void plusEq( Field b ){
-    for( int i=0; i<n; i++){
-    for( int j=0; j<m; j++){
-      a[i][j] += b.a[i][j];
-    }}
-  }
-  void plusEq( float b ){
-    for( int i=0; i<n; i++){
-    for( int j=0; j<m; j++){
-      a[i][j] += b;
-    }}
-  }
+  void plusEq( Field b ){ eq(plus(b)); }
+  void plusEq( float b ){ eq(plus(b)); }
   Field minus( Field b ){
     Field c = new Field(this);
     for( int i=0; i<n; i++){
@@ -281,12 +262,7 @@ class Field{
     }}
     return c;
   }
-  void minusEq( Field b ){
-    for( int i=0; i<n; i++){
-    for( int j=0; j<m; j++){
-      a[i][j] -= b.a[i][j];
-    }}
-  }
+  void minusEq( Field b ){ eq(minus(b)); }
   Field inv(){
     Field c = new Field(this);
     for( int i=0; i<n; i++){
@@ -295,6 +271,7 @@ class Field{
     }}
     return c;
   }
+  void invEq(){ eq(inv()); }
   float inner( Field b ){
     float s = 0;
     for ( int i=1 ; i<n-1 ; i++ ) {

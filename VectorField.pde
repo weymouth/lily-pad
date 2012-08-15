@@ -64,6 +64,17 @@ class VectorField{
     return d;
   }
 
+  Field ke (){
+    // returns {this}.{this} for unit cells
+    Field d = new Field( n, m );
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+      d.a[i][j] = (sq(x.a[i+1][j]+x.a[i][j]-2.0)+
+                   sq(y.a[i][j+1]+y.a[i][j]))*0.25;
+    }}
+    return d;
+  }
+
   Field vorticity (){
     Field d = new Field( n, m );
     for ( int i=1 ; i<n-1 ; i++ ) {
@@ -79,7 +90,7 @@ class VectorField{
          div{coeffs*grad{p}} = div{u}  (1)
          u -= coeffs*grad{p}           (2)
        and returns the field p. all FDs are on unit cells */
-    p = MGsolver( 10, new PoissonMatrix(coeffs), p , this.divergence() );
+    p = MGsolver( 20, new PoissonMatrix(coeffs), p , this.divergence() );
     p.plusEq(-1*p.sum()/(float)((n-2)*(m-2)));
     VectorField dp = p.gradient();
     x.plusEq(coeffs.x.times(dp.x.times(-1)));
@@ -113,13 +124,15 @@ class VectorField{
     popMatrix();
   } 
   
-   void AdvDif(VectorField u1, float dt, float nu) {
-    for ( int j=1; j<m-1; j++) {
+   void AdvDif(VectorField u0, float dt, float nu) {
+     VectorField v = new VectorField(this);
+     for ( int j=1; j<m-1; j++) {
       for ( int i=1; i<n-1; i++) {
-        u1.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+x.a[i][j];
-        u1.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+y.a[i][j];
+        v.x.a[i][j] = (advection(x, i, j) + nu*diffusion(x, i, j))*dt+u0.x.a[i][j];
+        v.y.a[i][j] = (advection(y, i, j) + nu*diffusion(y, i, j))*dt+u0.y.a[i][j];
       }
-    }   
+    }
+    this.eq(v);   
   }
 
   float advection (Field b, int i, int j) {  
@@ -178,7 +191,7 @@ class VectorField{
     return min(0.5/b,0.25/nu);
   }
   
-    VectorField times( VectorField b){
+  VectorField times( VectorField b){
     VectorField g = new VectorField(this);
     g.timesEq(b);
     return g;
@@ -207,6 +220,12 @@ class VectorField{
     g.plusEq(b);
     return g;
   }  
+
+  VectorField inv(){ 
+    VectorField g = new VectorField(this);
+    g.invEq();
+    return g;
+  }
   
   void eq( VectorField b ){ x.eq(b.x); y.eq(b.y);}
   void eq( float b ){ x.eq(b); y.eq(b);}
@@ -217,5 +236,6 @@ class VectorField{
   void minusEq( VectorField b ){ x.minusEq(b.x); y.minusEq(b.y);}  
   void advect( float dt, VectorField b ){ x.advect(dt,b); y.advect(dt,b);}
   void advect( float dt, VectorField b, VectorField b0 ){ x.advect(dt,b,b0); y.advect(dt,b,b0);}
+  void invEq(){ x.invEq(); y.invEq();}  
 }
 

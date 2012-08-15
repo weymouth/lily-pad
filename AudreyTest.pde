@@ -1,5 +1,6 @@
 /*************************
 Audrey Test Class
+Example test case in which a cylinder passes by a foil
 
 Example code:
 
@@ -11,32 +12,32 @@ SaveData dat;
 AudreyTest test;
 
 void setup(){
-  int resolution = 64, xLengths=5, yLengths=3, zoom = 1;
-  float xStart = 1, yDist = 0.06;
+  int resolution = 64, xLengths=5, yLengths=3, zoom = 2;    // choose the number of grid points per chord, the size of the domain in chord units and the zoom of the display
+  float xStart = 1, yDist = 0.06;        // choose the initial horizontal position of the cylinder and vertical separation between the foil and the cylinder
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
-  mm = new MovieMaker(this, width, height, "foil_d006D01Re500.mov", 30);
-  dat = new SaveData("pressure_d006D01Re500.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);
+  mm = new MovieMaker(this, width, height, "foil_d006D01Re500.mov", 30);   // initialize the movie
+  dat = new SaveData("pressure_d006D01Re500.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
 }
 
 void draw(){
-  if(test.t<Time){
+  if(test.t<Time){  // run simulation until t<Time
   test.update();
-  if(test.t>-2*Time){
+  if(test.t>-2*Time){   // only display and save once t>-2*Time
   test.display();
     if(recording){      
-    mm.addFrame();
-    dat.addData(test.t, test.flow.p);
+    mm.addFrame();      // add frame to the movie
+    dat.addData(test.t, test.flow.p);    // add the pressure arounf the foil to the data file
       }
     }
   }
-  if(test.t>=Time){
+  if(test.t>=Time){  // close and save everything when t>Time
     mm.finish();
     dat.finish();
     exit();
 }
 }
 
-void keyPressed(){
+void keyPressed(){   // close and save everything when the space bar is pressed
     mm.finish();
     dat.finish();
     exit();
@@ -45,30 +46,30 @@ void keyPressed(){
 ***********************/
 
 class AudreyTest{
-  final int n,m, resolution, NT=1;
-  float dt = 2.5, t, t0, Re=50000, cDiameter = 0.5;
-  boolean QUICK = true, order2 = true;
+  final int n,m, resolution, NT=10;  //nXm domain with resolution grid points per chord. displays and saves every NT computational time step
+  float dt = 0, t, t0, Re=50000, cDiameter = 0.5; //choose time step if using semi-lagrangian, Reynolds number if using QUICK, and cylinder diameter in chord units
+  boolean QUICK = true, order2 = true; // choose whether to use QUICK and second order time integration
   BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2;
   
   AudreyTest( int resolution, int xLengths, int yLengths, float xStart , float yDist, float zoom){
     n = xLengths*resolution+2;
     m = yLengths*resolution+2;
     this.resolution = resolution;
-    float xFoil = 1.0/3.0;
+    float xFoil = 1.0/3.0;     // position of the foil in % of the domain size
     float yFoil = 1.0/2.0;
-    float yStart = yLengths*yFoil-yDist-0.06-0.5*cDiameter;
+    float yStart = yLengths*yFoil-yDist-0.06-0.5*cDiameter;   // position of the cylinder at the beginning of the simulation
     
-    t0 = xStart-xFoil*xLengths;
+    t0 = xStart-xFoil*xLengths;    // choose initial time such that the cylinder is passing the foil at time=0
     t=t0;
 
     int w = int(zoom*(n-2)), h = int(zoom*(m-2));
     size(w,h);
     smooth();
-//    window = new Window(n,m);
+//    window = new Window(n,m);      // display the entire domain
     window = new Window(n/6,m/5,n/2,m/2);
-    window2 = new Window(n/6,m/5,n/2,m/2);
+    window2 = new Window(n/6,m/5,n/2,m/2);    // zoom on the foil
 
-    body = new BodyUnion( new NACA(xFoil*n,yFoil*m,resolution,0.12,window), new CircleBody(xStart*resolution,yStart*resolution,cDiameter*resolution,window));
+    body = new BodyUnion( new NACA(xFoil*n,yFoil*m,resolution,0.12,window), new CircleBody(xStart*resolution,yStart*resolution,cDiameter*resolution,window));   // create foil and cylinder
 
     flow = new BDIM(n,m,dt,body,(float) resolution/Re,QUICK);
 
@@ -83,10 +84,8 @@ class AudreyTest{
   
   void update(){
     for ( int i=0 ; i<NT ; i++ ) {
-    if (QUICK){
-     dt = flow.checkCFL();
-     flow.dt = dt;}
-     body.b.translate(dt,0);
+    if (QUICK){dt = flow.dt;}
+     body.b.translate(dt,0);    // translate the cylinder of dt*velocity. here the cylinder moves one chord length per unit time
      body.update();
      flow.update(body);
      if (order2) {flow.update2(body);}

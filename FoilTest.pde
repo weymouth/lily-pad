@@ -17,7 +17,7 @@ void draw(){
 
 class FoilTest{
   final int n,m;
-  float dt = 1, t = 0, heaveAmp, pitchAmp, omega = .25;
+  float t = 0, heaveAmp, pitchAmp, omega = .25;
   NACA foil; 
   BDIM flow; 
   FloodPlot flood, flood2; 
@@ -37,7 +37,7 @@ class FoilTest{
     foil.translate(0,this.heaveAmp);
     omega = TWO_PI*omega/resolution;
 
-    flow = new BDIM(n,m,dt,foil);//,0.01,true);
+    flow = new BDIM(n,m,0,foil,0.01,true); // QUICK with adaptive time step
     
     flood = new FloodPlot(window);
     flood.range = new Scale(-1,1);
@@ -50,16 +50,17 @@ class FoilTest{
   void update() {
     float velo = heaveAmp*omega*sin(omega*t);
     float spin = atan2(velo,1.)-foil.phi-pitchAmp*sin(omega*t);
-    foil.translate(0,-velo*dt);
+    foil.translate(0,-velo*flow.dt);
     foil.rotate(spin);
     foil.update();
     flow.update(foil);
     flow.update2(foil);
-    t += dt;
+    t += flow.dt;
   }
   void display() {
     flood.display(flow.u.vorticity());
     foil.display();
+    flood.displayTime(t);
   }
 }
 
