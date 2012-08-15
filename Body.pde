@@ -38,7 +38,7 @@
 
 class Body {
   Window window;
-  final color bodyColor = #CCCCCC;//#993333;
+  color bodyColor = #993333;
   final color bodyOutline = #000000;
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
@@ -109,7 +109,9 @@ class Body {
       orth[i] = new OrthoNormal(x1, x2);
     }
   }
-
+  void setColor(color c) {
+    bodyColor = c;
+  }
   void display() {
     display(bodyColor, window);
   }

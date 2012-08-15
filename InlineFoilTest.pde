@@ -46,6 +46,7 @@ class InlineFoilTest {
     flood.range = new Scale(-1, 1);
     flood.setLegend("vorticity");
     flood.setColorMode(1); 
+    foil.setColor(#CCCCCC);
 
     flood2 = new FloodPlot(window);
     flood.range = new Scale(-0.5, 0.5);
