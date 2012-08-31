@@ -3,32 +3,75 @@
  
  Example code:
  
- FoilTest test;
- void setup(){
- int resolution = 32, xLengths=4, yLengths=3, xStart = 1, zoom = 3;
- float heaveAmp = 0.5, pitchAmp = PI/12.;
- test = new FoilTest(resolution, xLengths, yLengths, xStart , zoom, heaveAmp, pitchAmp );
- }
- void draw(){
- test.update();
- test.display();
- }
+import processing.video.*;
+MovieMaker mm;
+InlineFoilTest test;
+SaveData dat;
+float maxT;
+float numframes = 250;
+float frame = 0;
+
+void setup() {
+  int Re = 6000, nflaps = 2;
+  float stru = .45, stk = -135*PI/180, hc = 1, dAoA = 25*PI/180, uAoA = 0;
+  int resolution = 32, xLengths=7, yLengths=7, xStart = 3, zoom = 3;
+  //int resolution = 64, xLengths=7, yLengths=6, xStart = 3, zoom = 1;
+  maxT = (int)(2*hc/stru*resolution*nflaps);
+
+  test = new InlineFoilTest(resolution, xLengths, yLengths, xStart, zoom, Re, true);
+  test.setFileRead("C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\FileToRead.txt");
+  test.setFlapParams(stru, stk, dAoA, uAoA, hc, "FileRead");
+
+  String datapath = "C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\";
+  mm = new MovieMaker(this, width, height, datapath+"flap.mov", 30);
+  dat = new SaveData(datapath+"pressure.txt", test.foil.coords, resolution, xLengths, yLengths, zoom);
+
+  dat.saveParam("stru", stru);
+  dat.saveParam("stk", stk);
+  dat.saveParam("hc", hc);
+  dat.saveParam("dAoA", dAoA);
+  dat.saveParam("uAoA", uAoA);
+}
+void draw() {
+  test.update();
+  test.display();
+  dat.addData(test.t, test.foil.pressForce(test.flow.p), test.foil, test.flow.p);
+
+  if (frame<test.t*numframes/maxT) {
+    frame = frame+1;
+    mm.addFrame();
+  }
+
+  if (test.t>=maxT) {
+    dat.finish();
+    mm.finish();
+    exit();
+  }
+}
+void keyPressed() {
+  mm.finish();
+  dat.finish();
+  exit();
+}
  ***********************/
 
 class InlineFoilTest {
   final int n, m;
   float dt = 1, t = 0, heaveAmp, dAoA, uAoA, inlineAmp, omega, chord = 1.0, period, dfrac;
-  float veloy, velox, adv_angle, recovery_angle, AoF, dAoFdt, v2, pitch=0, p=0, integerr=0, yold=0;
+  float veloy, velox, adv_angle, recovery_angle, AoF, dAoFdt, v2, pitch=0, p=0, dpdt=0, integerr=0, yold=0;
   float Fd=0, Fd_dot=0, F, Fold;
   float tau = .1, a=3, b=25;
   int resolution;
   String pitchmethod;
+  String filepath;
+
   boolean upstroke = false;
 
   NACA foil; 
   BDIM flow; 
   FloodPlot flood, flood2; 
   Window window;
+  ReadData reader;
 
   InlineFoilTest( int resolution, int xLengths, int yLengths, int xStart, float zoom, int Re, boolean QUICK) {
     this.resolution = resolution;
@@ -67,6 +110,10 @@ class InlineFoilTest {
 
     adv_angle = atan2(-heaveAmp*omega, 1.-inlineAmp*omega);
     recovery_angle = atan2(heaveAmp*omega, 1.+inlineAmp*omega);
+    
+    if (pitchmethod.equals("FileRead")){
+      readData();
+    }
   }
 
   void setControlParams(float a, float b, float tau) {
@@ -74,7 +121,12 @@ class InlineFoilTest {
     this.b = b;
     this.tau = tau*((float)resolution);
   }
-
+  void setFileRead(String filepath) {
+    this.filepath = filepath;
+  }
+  void readData(){
+    reader = new ReadData(filepath);
+  }
   float controller(float y, float yd) {
     //Really bad observer
     y = y*.3+yold*.7; 
@@ -91,9 +143,13 @@ class InlineFoilTest {
     return p;
   }
 
-  void computeState() {
+  void computeState(float t) {
     computeVelocity(t);
     AoF = atan2(-veloy, 1.-velox);
+    
+    float delt = resolution*0.5;
+    //AoF = atan2((heaveAmp*cos(omega*t)-heaveAmp*cos(omega*(t-delt)))/delt,(delt+inlineAmp*cos(omega*t)-inlineAmp*cos(omega*(t-delt)))/delt);
+    
     v2 = (1-velox)*(1-velox)+veloy*veloy;
 
     PVector pforce = foil.pressForce(flow.p);
@@ -121,7 +177,7 @@ class InlineFoilTest {
     }
   }
 
-  float computePitch() {
+  float computePitch(float t) {
     if (pitchmethod.equals("Cosine")){
       float pitchAmp = dAoA;
       if (upstroke) {
@@ -148,6 +204,25 @@ class InlineFoilTest {
       return pitchAmp/2-pitchAmp/2*cos(2*omega*t)+vortcan/v2*cos(omega*t-1*PI/4.0)+AoF;
     }
     
+    if (pitchmethod.equals("OpenLoop2")){
+      //Example: float stru = .5, stk = -120*PI/180, hc = 1.5, dAoA = 20*PI/180, uAoA = 20*PI/180, dfrac = .5;
+      float pitchAmp = dAoA;
+      if (upstroke) {
+        pitchAmp = 0;
+      }
+      float vortcan = uAoA;
+      return pitchAmp/2-pitchAmp/2*cos(2*omega*t)-vortcan/v2*dAoFdt+AoF;
+    }
+    if (pitchmethod.equals("OpenLoop3")){
+      //Example: float stru = .5, stk = -120*PI/180, hc = 1.5, dAoA = 20*PI/180, uAoA = 20*PI/180, dfrac = .5;
+      float pitchAmp = dAoA;
+      if (upstroke) {
+        pitchAmp = -uAoA;
+      }
+      Fd = a*v2*(pitchAmp/2-pitchAmp/2*cos(2*omega/(2*dfrac)*t));
+      return (Fd/v2+a*AoF+b*foil.phi/dt)/(a+b/dt);
+    }
+    
     if (pitchmethod.equals("ClosedLoop")){
       float pitchAmp = dAoA;
       if (upstroke) {
@@ -157,10 +232,41 @@ class InlineFoilTest {
       Fd = a*v2*(pitchAmp/2-pitchAmp/2*cos(2*omega/(2*dfrac)*t));
       return controller(F/v2, Fd/v2);
     }
+    if (pitchmethod.equals("ClosedLoop2")){
+      float pitchAmp = dAoA;
+      if (upstroke) {
+        pitchAmp = -uAoA;
+      }
+      Fd = a*v2*(pitchAmp/2-pitchAmp/2*cos(2*omega/(2*dfrac)*t));
+      return controller(F/v2, Fd/v2);
+    }
+    
+    if (pitchmethod.equals("Timeshift")){
+      float phase = uAoA;
+      uAoA = 0;
+      pitchmethod = "Cosine";
+      computeState(t-phase/omega);
+      p = computePitch(t-phase/omega);
+      pitchmethod = "Timeshift";
+      uAoA = phase;
+      computeState(t);
+      return p;
+    }
+    if (pitchmethod.equals("NoTrail")){
+      float dpdt = 4/3*(-veloy*cos(foil.phi)-(1-velox)*sin(foil.phi));
+      return foil.phi+dpdt*dt;
+    }
 
     if (pitchmethod.equals("Hummingbird")){
       //Taken from Tobalske profile: stru = .2, stk = -60*PI/180, hc = 1.5,
       return -25*PI/180*sin(omega*t)+(-5*PI/180*cos(omega*t)+5*PI/180)+10*PI/180;
+    }
+    
+    if (pitchmethod.equals("FileRead")){
+      int column = 0;
+      p = reader.interpolate(t*omega % TWO_PI,column);
+      println("Theta " + p);
+      return p;
     }
     
     if (pitchmethod.equals("Turtle")){
@@ -171,6 +277,9 @@ class InlineFoilTest {
     if (pitchmethod.equals("NoPitch")){
       return 0;
     }
+    if (pitchmethod.equals("Feather")){
+      return AoF;
+    }
     throw new Error("Not a valid pitch method - check your spelling perhaps?");
   }
   void update() {
@@ -179,9 +288,10 @@ class InlineFoilTest {
       flow.dt = dt;
     }
 
-    computeState();
-    pitch = computePitch();
+    computeState(t);
+    pitch = computePitch(t);
     foil.rotate(-foil.phi+pitch);
+    println("AoA: "+(pitch-AoF)*180/PI);
 
     computeVelocity(t-dt/2.0); //Recompute velocity for mid-timestep, fixes Euler drift
     foil.translate(velox*dt, veloy*dt);
