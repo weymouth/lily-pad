@@ -41,6 +41,9 @@ class SaveData{
   void saveParam(String name, float value){
     output.println("% " + name + " = " + value + ";");
   }
+  void saveString(String s){
+    output.println(s);
+  }
   
   void addData(float t, Field a){
     output.print(t + " ");

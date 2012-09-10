@@ -19,8 +19,8 @@ void setup() {
   maxT = (int)(2*hc/stru*resolution*nflaps);
 
   test = new InlineFoilTest(resolution, xLengths, yLengths, xStart, zoom, Re, true);
-  test.setFileRead("C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\FileToRead.txt");
-  test.setFlapParams(stru, stk, dAoA, uAoA, hc, "FileRead");
+  //test.setFileRead("C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\FileToRead.txt");
+  test.setFlapParams(stru, stk, dAoA, uAoA, hc, "ClosedLoop");
 
   String datapath = "C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\";
   mm = new MovieMaker(this, width, height, datapath+"flap.mov", 30);
