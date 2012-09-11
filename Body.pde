@@ -42,12 +42,12 @@ class Body {
   final color bodyOutline = #000000;
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
-  float phi=0, dphi=0;
+  float phi=0, dphi=0, area, mr;
   int hx, hy;
   ArrayList<PVector> coords;
   int n;
   boolean unsteady, pressed;
-  PVector xc, dxc;
+  PVector xc, dxc, dxc2;
   OrthoNormal orth[];
   Body box;
 
@@ -55,6 +55,7 @@ class Body {
     this.window = window;
     xc = new PVector(x, y);
     dxc = new PVector(0, 0);
+    dxc2 = new PVector(0, 0);
     coords = new ArrayList();
   }
 
@@ -314,6 +315,7 @@ class CircleBody extends EllipseBody {
 
   CircleBody( float x, float y, float d, Window window ) {
     super(x, y, d, 1.0, window);
+    area = 3.1415926*sq(d)/4;
   }
 
   float distance( float x, float y) {
@@ -323,6 +325,17 @@ class CircleBody extends EllipseBody {
   void rotate(float _dphi) {
     dphi = _dphi;
     phi = phi+dphi;
+  }
+  
+  void react (PVector force, float dt1, float dt2, float mr) {
+    dxc2.x = -dt2*(dt1+dt2)/2*force.x/(mr*area) + dt2/dt1*dxc.x;
+    dxc2.y = -dt2*(dt1+dt2)/2*force.y/(mr*area) + dt2/dt1*dxc.y; 
+    translate(dxc2.x, dxc2.y);
+  }
+  
+  // set body to neutrally buoyant if no mass ratio is provided
+  void react (PVector force, float dt1, float dt2) {
+    react(force, dt1, dt2, 1);
   }
 }
 
