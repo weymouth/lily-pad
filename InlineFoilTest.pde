@@ -10,27 +10,19 @@ SaveData dat;
 float maxT;
 float numframes = 250;
 float frame = 0;
-
+String datapath = "";
+  
 void setup() {
   int Re = 6000, nflaps = 2;
   float stru = .45, stk = -135*PI/180, hc = 1, dAoA = 25*PI/180, uAoA = 0;
   int resolution = 32, xLengths=7, yLengths=7, xStart = 3, zoom = 3;
-  //int resolution = 64, xLengths=7, yLengths=6, xStart = 3, zoom = 1;
   maxT = (int)(2*hc/stru*resolution*nflaps);
 
   test = new InlineFoilTest(resolution, xLengths, yLengths, xStart, zoom, Re, true);
-  //test.setFileRead("C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\FileToRead.txt");
   test.setFlapParams(stru, stk, dAoA, uAoA, hc, "ClosedLoop");
 
-  String datapath = "C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\";
   mm = new MovieMaker(this, width, height, datapath+"flap.mov", 30);
   dat = new SaveData(datapath+"pressure.txt", test.foil.coords, resolution, xLengths, yLengths, zoom);
-
-  dat.saveParam("stru", stru);
-  dat.saveParam("stk", stk);
-  dat.saveParam("hc", hc);
-  dat.saveParam("dAoA", dAoA);
-  dat.saveParam("uAoA", uAoA);
 }
 void draw() {
   test.update();

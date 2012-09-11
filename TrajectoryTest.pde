@@ -8,7 +8,7 @@
 class TrajectoryTest {
   final int n, m;
   float xpos, ypos, thpos, xStart, yStart, chord=1;
-  float dt = 1, t = 0, maxT = 0;
+  float dt = 5, t = 0, maxT = 0;
   int resolution, trialID;
   String filepath;
 

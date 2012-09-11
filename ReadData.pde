@@ -8,7 +8,7 @@
  float dat = reader.interpolate(t, column);
  
  ----the file should look like this, with Tabs between the data:
- #rows #cols dt
+ #rows #cols dt <AnyOtherInfoYouWant (Optional)>
  data00 data01 data02....
  data10 data11 data12....
  ...
@@ -16,7 +16,7 @@
  each row is the data at a timestep - 0zth row is t=0, 1st is t=dt, etc
  
  ----you can create this file type in matlab with these commands (if 'arr' is the array of data, 'dt' is your timestep, and 'filepath' is a string that points to a text file)
-header = [size(arr,1) size(arr,2) dt]
+header = [size(arr,1) size(arr,2) dt <AnyOtherInfoYouWant>]
 save(filepath,'header','-ascii', '-tabs');
 save(filepath,'arr','-append','-ascii', '-tabs');
  ***********************************/
