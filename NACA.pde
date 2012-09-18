@@ -2,7 +2,8 @@
 NACA airfoil class
 
 example code:
-NACA foil; Motions heave,pitch;
+
+NACA foil
 void setup(){
   size(400,400);
   foil = new NACA(1,1,0.5,0.20,new Window(3,3));
