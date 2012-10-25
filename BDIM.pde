@@ -118,7 +118,7 @@ class BDIM{
   }
 
   void update( Body body ){
-    if(body.unsteady){get_coeffs(body);}else{ub.eq(0.);}
+    if(body.unsteady){get_coeffs(body);}else{c.eq(del.times(rhoi.times(dt))); ub.eq(0.);}
     update();
   }
   void update2( Body body ){update2();} // don't need to get coeffs again
