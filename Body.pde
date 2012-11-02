@@ -42,12 +42,12 @@ class Body {
   final color bodyOutline = #000000;
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
-  float phi=0, dphi=0, area, mr;
+  float phi=0, dphi=0, mass=1, area=0;
   int hx, hy;
   ArrayList<PVector> coords;
   int n;
-  boolean unsteady, pressed;
-  PVector xc, dxc, dxc2;
+  boolean unsteady, pressed, xfree=true, yfree=true;
+  PVector xc, dxc;
   OrthoNormal orth[];
   Body box;
 
@@ -55,7 +55,6 @@ class Body {
     this.window = window;
     xc = new PVector(x, y);
     dxc = new PVector(0, 0);
-    dxc2 = new PVector(0, 0);
     coords = new ArrayList();
   }
 
@@ -80,6 +79,7 @@ class Body {
     n = coords.size();
     orth = new OrthoNormal[closed?n:n-1];
     getOrth(); // get orthogonal projection of line segments
+    if(closed) getArea();
 
     // make the bounding box
     if (n>4) {
@@ -110,6 +110,17 @@ class Body {
       orth[i] = new OrthoNormal(x1, x2);
     }
   }
+  void getArea() {    // get the polygon area
+    float s=0;
+    for ( int i = 0; i<n ; i++ ) {
+      PVector x1 = coords.get(i);
+      PVector x2 = coords.get((i+1)%n);
+      s -= x1.x*x2.y-x1.y*x2.x;
+    }
+    area = 0.5*s;
+    mass = area; // default unit density
+  }
+  
   void setColor(color c) {
     bodyColor = c;
   }
@@ -259,6 +270,20 @@ class Body {
     }
     return pv;
   }
+  
+  // compute body reaction to applied force using 1st order Euler 
+  void react (PVector force, float dt1, float dt2) {
+    float dx,dy;
+    dx = -dt2*(dt1+dt2)/2*force.x/mass + dt2/dt1*dxc.x;
+    dy = -dt2*(dt1+dt2)/2*force.y/mass + dt2/dt1*dxc.y; 
+    translate(xfree?dx:0, yfree?dy:0);
+  }
+  // set mass based on mass ratio is the area is nonzero
+  void react (PVector force, float dt1, float dt2, float mr) {
+    if(area>0) mass = area*mr;
+    react( force, dt1, dt2 );
+  }
+
 }
 /********************************
  EllipseBody class
@@ -279,6 +304,7 @@ class EllipseBody extends Body {
       add(xc.x+dx*cos(theta), xc.y+dy*sin(theta));
     }
     end(); // finalize shape
+    area = 3.1415926*sq(h)*a/4; mass = area; // exact area and default unit density
   }
 
   void display( color C, Window window ) {
@@ -315,7 +341,6 @@ class CircleBody extends EllipseBody {
 
   CircleBody( float x, float y, float d, Window window ) {
     super(x, y, d, 1.0, window);
-    area = 3.1415926*sq(d)/4;
   }
 
   float distance( float x, float y) {
@@ -327,15 +352,5 @@ class CircleBody extends EllipseBody {
     phi = phi+dphi;
   }
   
-  void react (PVector force, float dt1, float dt2, float mr) {
-    dxc2.x = -dt2*(dt1+dt2)/2*force.x/(mr*area) + dt2/dt1*dxc.x;
-    dxc2.y = -dt2*(dt1+dt2)/2*force.y/(mr*area) + dt2/dt1*dxc.y; 
-    translate(dxc2.x, dxc2.y);
-  }
-  
-  // set body to neutrally buoyant if no mass ratio is provided
-  void react (PVector force, float dt1, float dt2) {
-    react(force, dt1, dt2, 1);
-  }
 }
 

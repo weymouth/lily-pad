@@ -6,49 +6,25 @@ Swap which draw command is commented out (and uncomment other lines) if you want
 
 Example code:
 
-//import processing.video.*;
-//boolean recording=true;
 SaveData dat;
 AmandaTest test;
-//int Time =100;
-//MovieMaker mm; 
 void setup(){
   int resolution=32, xLengths=4, yLengths=3, xStart=1, zoom=3;  // choose the number of grid points per chord, the size of the domain in chord units and the zoom of the display
-  float mr=5, pitchAmp=PI/8.;
+  float mr=0.157, pitchAmp=PI/8.;
   test = new AmandaTest(resolution, xLengths, yLengths, xStart, zoom, pitchAmp, mr);
-  //mm = new MovieMaker(this, width, height, "foil_Amanda.mov", 30);   // initialize the movie
   dat = new SaveData("PressForce.txt", test.foil.coords, resolution, xLengths, yLengths, zoom);
 }
 
 void draw(){
   dat.addText("Heave Motion (per time step)");  
-  dat.addDataSimple(test.t, test.foil.dxc2, test.foil, test.flow.p);  // adds heave values: t heave.x heave.y
+  dat.addDataSimple(test.t, test.foil.dxc, test.foil, test.flow.p);  // adds heave values: t heave.x heave.y
   dat.addText("Pressure Force");  
   dat.addDataSimple(test.t, test.forceP, test.foil, test.flow.p);  //add Pressure force x and y values 
   test.update();
   test.display();
 }
 
-//void draw(){
-//  if(test.t<Time){  // run simulation until t<Time
-//  test.update();
-//  if(test.t>-2*Time){   // only display and save once t>-2*Time
-//  test.display();
-//    if(recording){      
-//    mm.addFrame();      // add frame to the movie
-//    dat.addData(test.t, test.flow.p);    // add the pressure around the foil to the data file
-//      }
-//    }
-//  }
-//  if(test.t>=Time){  // close and save everything when t>Time
-//    mm.finish();
-//    dat.finish();
-//    exit();
-//}
-//}
-
 void keyPressed(){  //close and save everything when spacebar is pressed
-  //mm.finish();
   dat.finish();
   exit();
 }
@@ -73,7 +49,13 @@ class AmandaTest{
 
     //NACA0018 foil with chord lengths equal to resolution positioned in middle of window
     foil = new NACA(xStart*resolution, m/2,resolution,0.18,window); 
-    Float FoilArea = 0.18*resolution*0.685084; //thickness * chord length * 0.685084
+    foil.xfree = false; // restrain freedom in x direction
+
+//  uncomment to check area
+//    Float FoilArea = 0.18*sq(resolution)*0.685084; //thickness * chord length * 0.685084
+//    println(foil.area);
+//    println(FoilArea);
+//    exit(); 
     
     this.pitchAmp = pitchAmp; 
     this.mr=mr;

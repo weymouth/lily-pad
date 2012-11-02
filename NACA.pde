@@ -59,19 +59,4 @@ class NACA extends Body{
     PVector pv = super.pressForce(p);
     return PVector.div(pv,c);
   }
-  
-    //react() function will translate foil with respect to pressure force from time step to time step.
-    //NOTE: This does not account for Moment on the foil (rotation reaction)
-    //Integration scheme based on 1st order Euler
-    void react (PVector force, float dt1, float dt2, float mr) {
-    dxc2.x = -dt2*(dt1+dt2)/2*force.x/(mr*FoilArea) + dt2/dt1*dxc.x;
-    dxc2.y = -dt2*(dt1+dt2)/2*force.y/(mr*FoilArea) + dt2/dt1*dxc.y; 
-    //translate(dxc2.x, dxc2.y);  //this wil allow translation in both x and y
-    translate(0,dxc2.y);  //The system I am modeling will only allow for the heave to be applied in the y direction. 
-  }
-  
-  // set body to neutrally buoyant if no mass ratio is provided
-  void react (PVector force, float dt1, float dt2) {
-    react(force, dt1, dt2, 1);
-  }
 }
