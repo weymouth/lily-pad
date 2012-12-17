@@ -46,11 +46,7 @@ class BDIM{
     this.dt = dt;
     this.nu=nu;
     this.QUICK=QUICK;
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> 28a5725eac1f7f4d1a643065fc94dd88702765ed
     u = uinit;
     u.x.gradientExit = true;
     u0 = new VectorField(n,m,0,0);
