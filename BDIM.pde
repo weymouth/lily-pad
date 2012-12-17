@@ -41,13 +41,15 @@ class BDIM{
   Field p;
   boolean QUICK, mu1=true, adaptive=false;
 
-  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){
+
+
+  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, int u_inf){
     this.n = n; this.m = m;
     this.dt = dt;
     this.nu=nu;
     this.QUICK=QUICK;
 
-    u = new VectorField(n,m,1,0);
+    u = new VectorField(n,m,u_inf,0);
     u.x.gradientExit = true;
     u0 = new VectorField(n,m,0,0);
     p = new Field(n,m);
@@ -64,6 +66,7 @@ class BDIM{
     get_coeffs(body);
   }
   
+  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){this(n,m,dt,body,nu,QUICK,1);}
   BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,1,false);}
   
   void update(){

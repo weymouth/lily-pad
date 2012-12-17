@@ -16,21 +16,26 @@ void draw(){
 class NACA extends Body{
   int m = 100;
   float c;
+  float pivot;
   
-  NACA( float x, float y, float c, float t, Window window ){
+  NACA( float x, float y, float c, float t, float pivot, Window window ){
     super(x,y,window);
-    add(xc.x-c*0.25,xc.y);
+    add(xc.x-c*pivot,xc.y);
     for( int i=1; i<m; i++ ){
       float xx = pow(i/(float)m,2);
-      add(xc.x+c*(xx-0.25),xc.y+t*c*offset(xx));      
+      add(xc.x+c*(xx-pivot),xc.y+t*c*offset(xx));      
     }
-    add(xc.x+c*0.75,xc.y);
+    add(xc.x+c*(1-pivot),xc.y);
     for( int i=m-1; i>0; i-- ){
       float xx = pow(i/(float)m,2);
-      add(xc.x+c*(xx-0.25),xc.y-t*c*offset(xx));
+      add(xc.x+c*(xx-pivot),xc.y-t*c*offset(xx));
     }
     end(); // finalizes shape
     this.c = c;
+  }
+  
+  NACA( float x, float y, float c, float t, Window window ){
+    this(x,y,c,t,.25,window);
   }
   
   float[][] interp( Field a ){
