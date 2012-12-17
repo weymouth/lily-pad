@@ -41,15 +41,13 @@ class BDIM{
   Field p;
   boolean QUICK, mu1=true, adaptive=false;
 
-
-
-  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, int u_inf){
+  BDIM( int n, int m, float dt, Body body, VectorField uinit, float nu, boolean QUICK ){
     this.n = n; this.m = m;
     this.dt = dt;
     this.nu=nu;
     this.QUICK=QUICK;
-
-    u = new VectorField(n,m,u_inf,0);
+    
+    u = uinit;
     u.x.gradientExit = true;
     u0 = new VectorField(n,m,0,0);
     p = new Field(n,m);
@@ -66,8 +64,16 @@ class BDIM{
     get_coeffs(body);
   }
   
-  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){this(n,m,dt,body,nu,QUICK,1);}
-  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,1,false);}
+  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, int u_inf){
+    this(n,m,dt,body,new VectorField(n,m,u_inf,0),nu,QUICK);}
+  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){
+    this(n,m,dt,body,new VectorField(n,m,1,0),nu,QUICK);}
+  
+  // If no body is supplied, create a body outside the domain
+  BDIM( int n, int m, float dt, VectorField uinit, float nu, boolean QUICK ){
+    this(n,m,dt,new CircleBody(-n/2,-m/2,n/10,new Window(0,0,n,m)),uinit,nu,QUICK);}
+  
+  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n,m,1,0),1,false);}
   
   void update(){
     // O(dt,dx^2) BDIM projection step:
@@ -112,7 +118,7 @@ class BDIM{
   }
 
   void update( Body body ){
-    if(body.unsteady){get_coeffs(body);}else{ub.eq(0.);}
+    if(body.unsteady){get_coeffs(body);}else{c.eq(del.times(rhoi.times(dt))); ub.eq(0.);}
     update();
   }
   void update2( Body body ){update2();} // don't need to get coeffs again

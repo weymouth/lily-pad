@@ -49,10 +49,11 @@ void keyPressed() {
 
 class InlineFoilTest {
   final int n, m;
-  float dt = 1, t = 0, heaveAmp, dAoA, uAoA, inlineAmp, omega, chord = 1.0, period, dfrac;
+  float dt = 0, t = 0, heaveAmp, dAoA, uAoA, inlineAmp, omega, chord = 1.0, period, dfrac;
   float veloy, velox, adv_angle, recovery_angle, AoF, dAoFdt, v2, pitch=0, p=0, dpdt=0, integerr=0, yold=0;
   float Fd=0, Fd_dot=0, F, Fold;
-  float tau = .1, a=3, b=25;
+  //float tau = .1, a=3, b=25; //note b/resolution is true time constant...
+  float tau = .1, a=3, b=50;
   int resolution;
   String pitchmethod;
   String filepath;
@@ -74,8 +75,11 @@ class InlineFoilTest {
     size(w, h);
     window = new Window(n, m);
 
-    foil = new NACA(xStart*resolution, m/2, resolution*chord, .12, window);
-    flow = new BDIM(n, m, dt, foil, (float)resolution/Re, QUICK);
+    foil = new NACA(xStart*resolution, m/2, resolution*chord, .15, window);
+    foil.rotate(-foil.phi+PI);
+    foil.rotate(0);
+    
+    flow = new BDIM(n, m, dt, foil, (float)resolution/Re, QUICK, -1);
 
     flood = new FloodPlot(window);
     flood.range = new Scale(-1, 1);
@@ -95,7 +99,8 @@ class InlineFoilTest {
     this.omega = TWO_PI/resolution * stru/(2*hc*chord);
     this.period = TWO_PI/omega;
     this.dfrac = 0.5; //Functionality for changing the downstroke to period fraction not fully implemented
-    foil.translate(-this.inlineAmp, -this.heaveAmp);
+    foil.translate(this.inlineAmp, -this.heaveAmp);
+    foil.translate(0,0);
 
     tau = tau*((float)resolution);
     this.pitchmethod = pitchmethod;
@@ -137,34 +142,35 @@ class InlineFoilTest {
 
   void computeState(float t) {
     computeVelocity(t);
-    AoF = atan2(-veloy, 1.-velox);
+    AoF = atan2(veloy, 1.+velox);
     
     float delt = resolution*0.5;
     //AoF = atan2((heaveAmp*cos(omega*t)-heaveAmp*cos(omega*(t-delt)))/delt,(delt+inlineAmp*cos(omega*t)-inlineAmp*cos(omega*(t-delt)))/delt);
     
-    v2 = (1-velox)*(1-velox)+veloy*veloy;
+    v2 = (1+velox)*(1+velox)+veloy*veloy;
 
     PVector pforce = foil.pressForce(flow.p);
     //float ysign = ((pforce.y>0)?1:0)*2-1;
-    F = pforce.y*cos(foil.phi)-pforce.x*sin(foil.phi);
+    //F = pforce.y*cos(foil.phi)-pforce.x*sin(foil.phi);
+    F = pforce.y*cos(AoF)+pforce.x*sin(AoF);
 
-    t = t-dt/2.0;
-    dAoFdt = -heaveAmp*omega*omega*cos(omega*t)/(omega*omega*sin(omega*t)*sin(omega*t)*inlineAmp*inlineAmp-2*omega*sin(omega*t)*inlineAmp+heaveAmp*heaveAmp*omega*omega*sin(omega*t)*sin(omega*t)+1);
-    t = t+dt/2.0;
+//    t = t-dt/2.0;
+//    dAoFdt = -heaveAmp*omega*omega*cos(omega*t)/(omega*omega*sin(omega*t)*sin(omega*t)*inlineAmp*inlineAmp-2*omega*sin(omega*t)*inlineAmp+heaveAmp*heaveAmp*omega*omega*sin(omega*t)*sin(omega*t)+1);
+//    t = t+dt/2.0;
   }
 
   void computeVelocity(float t) {
     float tnew = 0;
     if ((t%period)<(dfrac*period)) {
       tnew = t%period;
-      veloy = heaveAmp*omega/(dfrac*2)*sin(omega/(dfrac*2)*tnew);
-      velox = inlineAmp*omega/(dfrac*2)*sin(omega/(dfrac*2)*tnew);
+      veloy = -heaveAmp*omega/(dfrac*2)*sin(omega/(dfrac*2)*tnew);
+      velox = -inlineAmp*omega/(dfrac*2)*sin(omega/(dfrac*2)*tnew);
       upstroke = false;
     }
     else {
       tnew = (t%period)-period*dfrac;
-      veloy = -heaveAmp*omega/((1-dfrac)*2)*sin(omega/((1-dfrac)*2)*tnew);
-      velox = -inlineAmp*omega/((1-dfrac)*2)*sin(omega/((1-dfrac)*2)*tnew);
+      veloy = heaveAmp*omega/((1-dfrac)*2)*sin(omega/((1-dfrac)*2)*tnew);
+      velox = inlineAmp*omega/((1-dfrac)*2)*sin(omega/((1-dfrac)*2)*tnew);
       upstroke = true;
     }
   }
@@ -269,6 +275,10 @@ class InlineFoilTest {
     if (pitchmethod.equals("NoPitch")){
       return 0;
     }
+    if (pitchmethod.equals("SinusoidPitch")){
+      return dAoA*sin(omega*t);
+    }
+    
     if (pitchmethod.equals("Feather")){
       return AoF;
     }
@@ -282,13 +292,15 @@ class InlineFoilTest {
 
     computeState(t);
     pitch = computePitch(t);
-    foil.rotate(-foil.phi+pitch);
+    foil.rotate(-foil.phi-pitch+PI);
     println("AoA: "+(pitch-AoF)*180/PI);
 
     computeVelocity(t-dt/2.0); //Recompute velocity for mid-timestep, fixes Euler drift
-    foil.translate(velox*dt, veloy*dt);
+    foil.translate(velox*dt, -veloy*dt);
 
+     
     foil.update();
+    foil.unsteady = true;
     flow.update(foil);
     flow.update2(foil);
     t += dt;

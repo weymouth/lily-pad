@@ -7,6 +7,33 @@ Therefore a second geom "orig" is used to hold the original NACA coords.
 Transformations are applied to the distance and normal calculations on the convex original geom.
 The divergence free wave velocity is use for the body velocity field.
 
+example code:
+BDIM flow;
+FlexNACA fish; 
+FloodPlot flood;
+float time=0;
+float[] a={0,.2,-.1};
+void setup(){
+  int n=(int)pow(2,6)+2; // number of grid points
+  size(400,400);         // display window size
+  Window view = new Window(n,n);
+
+  fish = new FlexNACA(n/4,n/2,n/3,0.20,0.25,1.2,1.,a,view);
+  flow = new BDIM(n,n,0.5,fish,0.001,true);
+  flood = new FloodPlot(view);
+  flood.range = new Scale(-.5,.5);
+  flood.setLegend("vorticity");
+  flood.setColorMode(1); 
+}
+void draw(){
+  time += flow.dt;
+  fish.update(time);
+  flow.update(fish);
+  flow.update2();
+  flood.display(flow.u.vorticity());
+  fish.display();
+}
+
 ********************************/
 class FlexNACA extends NACA{
   float k,omega,T,x0,time=0;

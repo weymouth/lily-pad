@@ -2,7 +2,8 @@
 NACA airfoil class
 
 example code:
-NACA foil; Motions heave,pitch;
+
+NACA foil
 void setup(){
   size(400,400);
   foil = new NACA(1,1,0.5,0.20,new Window(3,3));
@@ -15,7 +16,7 @@ void draw(){
 ********************************/
 class NACA extends Body{
   int m = 100;
-  float c;
+  float c, FoilArea;
   float pivot;
   
   NACA( float x, float y, float c, float t, float pivot, Window window ){
@@ -32,6 +33,7 @@ class NACA extends Body{
     }
     end(); // finalizes shape
     this.c = c;
+     FoilArea = t*c*0.685084;    //crossectional area of NACA foil
   }
   
   NACA( float x, float y, float c, float t, Window window ){

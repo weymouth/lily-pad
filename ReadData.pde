@@ -28,7 +28,7 @@ class ReadData {
   float dat=0, dt=1;
   String[] header;
   int rows, cols;
-  boolean verbose = true;
+  boolean verbose = false;
   char delim = TAB;
 
   ReadData(String filepath) {
@@ -65,7 +65,7 @@ class ReadData {
       for (int j=0; j<cols; j++) {
         dat = float(pieces[j]);
         if (verbose) {
-          println("Row: " + i + "  Col: " + j + "  t: " + i*dt + "  Data: " + dat);
+          println("Row: " + i + "  Col: " + j + "  t: " + i*dt + "  Data: " + dat + "#Rows: " + rows);
         }
         data[i][j] = dat;
       }

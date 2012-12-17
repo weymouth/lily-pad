@@ -64,6 +64,16 @@ class SaveData{
     output.println(";");
   }
   
+  void addDataSimple(float t, PVector p, Body b, Field a){  //simplified to only output time and vector x and y values 
+    output.print(t + " ");
+    output.print(p.x + " " + p.y + " ");
+    output.println(";");
+  }
+
+  void addText(String s){   //allows to insert text anywhere in txt
+    output.println(s);
+  }
+
   void finish(){
     output.flush(); // Writes the remaining data to the file
     output.close(); // Finishes the file
