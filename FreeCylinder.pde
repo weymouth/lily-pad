@@ -55,6 +55,7 @@ class FreeCylinder {
     D = resolution;
     
     body = new CircleBody(.2*n, .5*m, D, view);
+    body.mass = mr*body.area;
     
     flow = new BDIM(n, m, 0, body, (float)D/Re, QUICK);
 
@@ -72,9 +73,9 @@ class FreeCylinder {
       flow.dt = dt;
     }
     
-    // translate body according to pressure force, previous dt, current dt, and mass ratio
+    // translate body according to pressure force, previous dt, current dt
     PVector forceP = body.pressForce(flow.p);
-    body.react(forceP, dto, dt, mr);
+    body.react(forceP, dto, dt);
     
     body.update();
     flow.update(body);

@@ -42,7 +42,7 @@ class Body {
   final color bodyOutline = #000000;
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
-  float phi=0, dphi=0, mass=1, area=0;
+  float phi=0, dphi=0, mass=1, I0=1, area=0;
   int hx, hy;
   ArrayList<PVector> coords;
   int n;
@@ -110,17 +110,19 @@ class Body {
       orth[i] = new OrthoNormal(x1, x2);
     }
   }
-  void getArea() {    // get the polygon area
-    float s=0;
+  void getArea() {    // get the polygon area and moment
+    float s=0, t=0;
     for ( int i = 0; i<n ; i++ ) {
       PVector x1 = coords.get(i);
       PVector x2 = coords.get((i+1)%n);
       s -= x1.x*x2.y-x1.y*x2.x;
+//      t += (sq(x1.x)+sq(x2.y)+sq(x1.y)+sq(x2.y)+x1.x*x2.x+x1.y*x2.y)(x1.x*x2.y-x1.y*x2.x);
     }
     area = 0.5*s;
+    I0 = t/12.;
     mass = area; // default unit density
   }
-  
+ 
   void setColor(color c) {
     bodyColor = c;
   }
@@ -271,18 +273,25 @@ class Body {
     return pv;
   }
   
+  float pressMoment ( Field p ) {
+    float mom = 0;
+    for ( OrthoNormal o: orth ) {
+      float pdl = p.linear( o.cen.x, o.cen.y )*o.l;
+      mom += pdl*(o.ny*(o.cen.x-xc.x)-o.nx*(o.cen.y-xc.y));
+    }
+    return mom;
+  }
+  
   // compute body reaction to applied force using 1st order Euler 
-  void react (PVector force, float dt1, float dt2) {
-    float dx,dy;
+  void react (PVector force, float moment, float dt1, float dt2) {
+    float dx,dy,dp;
     dx = -dt2*(dt1+dt2)/2*force.x/mass + dt2/dt1*dxc.x;
     dy = -dt2*(dt1+dt2)/2*force.y/mass + dt2/dt1*dxc.y; 
+    dp = -dt2*(dt1+dt2)/2*moment/I0 + dt2/dt1*dphi;
     translate(xfree?dx:0, yfree?dy:0);
+    rotate(dp);
   }
-  // set mass based on mass ratio is the area is nonzero
-  void react (PVector force, float dt1, float dt2, float mr) {
-    if(area>0) mass = area*mr;
-    react( force, dt1, dt2 );
-  }
+  void react (PVector force, float dt1, float dt2) {react(force, 0, dt1, dt2);}
 
 }
 /********************************
@@ -304,10 +313,12 @@ class EllipseBody extends Body {
       add(xc.x+dx*cos(theta), xc.y+dy*sin(theta));
     }
     end(); // finalize shape
-    area = 3.1415926*sq(h)*a/4; mass = area; // exact area and default unit density
+    area = 3.1415926*sq(h)*a/4; 
+    mass = area; // exact area and default unit density
+    I0 = mass*sq(h);
   }
 
-  void display( color C, Window window ) {
+/*  void display( color C, Window window ) {
     fill(C); 
     noStroke();
     ellipse(window.px(xc.x), window.py(xc.y), window.pdx(h*a), window.pdy(h));
@@ -334,6 +345,7 @@ class EllipseBody extends Body {
     PVector pv = super.pressForce(p);
     return PVector.div(pv, h);
   }
+  */
 }
 /* CircleBody
  simplified rotation and distance function */

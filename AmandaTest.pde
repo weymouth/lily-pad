@@ -50,7 +50,8 @@ class AmandaTest{
     //NACA0018 foil with chord lengths equal to resolution positioned in middle of window
     foil = new NACA(xStart*resolution, m/2,resolution,0.18,window); 
     foil.xfree = false; // restrain freedom in x direction
-
+    foil.mass = mr*foil.area;
+  
 //  uncomment to check area
 //    Float FoilArea = 0.18*sq(resolution)*0.685084; //thickness * chord length * 0.685084
 //    println(foil.area);
@@ -85,7 +86,7 @@ class AmandaTest{
     forceP = foil.pressForce(flow.p); 
     //angular velocity minus current pitch location minus desired pitch position
     float pitch = atan2(pitchAmp*omega*sin(omega*t),1.) - foil.phi - pitchAmp*sin(omega*t);  
-    foil.react(forceP,dt0,dt,mr);     
+    foil.react(forceP,dt0,dt);     
     foil.rotate(pitch);     //input angular velocity value
    
     foil.update();
