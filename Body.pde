@@ -116,7 +116,7 @@ class Body {
       PVector x1 = coords.get(i);
       PVector x2 = coords.get((i+1)%n);
       s -= x1.x*x2.y-x1.y*x2.x;
-//      t += (sq(x1.x)+sq(x2.y)+sq(x1.y)+sq(x2.y)+x1.x*x2.x+x1.y*x2.y)(x1.x*x2.y-x1.y*x2.x);
+      t -= (sq(x1.x-xc.x)+sq(x2.x-xc.x)+sq(x1.y-xc.y)+sq(x2.y-xc.y)+(x1.x-xc.x)*(x2.x-xc.x)+(x1.y-xc.x)*(x2.y-xc.y))*(x1.x*x2.y-x1.y*x2.x);
     }
     area = 0.5*s;
     I0 = t/12.;
