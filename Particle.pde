@@ -16,18 +16,16 @@ void setup(){
   int n=(int)pow(2,6)+2; size(400,400);
   Window view = new Window(n,n);
   body = new CircleBody(n/3,n/2,n/8,view);
-  body.bodyColor = color(0);
   flow = new BDIM(n,n,1,body);
-  streaks = new Swarm( view, 500, 10 );
+  streaks = new Swarm( view, 1500, 25 );
 }
 void draw(){
   body.update();
-  flow.update(body);
-  flow.update2();
+  flow.update(); flow.update2();
   streaks.update(flow);
-  noStroke();fill(255,25); rect(0,0,width,height); // Draw partially transparent background to get streaky effect
-  body.display();
+  noStroke(); fill(255,25); rect(0,0,width,height); // Draw partially transparent background to get streaky effect
   streaks.display();
+  body.display();
 }
 **************************/
 
@@ -35,7 +33,7 @@ class Particle {
   Window window;
   color bodyColor;
   PVector x,x0;
-  int step=0, lifeSpan=0;
+  int step=0, lifeSpan;
   
   Particle( float x0, float y0, color _color, Window _window, int _lifeSpan ) {
     x = new PVector( x0 , y0 );
@@ -75,7 +73,7 @@ class Swarm{
     this.window = window;
     this.imax = imax; 
     this.lifeSpan = lifeSpan;
-}
+  }
 
   void update(BDIM flow){
     // remove dead Particles
