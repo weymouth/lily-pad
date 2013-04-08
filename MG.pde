@@ -29,13 +29,14 @@ void draw(){
 Field MGsolver( float itmx, PoissonMatrix A, Field x, Field b ){
   MG solver = new MG( A, x, b);
   solver.update(itmx);
-  println("residual  "+solver.r.inner(solver.r));
+  println("residual: "+solver.r.inner(solver.r)+", iter: "+solver.iter);
   return solver.x;
 }
 
 class MG{
   PoissonMatrix A;
   Field r,x;
+  int iter=0;
 
   MG( PoissonMatrix A, Field x, Field b ){
     this.A = A;
@@ -48,6 +49,7 @@ class MG{
     if(divisible(x)){
       for( int i=0 ; i<itmx ; i++ ){
         x.plusEq(vCycle( A, r ));
+        iter++;
         if(r.inner(r)<1e-5) break;
       }
     }
