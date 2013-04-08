@@ -1,13 +1,47 @@
+/*
+Particle class
+
+This class defines Lagrangian marker Particles which can be advected with the flow.
+
+The Swarm class can be used to update a pack of these Particles. 
+
+
+example code:
+
+BDIM flow;
+CircleBody body;
+Swarm streaks;
+
+void setup(){
+  int n=(int)pow(2,6)+2; size(400,400);
+  Window view = new Window(n,n);
+  body = new CircleBody(n/3,n/2,n/8,view);
+  body.bodyColor = color(0);
+  flow = new BDIM(n,n,1,body);
+  streaks = new Swarm( view, 500, 10 );
+}
+void draw(){
+  body.update();
+  flow.update(body);
+  flow.update2();
+  streaks.update(flow);
+  noStroke();fill(255,25); rect(0,0,width,height); // Draw partially transparent background to get streaky effect
+  body.display();
+  streaks.display();
+}
+**************************/
+
 class Particle {
   Window window;
   color bodyColor;
   PVector x,x0;
-  int step=0, life=10;
+  int step=0, lifeSpan=0;
   
-  Particle( float x0, float y0, color _color, Window _window ) {
+  Particle( float x0, float y0, color _color, Window _window, int _lifeSpan ) {
     x = new PVector( x0 , y0 );
     bodyColor = _color;
     window = _window;
+    lifeSpan = _lifeSpan;
   }
   
   void update( float dt, VectorField u, VectorField u0 ){
@@ -27,20 +61,21 @@ class Particle {
   }
   
   boolean dead(){
-    return ( window.px(x.x)<-10 || window.py(x.y)<-10 || window.px(x.x)>width+10 || window.py(x.y)>height+10 || step > life );
+    return ( window.py(x.y)<-10 || window.px(x.x)>width+10 || window.py(x.y)>height+10 || step > lifeSpan );
   }
 }
 
 class Swarm{
   ArrayList<Particle> pSet;
   Window window;
-  int imax;
+  int imax, lifeSpan;
 
-  Swarm( Window window, int imax){ 
+  Swarm( Window window, int imax, int lifeSpan){ 
     pSet = new ArrayList();
     this.window = window;
     this.imax = imax; 
-  }
+    this.lifeSpan = lifeSpan;
+}
 
   void update(BDIM flow){
     // remove dead Particles
@@ -49,12 +84,12 @@ class Swarm{
       if( pIter.next().dead() ) pIter.remove();
     }
     // add new Particles
-    boolean free = flow.u.x.bval > 0;
-    for( int i=0; pSet.size()<imax & i<imax/10; i++) {
-      float x = random(1,width), y = random(1,height);
-      if(free) x = -log(random(1))*width/2;
+    float upstream = flow.u.x.bval*lifeSpan*flow.dt;
+    int i0 = 1-window.px(upstream);
+    for( int i=0; pSet.size()<imax & i<imax/lifeSpan; i++) {
+      float x = random(i0,width), y = random(1,height);
       x = window.ix((int)x); y = window.iy((int)y);
-      pSet.add( new Particle(x,y,color(0),window) );
+      pSet.add( new Particle( x, y, color(0), window, lifeSpan ) );
     }
     // update Particles
     println("Swarm size:"+pSet.size());
