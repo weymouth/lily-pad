@@ -57,9 +57,7 @@ class Particle {
   
   void displayPoint(){displayPoint(bodyColor);}
   void displayPoint(color C){
-    noStroke(); 
-    fill(C,0.5); ellipse(window.px(x.x),window.py(x.y),6,6);
-//    fill(C    ); ellipse(window.px(x.x),window.py(x.y),3,3);
+    noStroke(); fill(C); ellipse(window.px(x.x),window.py(x.y),4,4);
   }
 
   boolean dead(){
