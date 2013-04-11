@@ -60,6 +60,7 @@ class Scale{
     this.outE = outE;
     r = (outE-outS)/(inE-inS);
   }
+  float outB( float in ){ return out(min(max(in,inS),inE));}
   float out( float in ){ return (in-inS)*r+outS;} 
   float in( float out ){ return (out-outS)/r+inS;}
 }

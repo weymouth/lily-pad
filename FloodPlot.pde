@@ -26,9 +26,10 @@ class FloodPlot{
   PImage img;
   Window window;
   Scale range = new Scale(0,1);
-  Scale hue = new Scale(200,0);
+  Scale hue = new Scale(240,0);
   Scale sat = new Scale(1,1);
-  boolean sequential=false,legendOn=false,dark=true;
+  Scale bri = new Scale(1,1);
+  boolean sequential=false,legendOn=false,dark=false,sharp=false;
 
   FloodPlot( Window window ){
     this.window = window;
@@ -39,16 +40,16 @@ class FloodPlot{
     img = a.img; 
     window = a.window;
     range = a.range; 
-    hue = a.hue; 
-    sat = a.sat; 
+    hue = a.hue; sat = a.sat; bri = a.bri;
     sequential = a.sequential; 
-    legendOn = a.legendOn;
+    legendOn = a.legendOn; dark = a.dark; sharp = a.sharp;
   }
 
   color colorScale( float f ){
     float i = range.in(f); // get % of the range
+    if( sharp & i>0.4 & i<0.6 ) i = 0.5;
     if(sequential){          // blend hue and saturation
-      return color(hue.out(i),sat.out(i),1);
+      return color(hue.outB(i),sat.out(i),bri.out(i));
     } 
     else if(i<0.5) {       // blend from low end to black/white
       if (dark) {return color(hue.outS,sat.outS,1-2*i);}
@@ -80,19 +81,26 @@ class FloodPlot{
     if(legendOn) legend.display(minv,maxv);
   }
 
-  void setLegend(String title){
+  void setLegend(String title, float low, float high){
+    range = new Scale(low,high);
     legend = new LegendPlot(this,title);
     legendOn = true;
   }
+  void setLegend(String title){ setLegend( title, range.outS, range.outE );}
+
   void setColorMode(int mode){
     if (mode==1){dark = false;}
     if (mode==2){sequential = true;}
+    if (mode==3){sequential = true; sat = new Scale(0,0); bri = new Scale(0,1);}
+    if (mode==4){sequential = true; sat = new Scale(1,0); bri = new Scale(0.24,1); hue.outE = hue.outS; hue.r = 0;}
     if (legendOn){legend.setColorMode(mode);}
   }
+
   class LegendPlot extends FloodPlot{
     String title;
     PFont font;
     Field levels;
+    boolean box = false;
 
     LegendPlot( FloodPlot a, String _title){
       super(a); // duplicate the flood settings
@@ -112,6 +120,11 @@ class FloodPlot{
       }
     }
     void display( float minv, float maxv ){
+      if(box) {
+        noStroke(); fill(colorScale(0));
+        rect(0,0,width,45);
+      }
+
       super.display(levels);
 
       int x0 = window.x0, x1 = window.x0+window.dx;
@@ -120,11 +133,7 @@ class FloodPlot{
       Scale x = new Scale(low,high,x0,x1);
 
       textFont(font);
-      if (dark){
-      fill((sequential)?0:360,.75);
-      }else{
-        fill(#000000);
-      }
+      fill((sequential |!dark )?0:360);
       textAlign(RIGHT,CENTER);
       text(title,x0,0.5*(y0+y1));
       textAlign(CENTER,BASELINE);
@@ -139,6 +148,7 @@ class FloodPlot{
       fill(colorScale(maxv)); 
       a = ""+maxv;
       text(a.substring(0,min(a.length(),5)),x.out(maxv),y1);
+      
     }
   }
   
