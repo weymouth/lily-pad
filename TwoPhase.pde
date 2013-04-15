@@ -29,7 +29,7 @@ class TwoPhase extends BDIM{
     super( n, m, dt, body, nu, QUICK);
     f  = new FreeInterface( n, m, gamma );
     f0 = new FreeInterface( n, m, gamma );
-    this.g = g;
+    this.g.y = g;
   }
   TwoPhase( int n, int m, float dt, float g ){
     this( n, m, dt, new CircleBody(-10.,-10.,0.,new Window()), 1, false, g, 0.1);

@@ -233,6 +233,7 @@ class VectorField{
   void timesEq( float b ){ x.timesEq(b); y.timesEq(b);}
   void plusEq( VectorField b ){ x.plusEq(b.x); y.plusEq(b.y);}
   void plusEq( float b ){ x.plusEq(b); y.plusEq(b);}  
+  void plusEq( PVector b ){ x.plusEq(b.x); y.plusEq(b.y);}  
   void minusEq( VectorField b ){ x.minusEq(b.x); y.minusEq(b.y);}  
   void advect( float dt, VectorField b ){ x.advect(dt,b); y.advect(dt,b);}
   void advect( float dt, VectorField b, VectorField b0 ){ x.advect(dt,b,b0); y.advect(dt,b,b0);}

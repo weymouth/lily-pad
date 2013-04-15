@@ -36,7 +36,8 @@ void draw(){
 *********************************************************/
 class BDIM{
   int n,m; // number of cells in uniform grid
-  float dt, nu, eps=2.0, g=0;
+  float dt, nu, eps=2.0;
+  PVector g= new PVector(0,0);
   VectorField u,del,del1,c,u0,ub,wnx,wny,distance,rhoi;
   Field p;
   boolean QUICK, mu1=true, adaptive=false;
@@ -110,7 +111,7 @@ class BDIM{
       div(u) = div(coeff*gradient(p)+stuff) = 0
     u.project solves this equation for p and then projects onto u
 */
-    R.y.plusEq(g*dt);
+    R.plusEq(PVector.mult(g,dt));
     u.eq(del.times(R).minus(ub.times(del.plus(-1))));
     if(mu1) u.plusEq(del1.times((R.minus(ub)).normalGrad(wnx,wny)));
     u.setBC();
