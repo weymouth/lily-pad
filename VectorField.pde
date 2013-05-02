@@ -188,7 +188,7 @@ class VectorField{
         if (c>b) b=c;
       }
     }
-    return min(0.5/b,0.25/nu);
+    return min(0.5/b,0.2/nu);
   }
   
   VectorField times( VectorField b){
