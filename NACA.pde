@@ -60,8 +60,8 @@ class NACA extends Body{
     return 5*(0.2969*sqrt(x)-0.1260*x-0.3516*pow(x,2)+0.2843*pow(x,3)-0.1015*pow(x,4));
   }
 
-  PVector pressForce ( Field p ){
-    PVector pv = super.pressForce(p);
-    return PVector.div(pv,c);
-  }
+//  PVector pressForce ( Field p ){
+//    PVector pv = super.pressForce(p);
+//    return PVector.div(pv,c);
+//  }
 }
