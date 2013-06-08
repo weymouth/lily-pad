@@ -78,6 +78,7 @@ class BDIM{
   
   void update(){
     // O(dt,dx^2) BDIM projection step:
+    c.eq(del.times(rhoi.times(dt))); 
     u0.eq(u);
     VectorField F = new VectorField(u);
     if(QUICK) F.AdvDif( u0, dt, nu );
@@ -119,7 +120,7 @@ class BDIM{
   }
 
   void update( Body body ){
-    if(body.unsteady){get_coeffs(body);}else{c.eq(del.times(rhoi.times(dt))); ub.eq(0.);}
+    if(body.unsteady){get_coeffs(body);}else{ub.eq(0.);}
     update();
   }
   void update2( Body body ){update2();} // don't need to get coeffs again
@@ -130,7 +131,6 @@ class BDIM{
     get_del1();
     get_ub(body);
     get_wn(body);
-    c.eq(del.times(rhoi.times(dt)));
   }
   
   void get_ub( Body body ){
