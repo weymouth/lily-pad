@@ -84,6 +84,18 @@ class VectorField{
     }}
     return d;
   }
+  Field Qcrit (){
+    Field q = new Field( n, m );
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+    float dudx = 0.5*(x.a[i+1][j]-x.a[i-1][j]);
+    float dudy = 0.5*(x.a[i][j+1]-x.a[i][j-1]);
+    float dvdx = 0.5*(y.a[i+1][j]-y.a[i-1][j]);
+    float dvdy = 0.5*(y.a[i][j+1]-y.a[i][j-1]);
+    q.a[i][j] = dudx*dvdy-dvdx*dudy;
+    }}
+    return q;
+  }
 
   Field project ( VectorField coeffs, Field p ){
     /* projects u,v onto a divergence-free field using
