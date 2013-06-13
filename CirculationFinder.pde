@@ -60,10 +60,10 @@ class CirculationFinder {
     this.flow = flow;
     this.body = body;
     this.window = window;
-    setParams(0.01, 0.01, 5, 0.05, 0);
+    setParams(0.01, 0.01, 5, 0.05);
     r_max = 0.25*window.dy;
   }
-  void setParams(float Qmin, float wmin, float bmin, float diatol, int circumode) {
+  void setParams(float Qmin, float wmin, float bmin, float diatol) {
     this.Qmin = Qmin; //Minimum Qcriterion to be considered a core
     this.wmin = wmin; //Minimum vorticity in center to be considered a core
     this.bmin = bmin; //Minimum distance from body
@@ -146,6 +146,7 @@ class CirculationFinder {
         dashcirc(c.xc.x, c.xc.y, c.r, round(c.r*2), window);
         if (dispG) {
           textSize(txtpnt);
+          textAlign(CENTER, TOP);
           fill(0);
           char sign = '+';
           if (c.G<0)

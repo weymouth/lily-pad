@@ -96,6 +96,34 @@ class VectorField{
     }}
     return q;
   }
+  Field streamFunc() {
+    //Integrates the flow field to get a stream function
+    Field psi = new Field( n, m );
+    float[][] s1 = new float[n][m];
+    float[][] s2 = new float[n][m];
+
+    //Integrate from top left corner
+    for (int i=0 ; i<n ; i++ )
+      s1[i][0] = 0;
+    for (int i=0 ; i<n ; i++ )
+      for (int j=1 ; j<m ; j++ )
+        s1[i][j] = s1[i][j-1]+0.5*(x.a[i][j-1]+x.a[i][j]);
+
+    //Integrate from lower right corner
+    s2[n-1][m-1]=0;
+    for (int i=n-2; i>=0; i--)
+      s2[i][m-1] = 0;
+    for (int i=0 ; i<n ; i++ )
+      for (int j=m-2 ; j>=0; j-- )
+        s2[i][j] = s2[i][j+1]-0.5*(x.a[i][j+1]+x.a[i][j]);
+
+    //Average both solutions
+    float basepsi = s2[0][0];
+    for (int i=0 ; i<n ; i++ )
+      for (int j=0 ; j<m ; j++ )
+        psi.a[i][j] = 0.5*(s1[i][j] + s2[i][j]-basepsi);    
+    return psi;
+  }
 
   Field project ( VectorField coeffs, Field p ){
     /* projects u,v onto a divergence-free field using
