@@ -141,8 +141,8 @@ class VectorField{
 
   void display( float unit, int skip){
     stroke(#993333);
-    float DX = height/(float)n;
-    float DY = width/(float)m;
+    float DX = width/(float)n;
+    float DY = height/(float)m;
     for ( int i=0 ; i<n ; i+=skip ) {
     for ( int j=0 ; j<m ; j+=skip ) {
       float px = i*DX;
