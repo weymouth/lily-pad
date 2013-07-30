@@ -15,7 +15,7 @@ void setup(){
 ********************************/
 
 class LineSegBody extends Body{
-  float thk=5;
+  float thk=4;
   
   LineSegBody( float x, float y, Window window ){super(x,y,window);}
   
@@ -41,5 +41,17 @@ class LineSegBody extends Body{
     for( OrthoNormal o: orth ) dis = min(dis,o.distance(x,y,false));
     return dis-0.5*thk;
   }
+  
+  PVector pressForce ( Field p ) {
+    PVector pv = new PVector(0, 0);
+    for ( int s=-1; s<=1; s+=2 ){
+      for ( OrthoNormal o: orth ) {
+        float pdl = p.linear( o.cen.x+0.5*s*thk*o.nx, o.cen.y+0.5*s*thk*o.ny )*o.l;
+        pv.add(s*pdl*o.nx, s*pdl*o.ny, 0);
+      }
+    }
+    return pv;
+  }
+  
 }
 
