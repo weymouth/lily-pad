@@ -199,13 +199,13 @@ class Field{
       if(btype==1){
         if(gradientExit){
           a[1][j]   = bval;  
-          s += a[n-1][j];          
+          if(j>0 & j<m-1) s += a[n-1][j];          
         } else {
           a[1][j]   = bval;  
           a[n-1][j] = bval;
     }}}
     for (int i=0 ; i<n ; i++ ) {  
-      a[i][0]   = a[i][1];  
+      a[i][0]   = a[i][1];
       a[i][m-1] = a[i][m-2];
       if(btype==2){
         a[i][1]   = bval;  
@@ -213,10 +213,20 @@ class Field{
       }   
     }
     if(gradientExit){
-      s /= (float)m;
-      for( int j=0; j<m; j++ ) a[n-1][j] += bval-s;
+      s /= float(m-2);
+      for( int j=1; j<m-1; j++ ) a[n-1][j] += bval-s;
     }
   }
+  
+  Field normalGrad(VectorField wnx, VectorField wny){
+    Field g = new Field(n,m,0,0);
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+      g.a[i][j] = 0.5*(wnx.x.a[i][j]*(a[i+1][j]-a[i-1][j])+wny.x.a[i][j]*(a[i][j+1]-a[i][j-1]));
+    }}
+    return g;
+  }
+
 
   Field times( float b ){
     Field c = new Field(this);
