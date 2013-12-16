@@ -125,12 +125,12 @@ class VectorField{
     return psi;
   }
 
-  Field project ( VectorField coeffs, Field p ){
+  Field project ( VectorField coeffs, Field p, Field s ){
     /* projects u,v onto a divergence-free field using
          div{coeffs*grad{p}} = div{u}  (1)
          u -= coeffs*grad{p}           (2)
        and returns the field p. all FDs are on unit cells */
-    p = MGsolver( 20, new PoissonMatrix(coeffs), p , this.divergence() );
+    p = MGsolver( 20, new PoissonMatrix(coeffs), p , s );
     p.plusEq(-1*p.sum()/(float)((n-2)*(m-2)));
     VectorField dp = p.gradient();
     x.plusEq(coeffs.x.times(dp.x.times(-1)));
@@ -138,6 +138,7 @@ class VectorField{
     setBC();
     return p;
   }
+  Field project ( VectorField coeffs, Field p ){ return project(  coeffs, p, this.divergence() ); }
 
   void display( float unit, int skip){
     stroke(#993333);
