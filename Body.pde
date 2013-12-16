@@ -113,10 +113,11 @@ class Body {
   void getArea() {    // get the polygon area and moment
     float s=0, t=0;
     for ( int i = 0; i<n ; i++ ) {
-      PVector x1 = coords.get(i);
-      PVector x2 = coords.get((i+1)%n);
-      s -= x1.x*x2.y-x1.y*x2.x;
-      t -= (sq(x1.x-xc.x)+sq(x2.x-xc.x)+sq(x1.y-xc.y)+sq(x2.y-xc.y)+(x1.x-xc.x)*(x2.x-xc.x)+(x1.y-xc.x)*(x2.y-xc.y))*(x1.x*x2.y-x1.y*x2.x);
+      PVector p1 = coords.get(i);
+      PVector p2 = coords.get((i+1)%n);
+      float x1 = p1.x-xc.x, x2 = p2.x-xc.x, y1 = p1.y-xc.y, y2 = p2.y-xc.y, da = x1*y2-x2*y1;
+      s -= da;
+      t -= (sq(x1)+x1*x2+sq(x2)+sq(y1)+y1*y2+sq(y2))*da;
     }
     area = 0.5*s;
     I0 = t/12.;
@@ -384,39 +385,7 @@ class EllipseBody extends Body {
       add(xc.x+dx*cos(theta), xc.y+dy*sin(theta));
     }
     end(); // finalize shape
-    area = 3.1415926*sq(h)*a/4; 
-    mass = area; // exact area and default unit density
-    I0 = mass*sq(h);
   }
-
-/*  void display( color C, Window window ) {
-    fill(C); 
-    noStroke();
-    ellipse(window.px(xc.x), window.py(xc.y), window.pdx(h*a), window.pdy(h));
-  }
-
-  float distance( float x, float y) {
-    if (x==xc.x & y==xc.y) return -0.5*h*a;
-    float xx = x-xc.x, yy = y-xc.y;
-    float  l = 1-0.5*h/mag(xx/a, yy);               // straight line approx
-    return l*( sq(xx)/a+sq(yy)*a )/mag(xx/a, yy*a); // correction using normal
-  }
-
-  PVector WallNormal(float x, float y) {
-    PVector wnormal = new PVector((x-xc.x)/a, (y-xc.y)*a);
-    wnormal.normalize(); 
-    return wnormal;
-  }
-
-  void rotate(float dphi) {
-    return;
-  }// no rotation
-
-    PVector pressForce ( Field p ) {
-    PVector pv = super.pressForce(p);
-    return PVector.div(pv, h);
-  }
-  */
 }
 /* CircleBody
  simplified rotation and distance function */
