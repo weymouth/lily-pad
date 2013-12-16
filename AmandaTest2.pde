@@ -230,7 +230,7 @@ class AmandaTest2 {
   float AvailCyc, ReqCyc, AvailSum, ReqSum, beta, pitch, angAccel, StepEff, sumMomError, momError, MomError, AvgMomError;
   float Attack, AttackDeg, PCyc, HeaveAmp, phi0, time0=0, PotPow, eff, PowerCycle, time, rho=1, pitchVel, pitchDeg;
   boolean QUICK = true, order2 = true;
-  NACA foil;
+  AmandaNACA foil;
   BDIM flow;
   FloodPlot flood, flood2;
   Window window;
@@ -246,7 +246,7 @@ class AmandaTest2 {
 
     reader = new ReadData(filepath);
 
-    foil = new NACA(xStart*resolution, m/2, resolution, 0.18, window);  // 0.18=thickness
+    foil = new AmandaNACA(xStart*resolution, m/2, resolution, 0.18, window);  // 0.18=thickness
     foil.xfree = false; // restrain freedom in x direction
     foil.mass = mr*foil.area;
     
@@ -384,4 +384,83 @@ class AmandaTest2 {
     //flood2.displayTime(t);
   }
 }
+
+class AmandaNACA extends NACA{
+  
+  AmandaNACA( float x, float y, float c, float t, Window window ){
+    super(x,y,c,t,window);
+  }
+  
+  float approxMoment(Field p, int[] c){   //written for AmandaTest2  - approximates a fluid moment calculation around the body using pressure measurements at 8 locations around the body
+    float amom = 0;
+    float[] l = new float[8];
+    int[] d = new int[9];
+    float dl = 0;
+    d[0]=0;
+    d[8]=199;
+    for( int i=2; i<9; i++){
+      d[i-1] = c[i-2] + round((c[i-1]-c[i-2])/2);
+    }
+    for( int i=0; i<8; i++){
+      dl=0;
+      for( int j=0; j<((d[i+1]-d[i])-1); j++){
+      OrthoNormal o=orth[d[i]+j];
+      dl += o.l;
+      l[i]=dl;
+      }
+    OrthoNormal o=orth[c[i]];
+    float mdl = p.linear(o.cen.x, o.cen.y)*l[i]; 
+    amom += mdl*(o.ny*(o.cen.x-xc.x)-o.nx*(o.cen.y-xc.y));
+    }
+    return amom; 
+  }
+  
+  //FUNCTIONS THAT STORE ORTHONORMAL VALUES  (for Amanda MATLAB optimization)
+   float[] orthCenX(){
+    float[] ocenx = new float[orth.length];
+      for (int i=0; i<orth.length; i++){
+        OrthoNormal o=orth[i];
+      ocenx[i]=o.cen.x;
+      }
+    return ocenx;
+  }
+  
+    float[] orthCenY(){
+    float[] oceny = new float[orth.length];
+      for (int i=0; i<orth.length; i++){
+        OrthoNormal o=orth[i];
+      oceny[i]=o.cen.y;
+      }
+    return oceny;
+  }
+  
+  float[] ol(){
+    float[] oL = new float[orth.length];
+    for (int i=0; i<orth.length; i++){
+      OrthoNormal o=orth[i];
+      oL[i]=o.l;
+    }
+    return oL;
+  }
+  
+    float[] nx(){
+    float[] nX = new float[orth.length];
+    for (int i=0; i<orth.length; i++){
+      OrthoNormal o=orth[i];
+      nX[i]=o.nx;
+    }
+    return nX;
+  }
+  
+    float[] ny(){
+    float[] nY = new float[orth.length];
+    for (int i=0; i<orth.length; i++){
+      OrthoNormal o=orth[i];
+      nY[i]=o.ny;
+    }
+    return nY;
+  }
+}
+  
+
 

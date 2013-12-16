@@ -36,7 +36,7 @@ class AmandaData {
     output.println(";");
   }
   
-  void addField(float t, LilyPad.Field b){    //output entire velocity and pressure fields
+  void addField(float t, Field b){    //output entire velocity and pressure fields
     for(int i=0; i<N; i++){
       for(int j=0; j<M; j++){
       output.print(b.a[i][j] +" ");
