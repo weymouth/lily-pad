@@ -103,7 +103,7 @@ class FloodPlot{
     boolean box = false;
 
     LegendPlot( FloodPlot a, String _title){
-      super(a); // duplicate the flood settings
+      super(a); legendOn = false; // duplicate the flood settings, except for legend
 
       int n = 11, m = 2; // resize the window and image
       window = new Window(1,1,n-2,m-2,a.window.x0+a.window.dx/4,a.window.y0+14,a.window.dx/2,16);
