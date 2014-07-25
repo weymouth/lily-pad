@@ -46,6 +46,7 @@ class MG{
 
   void update( float itmx ){
     x.plusEq(smooth( 1, A, r ));
+    if(r.inner(r)<1e-5) return;
     if(divisible(x)){
       for( int i=0 ; i<itmx ; i++ ){
         x.plusEq(vCycle( A, r ));
@@ -66,7 +67,12 @@ class MG{
   }
 
   boolean divisible( Field x ){
-    return( (x.n-2)%2==0 && (x.m-2)%2==0 );
+    boolean flag = (x.n-2)%2==0 && (x.m-2)%2==0 ;
+    if( !flag && x.n>9 && x.m>9 ) {
+      println("MultiGrid requires the size in each direction be a large factor of two (2^p) times a small number (N=1..9) plus 2.");
+      exit(); 
+    }
+    return flag;
   }
 
   PoissonMatrix restrict( PoissonMatrix A ){
