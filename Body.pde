@@ -46,7 +46,7 @@ class Body {
   int hx, hy;
   ArrayList<PVector> coords;
   int n;
-  boolean unsteady, pressed, xfree=true, yfree=true;
+  boolean unsteady, pressed, xfree=true, yfree=true, updated=true;
   PVector xc, dxc;
   OrthoNormal orth[];
   Body box;
@@ -227,6 +227,7 @@ class Body {
     for ( PVector x: coords ) x.add(dxc);
     for ( OrthoNormal o: orth   ) o.translate(dx, dy);
     if (n>4) box.translate(dx, dy);
+    updated = false;
   }
 
   void rotate( float dphi ) {
@@ -236,6 +237,7 @@ class Body {
     for ( PVector x: coords ) rotate( x, sa, ca ); 
     getOrth(); // get new orthogonal projection
     if (n>4) box.rotate(dphi);
+    updated = false;
   }
   void rotate( PVector x, float sa, float ca ) {
     PVector z = PVector.sub(x, xc);
@@ -243,6 +245,7 @@ class Body {
     x.y = sa*z.x+ca*z.y+xc.y;
   }
 
+  void updatePositionOnly() {updated=true; update(); }
   void update() {
     if (pressed) {
       this.translate( window.idx(mouseX-hx), window.idy(mouseY-hy) );
@@ -250,6 +253,8 @@ class Body {
       hy = mouseY;
     }
     unsteady = (dxc.mag()!=0)|(dphi!=0);
+    if(updated){ dxc = new PVector(0,0); dphi = 0; }
+    updated = true;
   }
 
   void mousePressed() {
