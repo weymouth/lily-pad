@@ -46,7 +46,6 @@ class MG{
 
   void update( float itmx ){
     x.plusEq(smooth( 1, A, r ));
-    if(r.inner(r)<1e-5) return;
     if(divisible(x)){
       for( int i=0 ; i<itmx ; i++ ){
         x.plusEq(vCycle( A, r ));

@@ -229,7 +229,7 @@ class VectorField{
         if (c>b) b=c;
       }
     }
-    return min(0.5/b,0.2/nu);
+    return 1./(b+3.*nu);
   }
   
   VectorField times( VectorField b){
