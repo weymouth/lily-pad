@@ -49,7 +49,7 @@ class BDIM{
     this.QUICK=QUICK;
 
     u = uinit;
-    u.x.gradientExit = true;
+    if(u.x.bval!=0) u.x.gradientExit = true;
     u0 = new VectorField(n,m,0,0);
     p = new Field(n,m);
     if(dt==0) setDt(); // adaptive time stepping for O(2) QUICK
