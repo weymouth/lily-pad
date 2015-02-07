@@ -6,15 +6,15 @@
  
  Example code:
  
- FreeCylinder test;
+FreeCylinder test;
 
 //INPUT PARAMETERS_______________________________________________________________________
-int resolution = 8;               // number of grid points spanning radius of vortex
-int xLengths = 10;                // (streamwise length of computational domain)/(resolution)
-int yLengths = 6;                 // (transverse length of computational domain)/(resolution)
+int resolution = 16;               // number of grid points spanning radius of vortex
+int xLengths = 12;                // (streamwise length of computational domain)/(resolution)
+int yLengths = 8;                 // (transverse length of computational domain)/(resolution)
 int area = 300000;                // window view area
 int Re = 100;                     // Reynolds number
-float mr = 1.2;                     // mass ratio = (body mass)/(mass of displaced fluid)
+float mr = 2;                     // mass ratio = (body mass)/(mass of displaced fluid)
 //_______________________________________________________________________________________
 
 void setup() {
@@ -33,8 +33,7 @@ void draw() {
 
 void keyPressed(){exit();}
  
- 
- ***********************/
+***********************/
 
 
 class FreeCylinder {
@@ -49,8 +48,8 @@ class FreeCylinder {
   FreeCylinder(int resolution, int Re, int xLengths, int yLengths, float mr) {
     this.resolution = resolution;
     this.mr = mr;
-    n=xLengths*resolution;
-    m=yLengths*resolution;
+    n=xLengths*resolution+2;
+    m=yLengths*resolution+2;
     Window view = new Window(0, 0, n, m);
     D = resolution;
     
