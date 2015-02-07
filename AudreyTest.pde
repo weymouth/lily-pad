@@ -4,10 +4,6 @@ Example test case in which a cylinder passes by a foil
 
 Example code:
 
-import processing.video.*;
-boolean recording=true;
-int Time =4;
-MovieMaker mm; 
 SaveData dat;
 AudreyTest test;
 
@@ -15,38 +11,29 @@ void setup(){
   int resolution = 64, xLengths=5, yLengths=3, zoom = 2;    // choose the number of grid points per chord, the size of the domain in chord units and the zoom of the display
   float xStart = 1, yDist = 0.06;        // choose the initial horizontal position of the cylinder and vertical separation between the foil and the cylinder
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
-  mm = new MovieMaker(this, width, height, "foil_d006D01Re500.mov", 30);   // initialize the movie
-  dat = new SaveData("pressure_d006D01Re500.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
+  dat = new SaveData("saved/pressure.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
 }
 
 void draw(){
-  if(test.t<Time){  // run simulation until t<Time
-  test.update();
-  if(test.t>-2*Time){   // only display and save once t>-2*Time
-  test.display();
-    if(recording){      
-    mm.addFrame();      // add frame to the movie
+  if(test.t<2){  // run simulation until t<Time
+    test.update();
+    test.display();
     dat.addData(test.t, test.flow.p);    // add the pressure arounf the foil to the data file
-      }
-    }
-  }
-  if(test.t>=Time){  // close and save everything when t>Time
-    mm.finish();
+    saveFrame("saved/frame-####.png");   // save images. To make a movie use Tools > Movie Maker
+  }else{  // close and save everything when t>Time
     dat.finish();
     exit();
-}
+  }
 }
 
 void keyPressed(){   // close and save everything when the space bar is pressed
-    mm.finish();
     dat.finish();
     exit();
 }
-
 ***********************/
 
 class AudreyTest{
-  final int n,m, resolution, NT=10;  //nXm domain with resolution grid points per chord. displays and saves every NT computational time step
+  final int n,m, resolution, NT=2;  //nXm domain with resolution grid points per chord. displays and saves every NT computational time step
   float dt = 0, t, t0, Re=50000, cDiameter = 0.5; //choose time step if using semi-lagrangian, Reynolds number if using QUICK, and cylinder diameter in chord units
   boolean QUICK = true, order2 = true; // choose whether to use QUICK and second order time integration
   BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2;
