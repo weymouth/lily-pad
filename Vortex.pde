@@ -7,10 +7,11 @@
  
  Example code:
  
+ 
 //INPUT PARAMETERS_______________________________________________________________________
-int resolution = 6;            // number of grid points spanning vortex diameter
-int xLengths = 15;             // (streamwise length of computational domain)/(resolution)
-int yLengths = 9;              // (transverse length of computational domain)/(resolution)
+int resolution = 8;            // number of grid points spanning vortex diameter
+int xLengths = 16;             // (streamwise length of computational domain)/(resolution)
+int yLengths = 8;              // (transverse length of computational domain)/(resolution)
 int area = 300000;             // window view area
 int Re = 1000;                 // Reynolds number
 float q = 1;                   // vortex circulation
@@ -33,8 +34,7 @@ void draw() {
 }
 
 void keyPressed(){exit();}
- 
- ***********************/
+***********************/
 
 
 class Vortex {
@@ -48,8 +48,8 @@ class Vortex {
 
   Vortex(int resolution, int Re, int xLengths, int yLengths, float q, float sep) {
     this.resolution = resolution;
-    n=xLengths*resolution;
-    m=yLengths*resolution;
+    n=xLengths*resolution+2;
+    m=yLengths*resolution+2;
     Window view = new Window(0, 0, n, m);
     this.dCore = resolution;
     this.q = q;
