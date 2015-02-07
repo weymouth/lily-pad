@@ -3,10 +3,11 @@
  
 Saves data to a text file with customizable header
  
- example code:
+---- example code fragment:
  dat = new SaveData("pressure.txt",test.foil.fcoords,resolution,xLengths,yLengths,zoom);
  dat.addData(test.t, test.flow.p);
  dat.finish();
+----see use in InlineFoilTest.pde, AudreyTest.pde, etc
 ***********************************/
  
 class SaveData{

@@ -12,11 +12,13 @@ diagonals are given by
 
   sum{a_{i,j},i} = 0 forall j       (2)
 
+example code:
+
 void setup(){
   colorMode(RGB,1.0);
   size(500,500);
   VectorField c = new VectorField(40,40,0,0);
-  c.u.eq(1.); c.v.eq(1.); c.setBC();
+  c.x.eq(1.); c.y.eq(1.); c.setBC();
   PoissonMatrix A = new PoissonMatrix(c);
   Field x = new Field(40,40,0,1);
   for(int i=0; i<40; i++ ){

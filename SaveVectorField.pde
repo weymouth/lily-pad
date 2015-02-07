@@ -2,48 +2,24 @@
  SaveVectorField class
  
 Saves the velocity and pressure field to a text file with customizable header
- 
-import processing.video.*;
-int recording=1;
-SaveVectorField vel1, vel2, vel3;
+These files can be quite large!
+
+example code:
+
+SaveVectorField data;
 AudreyTest test;
 
 void setup(){
   int resolution = 128, xLengths=6, yLengths=3, zoom = 1;
   float xStart = -4, yDist =0.2;
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
-  vel1 = new SaveVectorField("vfield_d02_D05_Re10000_t-03linear.txt",test.body.a.coords,test.Re,resolution, test.n,test.m);
-  vel2 = new SaveVectorField("vfield_d02_D05_Re10000_t0linear.txt",test.body.a.coords,test.Re,resolution, test.n,test.m);
-  vel3 = new SaveVectorField("vfield_d02_D05_Re10000_t06linear.txt",test.body.a.coords,test.Re,resolution, test.n,test.m);
-}
-
-void draw(){
-
   test.update();
-  if((test.t>-0.3) && (recording==1)){  
-    vel1.addField(test.flow.u,test.flow.p);
-    recording = 2;
-  }
-  if((test.t>0.) && (recording==2)){
-    vel2.addField(test.flow.u,test.flow.p);
-    recording = 3;
-  }
-  if((test.t>0.6) && (recording==3)){
-    vel3.addField(test.flow.u,test.flow.p);
-    vel1.finish();
-    vel2.finish();
-    vel3.finish();
-    exit();
-  }
-}
 
-void keyPressed(){
-    vel1.finish();
-    vel2.finish();
-    vel3.finish();
-    exit();
+  data = new SaveVectorField("saved/data.txt",test.body.a.coords,test.Re,resolution, test.n,test.m);
+  data.addField(test.flow.u,test.flow.p);
+  data.finish();
 }
- ***********************************/
+***********************************/
 
 class SaveVectorField {
   PrintWriter output;

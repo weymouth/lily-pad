@@ -1,6 +1,4 @@
 /*************************
-import processing.video.*;
-MovieMaker mm;
 UnsteadyLiftControl test;
 SaveData dat;
 float maxT = 10;

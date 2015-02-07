@@ -9,7 +9,6 @@ It can also be used to draw pretty pictures...
 
 Example code:
 
-import java.util.Iterator;
 WingTestKinematics wing1;
 
 void setup() {

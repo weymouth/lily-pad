@@ -3,9 +3,10 @@
  
  Reads timestamped data from a file to use in Lilypad
  
- ----example code:
+ ----example code fragment:
  reader = new ReadData("FileToRead.txt");
  float dat = reader.interpolate(t, column);
+ ----see use in InlineFoilTest.pde
  
  ----the file should look like this, with Tabs between the data:
  #rows #cols dt <AnyOtherInfoYouWant (Optional)>
