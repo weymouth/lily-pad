@@ -1,8 +1,7 @@
 /**********************************
 MG (MultiGrid) class
 
-Sets up a PossionMatrix problem and solves
-with MG
+Sets up a PossionMatrix problem and solves with MG
 
 Example code:
 
@@ -10,19 +9,23 @@ MG solver;
 void setup(){
   size(400,400);
   noStroke();
-  frameRate(1);
+  frameRate(.5);
   colorMode(RGB,1.0);
-  int N = 130;
+  int N = 128+2;                               // <-Try changing the number of points
   VectorField u = new VectorField(N,N,1,-0.5);
-  u.x.eq(0.,40,50,40,75);
+  u.x.eq(0.,40,50,40,75);                      // Create divergent velocity field
   VectorField c = new VectorField(N,N,0,0);
   c.x.eq(1); c.y.eq(1); c.setBC();
   solver = new MG( new PoissonMatrix(c), new Field(N,N), u.divergence() );
+  println(solver.tol);                          //  <- note dependance on N
 }
 void draw(){
-  solver.update();
-  solver.r.display(-0.1,0.1);
-  println(solver.r.inner(solver.r));
+  solver.update();                             // Do one solver iteration
+  float res = solver.r.inner(solver.r);
+  solver.r.display(-solver.tol,solver.tol);    // Visualize the residual
+//  solver.r.display(-0.1*res,0.1*res);          // Scale by its magnitude instead
+  println(res/solver.tol);
+  if(res/solver.tol<1e-6) exit();              // Much more accurate than required...
 }
 ***********************************/
 
@@ -37,10 +40,13 @@ class MG{
   PoissonMatrix A;
   Field r,x;
   int iter=0;
+  float tol=1e-4;
 
   MG( PoissonMatrix A, Field x, Field b ){
     this.A = A;
     this.x = x;
+    r = new Field(x.n,x.m,0,tol);
+    tol = r.inner(r);
     r = A.residual(b,x);
   }
 
@@ -50,7 +56,7 @@ class MG{
       for( int i=0 ; i<itmx ; i++ ){
         x.plusEq(vCycle( A, r ));
         iter++;
-        if(r.inner(r)<1e-5) break;
+        if(r.inner(r)<tol) break;
       }
     }
   }
