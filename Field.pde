@@ -227,7 +227,6 @@ class Field{
     return g;
   }
 
-
   Field times( float b ){
     Field c = new Field(this);
     for( int i=0; i<n; i++){
@@ -237,6 +236,7 @@ class Field{
     return c;
   }
   Field times( Field b ){
+    mismatch(this.btype,b.btype); 
     Field c = new Field(this);
     for( int i=0; i<n; i++){
     for( int j=0; j<m; j++){
@@ -255,6 +255,7 @@ class Field{
     return c;
   }
   Field plus( Field b ){
+    mismatch(this.btype,b.btype); 
     Field c = new Field(this);
     for( int i=0; i<n; i++){
     for( int j=0; j<m; j++){
@@ -265,6 +266,7 @@ class Field{
   void plusEq( Field b ){ eq(plus(b)); }
   void plusEq( float b ){ eq(plus(b)); }
   Field minus( Field b ){
+    mismatch(this.btype,b.btype); 
     Field c = new Field(this);
     for( int i=0; i<n; i++){
     for( int j=0; j<m; j++){
@@ -283,6 +285,7 @@ class Field{
   }
   void invEq(){ eq(inv()); }
   float inner( Field b ){
+    mismatch(this.btype,b.btype); 
     float s = 0;
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
@@ -310,5 +313,12 @@ class Field{
     for( int j=0; j<m; j++){
       a[i][j] = b.a[i][j];
     }}
+  }
+  
+  void mismatch(int i, int j){
+    if(i!=j){
+      println("You can't add or multiple fields of different types.");
+      exit();
+    }     
   }
 }
