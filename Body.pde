@@ -14,27 +14,28 @@
  the update function checks for mouse user interaction and
  updates the `unsteady' flag.
  
- example code:
- Body body;
- void setup(){
- size(400,400);
- body = new Body(0,0,new Window(0,0,4,4));
- body.add(0.5,2.5);
- body.add(2.75,0.25);
- body.add(0,0);
- body.end();
- body.display();
- println(body.distance(3.,1.)); // should be sqrt(1/2)
- }
+Example code:
  
- void draw(){
- background(0);
- body.update();
- body.display();
- }
- void mousePressed(){body.mousePressed();}
- void mouseReleased(){body.mouseReleased();}
- ********************************/
+Body body;
+void setup(){
+  size(400,400);
+  body = new Body(0,0,new Window(0,0,4,4));
+  body.add(0.5,2.5);
+  body.add(2.75,0.25);
+  body.add(0,0);
+  body.end();
+  body.display();
+  println("The distance "+body.distance(3.,1.)+" should equal "+sqrt(.5));
+}
+void draw(){
+  background(0);
+  body.update();
+  body.display();
+}
+void mousePressed(){body.mousePressed();}
+void mouseReleased(){body.mouseReleased();}
+
+********************************/
 
 class Body {
   Window window;

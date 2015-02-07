@@ -8,7 +8,8 @@
 void setup(){
   size(400,400);
   int n=100,m=2;
-  FloodPlot plot = new FloodPlot(new Window(1,1,n-2,m-2,100,1,300,325));
+//  FloodPlot plot = new FloodPlot(new Window(1,1,n-2,m-2,100,1,300,325)); //custom window
+  FloodPlot plot = new FloodPlot(new Window(n,m)); // standard window
   Field p = new Field(n,m);
   for( int i=0; i<n; i++){
   for( int j=0; j<m; j++){

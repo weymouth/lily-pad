@@ -7,13 +7,15 @@ which `adds` bodies to the flow. other operations are possible.
 note that it is possble to get an arbitrary number of bodies by
 applying the union multiple times, as in the example.
 
-example code:
+Example code:
+
 BodyUnion body;
 void setup(){
   size(400,400);
   Window view = new Window(100,100);
   body = new BodyUnion( new NACA(30,30,20,0.2,view),
-  new BodyUnion( new EllipseBody(70,30,15,view), new EllipseBody(30,70,15,view) ));
+                        new BodyUnion( new CircleBody(70,30,15,view), 
+                                       new CircleBody(30,70,15,view) ));
 }
 void draw(){
   background(0);
