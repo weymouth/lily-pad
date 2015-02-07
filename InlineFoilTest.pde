@@ -3,14 +3,10 @@
  
  Example code:
  
-import processing.video.*;
-MovieMaker mm;
 InlineFoilTest test;
 SaveData dat;
 float maxT;
-float numframes = 250;
-float frame = 0;
-String datapath = "";
+String datapath = "saved/";
   
 void setup() {
   int Re = 6000, nflaps = 2;
@@ -19,9 +15,8 @@ void setup() {
   maxT = (int)(2*hc/stru*resolution*nflaps);
 
   test = new InlineFoilTest(resolution, xLengths, yLengths, xStart, zoom, Re, true);
-  test.setFlapParams(stru, stk, dAoA, uAoA, hc, "ClosedLoop");
+  test.setFlapParams(stru, stk, dAoA, uAoA, hc, "Sine");
 
-  mm = new MovieMaker(this, width, height, datapath+"flap.mov", 30);
   dat = new SaveData(datapath+"pressure.txt", test.foil.coords, resolution, xLengths, yLengths, zoom);
 }
 void draw() {
@@ -29,23 +24,17 @@ void draw() {
   test.display();
   dat.addData(test.t, test.foil.pressForce(test.flow.p), test.foil, test.flow.p);
 
-  if (frame<test.t*numframes/maxT) {
-    frame = frame+1;
-    mm.addFrame();
-  }
-
   if (test.t>=maxT) {
     dat.finish();
-    mm.finish();
     exit();
   }
 }
 void keyPressed() {
-  mm.finish();
   dat.finish();
   exit();
 }
- ***********************/
+
+***********************/
 
 class InlineFoilTest {
   final int n, m;

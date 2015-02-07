@@ -10,21 +10,22 @@ void setup(){
     body.add(i/25.,(sin(i/3.)+1.5)/3.);      
   }
   body.end();
+  body.weight = 4;
   body.display();
 }
 ********************************/
 
 class LineSegBody extends Body{
-  float thk=4;
+  float thk=4,weight;
   
-  LineSegBody( float x, float y, Window window ){super(x,y,window);}
+  LineSegBody( float x, float y, Window window ){super(x,y,window); weight = window.pdx(thk);}
   
   void add( float x, float y ){coords.add( new PVector( x, y ) );}
   
   void end(){super.end(false);}
   
   void display( color C, Window window ){ // note: can display while adding
-    stroke(C); noFill(); strokeWeight(window.pdx(thk));
+    stroke(C); noFill(); strokeWeight(weight);
     beginShape();
     for ( PVector x:  coords ) vertex(window.px(x.x),window.py(x.y));
     endShape();

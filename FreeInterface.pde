@@ -5,15 +5,14 @@ Extends SharpField by adding the density
   ratio (gamma) to compute the density 
   (rho)
 
-example code:
-
-FreeInterface f;
-int m=100,n=100;
+Example code:
 
 void setup(){
-  size(600,600,P2D);
-  colorMode(RGB,1.0);
-  noStroke();
+  size(400,400);
+
+  FreeInterface f;
+  int m=100,n=100;
+
   f = new FreeInterface(n,m,0.1);
   for( int i=0; i<n; i++){
     for( int j=0; j<m/3; j++){
@@ -25,7 +24,8 @@ void setup(){
       f.a[i][j] = 0.0;
     }
   }
-  f.rho().display(0,1);
+  f.display(0,1);
+  f.rho().display(1,2);
 } 
 ***************************************/
 
