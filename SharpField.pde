@@ -49,8 +49,8 @@ class SharpField extends Field{
     // iterate split-advection method
     for (int itr = 0; itr<it; itr++){
       SharpField c = new SharpField(this);
-      if(strang==0){ left( substep, u, c ); bottom( substep, v, c ); }
-      else         { bottom( substep, v, c ); left( substep, u, c ); }
+      if(strang==0){ left( substep, u, c ); bottom( substep, v, c ); strang=1;}
+      else         { bottom( substep, v, c ); left( substep, u, c ); strang=0;}
     }
   }
   void advect( float step, Field u, Field v, Field u0, Field v0 ){
