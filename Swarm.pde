@@ -1,4 +1,5 @@
 import java.util.Iterator;
+import java.util.ListIterator;
 /*
 Swarm class
 
@@ -134,11 +135,46 @@ class InletSwarm extends Swarm{
   void add(VectorField u, VectorField u0 , float dt){
     for( int i=0; pSet.size()<imax & i<max(1,imax/lifeSpan) ; i++) {
       float x = 0, y = random(0,height);
-      color c = (y<width/2)?color(#00FF33):color(#215E21);
+      color c = (y<height/2+1)?color(#00FF33):color(#215E21);
 //      color c = bodyColor;
       x = window.ix((int)x); y = window.iy((int)y);
       pSet.add( new Particle( x, y, c, window, lifeSpan ) );
     }
   }
 }
+
+// Extend SourceSwarm to fill in gaps between points. Even better for streaklines
+class StreakSwarm extends SourceSwarm{
+
+  StreakSwarm( Window window, PVector p ){
+    super( window, p );
+  }
+  
+  void add(VectorField u, VectorField u0 , float dt){
+    pSet.add( new Particle( p.x, p.y, bodyColor, window, lifeSpan ) );
+    ListIterator<Particle> pIter = pSet.listIterator();
+    while ( pIter.hasNext()){
+      PVector a = pIter.next().x.get();
+      if(pIter.hasNext()) {
+        PVector b = pSet.get(pIter.nextIndex()).x.get();
+        int d2 = window.pdx(sq(a.x-b.x)+sq(a.y-b.y));
+        if(d2>4) pIter.add( new Particle( 0.5*(a.x+b.x), 0.5*(a.y+b.y), bodyColor, window, lifeSpan ) );
+      }
+    }
+  }
+
+  void remove(){
+    while( pSet.size()>imax ) pSet.remove(0);
+  } 
+  
+  void display(){
+    noFill(); 
+    stroke(bodyColor);
+    strokeWeight(4);
+    beginShape();
+    for( Particle a: pSet ) vertex(window.px(a.x.x), window.py(a.x.y));
+    endShape(OPEN);
+  }
+}
+
 
