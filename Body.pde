@@ -337,6 +337,7 @@ class CircleBody extends EllipseBody {
   void rotate(float _dphi) {
     dphi = _dphi;
     phi = phi+dphi;
+    updated = false;
   }
   
 }
