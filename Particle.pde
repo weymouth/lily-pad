@@ -32,12 +32,14 @@ class Particle {
   PVector x,x0;
   int step=0, lifeSpan;
   
-  Particle( float x0, float y0, color _color, Window _window, int _lifeSpan ) {
+  Particle( float x0, float y0, color _color, Window _window, int _lifeSpan, int _step ) {
     x = new PVector( x0 , y0 );
     bodyColor = _color;
     window = _window;
     lifeSpan = _lifeSpan;
+    step = _step;
   }
+  Particle( float x0, float y0, color _color, Window _window, int _lifeSpan ) { this(x0,y0,_color,_window,_lifeSpan,0); }
   
   void update( VectorField u, VectorField u0, float dt ){
     x0 = x.get();
