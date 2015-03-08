@@ -79,11 +79,14 @@ class VectorField{
     Field d = new Field( n, m );
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
-      d.a[i][j] = 0.5*(x.a[i][j-1]-x.a[i][j+1]+
-                       y.a[i+1][j]-y.a[i-1][j]);
+      d.a[i][j] = 0.25*(x.a[i  ][j-1]-x.a[i  ][j+1]+
+                        x.a[i+1][j-1]-x.a[i+1][j+1]+
+                        y.a[i+1][j  ]-y.a[i-1][j  ]+
+                        y.a[i+1][j+1]-y.a[i-1][j+1]);
     }}
     return d;
   }
+
   Field Qcrit (){
     Field q = new Field( n, m );
     for ( int i=1 ; i<n-1 ; i++ ) {
