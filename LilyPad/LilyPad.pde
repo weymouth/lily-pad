@@ -12,9 +12,9 @@ CircleArrangement body;
 FloodPlot flood;
 
 void setup(){
-  int n=(int)pow(2,8)+2; // number of grid points
-  size(1400,1000);         // display window size
-  Window view = new Window(0, 0, n, n);
+  int n=(int)pow(2,9)+2; // number of grid points
+  size(1350,900);         // display window size
+  Window view = new Window(3*n/2, n);
   
   float D;           //Bundle radius
   float d = 2;       //Define each cylinder's diameter
