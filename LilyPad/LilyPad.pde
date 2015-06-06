@@ -1,7 +1,9 @@
 /*********************************************************
                   Main Window! 
 Click the "Run" button to Run the simulation.
+
 Change the geometry, flow conditions, numercial parameters
+
  visualizations and measurments from this window. 
 *********************************************************/
 BDIM flow;
