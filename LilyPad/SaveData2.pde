@@ -4,9 +4,20 @@
  Saves data to a text file with customizable header
  
 ---- example code fragment:
+
  SaveData2 dat;
- dat = new SaveData2("saved/N39d12DragAoA90.txt",body);
- dat.addData(flow.p,"Drag", DG);
+ 
+ void setup(){
+   ...
+   dat = new SaveData2("saved/N39d12DragAoA90.txt",body);
+   ...
+ }
+ 
+ void draw(){
+   ...
+   dat.addData(flow.p,"Drag", DG);
+   ... 
+ }
 ----see use in CircleArray.pde
 ***********************************/
 class SaveData2{
@@ -18,11 +29,11 @@ class SaveData2{
     output = createWriter(name);
     n = 0;
     for(CircleArray subcircleArr : body.circleArr){
-        for(CircleBody x: subcircleArr.circleList){
-          for(PVector xx: x.coords){
-            coords.add(xx);
+        for(CircleBody circle: subcircleArr.circleList){
+          for(PVector xy: circle.coords){
+            coords.add(xy);
           }
-          bodys.add(x);
+          bodys.add(circle);
           n++;
         }
     }

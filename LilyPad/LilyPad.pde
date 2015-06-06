@@ -1,33 +1,23 @@
 /*********************************************************
                   Main Window! 
-
 Click the "Run" button to Run the simulation.
-
 Change the geometry, flow conditions, numercial parameters
  visualizations and measurments from this window. 
-
 *********************************************************/
 BDIM flow;
-CircleArrangement body;
+CircleBody body;
 FloodPlot flood;
 
 void setup(){
-  int n=(int)pow(2,9)+2; // number of grid points
-  size(1350,900);         // display window size
-  Window view = new Window(3*n/2, n);
-  
-  float D;           //Bundle radius
-  float d = 2;       //Define each cylinder's diameter
-  D = d * 21;
-  float x = n/4, y = n/2;
-  float aoa = PI/2;   //aoa is Angle of Attack
-   
-  body = new CircleArrangement(x, y, d, D/2, 95, aoa, view);
-  
-//  flow = new BDIM(n,n,1.5,body);           // solve for flow using BDIM
-  flow = new BDIM(n,n,0,body,0.01,true);   // QUICK with adaptive dt
+  int n=(int)pow(2,6)+2; // number of grid points
+  size(400,400);         // display window size
+  Window view = new Window(n,n);
+
+  body = new CircleBody(n/3,n/2,n/8,view); // define geom
+  flow = new BDIM(n,n,1.5,body);           // solve for flow using BDIM
+//  flow = new BDIM(n,n,0,body,0.01,true);   // QUICK with adaptive dt
   flood = new FloodPlot(view);
-  flood.range = new Scale(-1.,1);
+  flood.range = new Scale(-.75,.75);
   flood.setLegend("vorticity");
 }
 void draw(){
@@ -39,7 +29,4 @@ void draw(){
 }
 void mousePressed(){body.mousePressed();}
 void mouseReleased(){body.mouseReleased();}
-
-
-
 

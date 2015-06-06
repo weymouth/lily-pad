@@ -1,42 +1,30 @@
 /*********************************
-CircleArray class creats a single circle array of cylinders.
-This is special for bundle case.
+CircleArray class creats a single circle ring of cylinders.
 The input arguments are center coordinates X, Y; diameter of each cylinder D; 
 Radius of circle array; division n; Angle of Attack rad; window.
 
 CircleArrangement class uses CircleArray to setup circular arrangement for many times.
-Setup order (logic): single cylinder-->circle array (single ring of cylinders)--> circular arrangement (many rings of cylinders)
 
 Example code: 
-
 
 SaveData2 dat;
 CircleArrangement body;
 BDIM flow;
 FloodPlot flood;
-
-float DomainRatio = 2;               // Domain/DG
-int   gridScale   = 8;               // coefficient for number of grid points
-int   Nc          = 39;               // circles in bundle
-int   n = gridScale*(int)pow(2,6)+2; // y-axis number of points
-int   m = 2*(n-2)+2;                 // x-axis number of points
-float DG = float(n-2)/DomainRatio;   // Bundle diameter
-float d = DG/21.;                    // Cylinder's diameter
-float R = DG/2;     //Bundle radius
-float aoa = PI/2;   //Angle of Attack
-float ReG = 2100;   //physical Reynolds number
-float Reh = ReG/DG; //grid-based Reynolds number
-float dt = 0;
-boolean QUICK = true;
+int n=(int)pow(2,6)+2;
+float DG = float(n-2)/2;   // Bundle diameter
+float d = DG/21.;          // Cylinder's diameter
+float R = DG/2;            //Bundle radius 
+float ReG = 2100;          //physical Reynolds number
+float Reh = ReG/DG;        //grid-based Reynolds number
 
 void setup(){
-  size(1200,600);         // display window size
-  Window view = new Window(m,n);
-
+  size(600,600);            // display window size
+  Window view = new Window(n,n);
   float x = (float)n/2., y = (float)n/2.;  //central position 
-  body = new CircleArrangement(x, y, d, R, Nc, aoa, view); 
-  dat = new SaveData2("saved/N39d12DragAoA90.txt",body);    // initialize the output data file with header information
-  flow = new BDIM(m,n,dt,body,(float)1./Reh,QUICK);
+  body = new CircleArrangement(x, y, d, R, 20, PI/2, view); 
+  dat = new SaveData2("saved/N39d12DragAoA90.txt",body);   
+  flow = new BDIM(n,n,0,body,(float)1./Reh,true);
   flood = new FloodPlot(view);
   flood.range = new Scale(-.75,.75);
   flood.setLegend("vorticity");
@@ -50,7 +38,6 @@ void draw(){
   body.display();
   dat.addData(flow.p,"Drag", DG);    // "Drag" or "Lift"
 }
-
 **********************************/
 
 class CircleArray extends Body{
