@@ -84,8 +84,7 @@ class Body {
 
     // make the bounding box
     if (n>4) {
-      PVector mn = xc.get();
-      PVector mx = xc.get();
+      PVector mn = xc.copy(), mx = xc.copy();
       for ( PVector x: coords ) {
         mn.x = min(mn.x, x.x);
         mn.y = min(mn.y, x.y);
@@ -152,7 +151,6 @@ class Body {
   }
   void displayVector(color C, Window window, PVector V, String title, boolean legendOn) { // note: can display while adding
     //    if(n>4) box.display(#FFCC00);
-    float Vabs = sqrt(V.x*V.x+V.y*V.y);
     float Vscale=10;
     float circradius=6; //pix
     
@@ -168,8 +166,7 @@ class Body {
         textFont(font);
         fill(C);
         float spacing=20;
-        int x0 = window.x0, x1 = window.x0+window.dx;
-        int y0 = window.y0, y1 = window.y0+window.dy;
+        int x0 = window.x0, y1 = window.y0+window.dy;
         textAlign(LEFT,BASELINE);
         String ax = ""+V.x;
         String ay = ""+V.y;
@@ -341,4 +338,3 @@ class CircleBody extends EllipseBody {
   }
   
 }
-

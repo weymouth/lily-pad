@@ -87,7 +87,7 @@ class FlexNACA extends NACA{
   void rotate( float dphi ){} // no rotation
 
   void update(float time) { // update time and coords
-    for ( int i=0; i<coords.size(); i++ ) coords.set(i,orig.coords.get(i).get());
+    for ( int i=0; i<coords.size(); i++ ) coords.set(i,orig.coords.get(i).copy());
     this.time = time;
     for ( PVector x: coords ) x.y += h(x.x);
     getOrth();

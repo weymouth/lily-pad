@@ -44,8 +44,6 @@ class Swarm{
   Swarm( Window window ){ 
     pSet = new ArrayList();
     this.window = window;
-    this.imax = imax; 
-    this.lifeSpan = lifeSpan;
   }
 
   void update(VectorField u, VectorField u0 , float dt){
@@ -181,5 +179,3 @@ class StreakSwarm extends SourceSwarm{
     endShape(OPEN);
   }
 }
-
-

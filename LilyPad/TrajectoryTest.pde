@@ -2,43 +2,20 @@
  Trajectory Follower Class
  
 Example code: WILL ONLY WORK IF YOU USE A TRAJECTORY FILE WRITTEN IN MATLAB, PARSED INTO READDATA 
-import processing.video.*;
-MovieMaker mm;
+
 TrajectoryTest test;
-SaveData dat;
-float numframes = 400, frame = 0, nflaps=2;
 int trialnum;
-String folderpath = "C:\\Users\\jsi\\Documents\\Research\\CFD\\Data\\Learning\\";
 String inputfile = "FileToRead.txt";
 
 void setup() {
   int Re = 6000;
-  //int resolution = 32, xLengths=7, yLengths=9, xStart = 4, ystart = 4, zoom = 2;
   int resolution = 64, xLengths=7, yLengths=9, xStart = 4, ystart = 5, zoom = 1;
-  test = new TrajectoryTest(resolution, xLengths, yLengths, xStart, ystart, zoom, Re, folderpath+inputfile, true);
-  mm = new MovieMaker(this, width, height, folderpath + "flap" + test.trialID + ".mov", 30);
-  
-  //dat = new SaveData(folderpath+"pressure" + test.trialID + ".txt", test.foil.coords, resolution, xLengths, yLengths, zoom);
-  dat = new SaveData(folderpath+"pressure.txt", test.foil.coords, resolution, xLengths, yLengths, zoom);
+  test = new TrajectoryTest(resolution, xLengths, yLengths, xStart, ystart, zoom, Re, inputfile, true);
 }
 
 void draw() {
   test.update();
   test.display();
-  dat.addData(test.t, test.foil.pressForce(test.flow.p), test.foil, test.flow.p);
-
-  if (frame<(test.t*numframes/(test.maxT*nflaps))){
-    frame = frame+1;
-    mm.addFrame();
-  }
-
-  if (test.t>=test.maxT*nflaps) {
-    dat.saveString("% Finished");
-    dat.finish();
-    mm.finish();
-    exit();
-  }
-  
   test.incrementTime();
 }
  
@@ -119,4 +96,3 @@ class TrajectoryTest {
     foil.displayVector(foil.pressForce(flow.p));
   }
 }
-
