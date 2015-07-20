@@ -5,7 +5,7 @@ cylinder, D, located at (xc, yc).
 
 Example Code:
 
-DIM flow;
+BDIM flow;
 CircleBody mainCylinder;
 CounterRotatingCylinders controlCylinders;
 BodyUnion body;
