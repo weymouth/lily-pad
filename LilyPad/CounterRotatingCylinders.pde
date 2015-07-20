@@ -5,9 +5,12 @@ cylinder, D, located at (xc, yc).
 
 Example Code:
 
-BDIM flow;
+DIM flow;
+CircleBody mainCylinder;
+CounterRotatingCylinders controlCylinders;
 BodyUnion body;
 FloodPlot flood;
+float xi;
 
 void setup(){
 
@@ -22,11 +25,14 @@ void setup(){
   float xc = n/2.5, yc = n/2; // Position of Main cylinder
   // -------------------------
 
+  this.xi = xi;
   size(400,400);  // display window size
   Window view = new Window(n,n);
   
   // Create union of main cylinder and counter-rotating cylinders
-  body = new BodyUnion(new CircleBody(xc,yc,D,view), new CounterRotatingCylinders(xc, yc, dR, theta, gR, xi, D, view));
+  mainCylinder = new CircleBody(xc,yc,D,view);
+  controlCylinders = new CounterRotatingCylinders(xc, yc, dR, theta, gR, xi, D, view);
+  body = new BodyUnion(mainCylinder, controlCylinders);
   flow = new BDIM(n, n, 0, body, D/Re, true);
 
   flood = new FloodPlot(view);
@@ -36,6 +42,7 @@ void setup(){
 
 void draw(){
   body.update();
+  controlCylinders.update(flow.dt);
   flow.update(body);
   flow.update2();
   flood.display(flow.u.vorticity());
@@ -57,12 +64,12 @@ CounterRotatingCylinders(float xc, float yc, float dR, float theta, float gR, fl
   this.D = D;
 }
 
-void update(){
+void update(float dt){
   unsteady = true;
 
   // Rotate the control cylinders
-  this.a.rotate(-xi*flow.dt*2/(dR*D));
-  this.b.rotate(xi*flow.dt*2/(dR*D));
+  this.a.rotate(-xi*dt*2/(dR*D));
+  this.b.rotate(xi*dt*2/(dR*D));
 }
 
 }
