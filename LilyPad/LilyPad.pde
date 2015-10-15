@@ -1,3 +1,12 @@
+/*********************************************************
+                  Main Window!
+
+Click the "Run" button to Run the simulation.
+
+Change the geometry, flow conditions, numercial parameters
+visualizations and measurments from this window.
+
+*********************************************************/
 BDIM flow;
 Body body;
 FloodPlot flood;
@@ -10,15 +19,15 @@ void setup(){
 
   body = new CircleBody(n/3,n/2,L,view);     // define geom
   flow = new BDIM(n,n,1.5,body);             // solve for flow using BDIM
-//  flow = new BDIM(n,n,0.,body,L/200,true);  // BDIM+QUICK
-  flood = new FloodPlot(view);
-  flood.setLegend("vorticity",-.5,.5);
+//  flow = new BDIM(n,n,0.,body,L/200,true);   // BDIM+QUICK
+  flood = new FloodPlot(view);               // intialize...
+  flood.setLegend("vorticity",-.5,.5);       // and label a flood plot
 }
 void draw(){
-  body.update();
-  flow.update(body); flow.update2();
-  flood.display(flow.u.vorticity());
-  body.display();
+  body.update();                             // update the body
+  flow.update(body); flow.update2();         // 2-step fluid update
+  flood.display(flow.u.vorticity());         // compute and display vorticity
+  body.display();                            // display the body
 }
-void mousePressed(){body.mousePressed();}
-void mouseReleased(){body.mouseReleased();}
+void mousePressed(){body.mousePressed();}    // user mouse...
+void mouseReleased(){body.mouseReleased();}  // interaction methods
