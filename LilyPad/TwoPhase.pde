@@ -10,10 +10,10 @@ example code:
 
 TwoPhase flow;
 void setup(){
-  int n=(int)pow(2,7)+2, m=(int)pow(2,6)+2; size(800,400);
+  int n=(int)pow(2,7), m=(int)pow(2,6); size(800,400);
   flow = new TwoPhase(n,m,2,0.01);
-  flow.f.eq(0,m,n,0,m);
-  flow.u = new VectorField(n,m,0,0);
+  flow.f.eq(0,m,n+2,0,m+2);
+  flow.u = new VectorField(n+2,m+2,0,0);
 }
 void draw(){
   flow.update();

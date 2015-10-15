@@ -6,14 +6,16 @@ Example code:
 
 SaveData dat;
 AudreyTest test;
+int resolution = 64, xLengths=5, yLengths=3, zoom = 2;    // choose the number of grid points per chord, the size of the domain in chord units and the zoom of the display
 
+void settings(){
+    size(zoom*xLengths*resolution, zoom*yLengths*resolution);
+}
 void setup(){
-  int resolution = 64, xLengths=5, yLengths=3, zoom = 2;    // choose the number of grid points per chord, the size of the domain in chord units and the zoom of the display
   float xStart = 1, yDist = 0.06;        // choose the initial horizontal position of the cylinder and vertical separation between the foil and the cylinder
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
   dat = new SaveData("saved/pressure.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
 }
-
 void draw(){
   if(test.t<2){  // run simulation until t<Time
     test.update();
@@ -39,8 +41,8 @@ class AudreyTest{
   BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2;
   
   AudreyTest( int resolution, int xLengths, int yLengths, float xStart , float yDist, float zoom){
-    n = xLengths*resolution+2;
-    m = yLengths*resolution+2;
+    n = xLengths*resolution;
+    m = yLengths*resolution;
     this.resolution = resolution;
     float xFoil = 1.0/3.0;     // position of the foil in % of the domain size
     float yFoil = 1.0/2.0;
@@ -49,8 +51,6 @@ class AudreyTest{
     t0 = xStart-xFoil*xLengths;    // choose initial time such that the cylinder is passing the foil at time=0
     t=t0;
 
-    int w = int(zoom*(n-2)), h = int(zoom*(m-2));
-    size(w,h);
     smooth();
 //    window = new Window(n,m);      // display the entire domain
     window = new Window(n/6,m/5,n/2,m/2);

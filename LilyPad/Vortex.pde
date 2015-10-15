@@ -6,8 +6,6 @@
  flow and then moves with its self-induced velocity.
  
  Example code:
- 
- 
 //INPUT PARAMETERS_______________________________________________________________________
 int resolution = 8;            // number of grid points spanning vortex diameter
 int xLengths = 16;             // (streamwise length of computational domain)/(resolution)
@@ -20,11 +18,11 @@ float sep = 1;                 // (separation between opposite sign vortices)/(c
 
 Vortex test;
 
-void setup() {
-  // set window view area 
+void settings(){
   float s = sqrt(area*xLengths/yLengths);
   size((int)s, (int)s*yLengths/xLengths);
-  
+}
+void setup() {
   test = new Vortex(resolution, Re, xLengths, yLengths, q, sep);
 }
 
@@ -88,7 +86,7 @@ class Vortex {
       }
     }
     
-    flow = new BDIM(n, m, 0, u0, (float)resolution/Re, QUICK);
+    flow = new BDIM(n-2, m-2, 0, u0, (float)resolution/Re, QUICK);
 
     flood = new FloodPlot(view); 
     flood.range = new Scale(-.5, .5);
@@ -134,5 +132,3 @@ class Vortex {
     flood.display(flow.u.vorticity());
   }
 }
-
-

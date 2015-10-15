@@ -19,19 +19,15 @@ solve the BDIM equation for velocity and pressure
 Example code:
 
 BDIM flow;
-CircleBody body;
 void setup(){
   size(400,400); 
-  int n=(int)pow(2,6)+2; // multigrid solver needs n = power of 2 
-  Window view = new Window(n,n);
-  body = new CircleBody(n/3,n/2,n/8,view);
-  flow = new BDIM(n,n,1.5,body);
+  int n=(int)pow(2,6);
+  flow = new BDIM(n,n,1.5,new CircleBody(n/3,n/2,n/8,new Window(n,n)));
 }
 void draw(){
   flow.update();  // project
   flow.update2(); // correct
   flow.u.vorticity().display(-0.75,0.75);
-  body.display();
 }
 *********************************************************/
 class BDIM{

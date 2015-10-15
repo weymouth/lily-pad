@@ -7,11 +7,15 @@ InlineFoilTest test;
 SaveData dat;
 float maxT;
 String datapath = "saved/";
-  
+
+int Re = 6000, nflaps = 2;
+float stru = .45, stk = -135*PI/180, hc = 1, dAoA = 25*PI/180, uAoA = 0;
+int resolution = 32, xLengths=7, yLengths=7, xStart = 3, zoom = 3;
+
+void settings(){
+  size(zoom*xLengths*resolution, zoom*yLengths*resolution);  
+}
 void setup() {
-  int Re = 6000, nflaps = 2;
-  float stru = .45, stk = -135*PI/180, hc = 1, dAoA = 25*PI/180, uAoA = 0;
-  int resolution = 32, xLengths=7, yLengths=7, xStart = 3, zoom = 3;
   maxT = (int)(2*hc/stru*resolution*nflaps);
 
   test = new InlineFoilTest(resolution, xLengths, yLengths, xStart, zoom, Re, true);
@@ -33,7 +37,6 @@ void keyPressed() {
   dat.finish();
   exit();
 }
-
 ***********************/
 
 class InlineFoilTest {
@@ -57,11 +60,8 @@ class InlineFoilTest {
 
   InlineFoilTest( int resolution, int xLengths, int yLengths, int xStart, float zoom, int Re, boolean QUICK) {
     this.resolution = resolution;
-    n = xLengths*resolution+2;
-    m = yLengths*resolution+2;
-
-    int w = int(zoom*(n-2)), h = int(zoom*(m-2));
-    size(w, h);
+    n = xLengths*resolution;
+    m = yLengths*resolution;
     window = new Window(n, m);
 
     foil = new NACA(xStart*resolution, m/2, resolution*chord, .15, window);

@@ -14,8 +14,8 @@ FloodPlot flood;
 float time=0;
 float[] a={0,.2,-.1};
 void setup(){
-  int n=(int)pow(2,6)+2; // number of grid points
-  size(400,400);         // display window size
+  int n=(int)pow(2,6);
+  size(400,400);      
   Window view = new Window(n,n);
 
   fish = new FlexNACA(n/4,n/2,n/3,0.20,0.25,1.2,1.,a,view);

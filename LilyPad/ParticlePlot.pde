@@ -9,7 +9,7 @@ Body body;
 ParticlePlot plot;
 
 void setup(){
-  int n = (int)pow(2,6)+2; size(400,400);
+  int n = (int)pow(2,6); size(400,400);
   Window window = new Window(n,n);
   body = new CircleBody( n/3, n/2, n/8, window );
   body.bodyColor = color(#00008B);
