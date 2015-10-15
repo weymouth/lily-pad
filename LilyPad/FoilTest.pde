@@ -4,8 +4,11 @@
  Example code:
  
 FoilTest test;
+int resolution = 32, xLengths=4, yLengths=3, xStart = 1, zoom = 3;
+void settings(){
+  size(zoom*xLengths*resolution, zoom*yLengths*resolution);  
+}
 void setup(){
-  int resolution = 32, xLengths=4, yLengths=3, xStart = 1, zoom = 3;
   float heaveAmp = 0.5, pitchAmp = PI/12.;
   test = new FoilTest(resolution, xLengths, yLengths, xStart , zoom, heaveAmp, pitchAmp );
 }
@@ -24,11 +27,8 @@ class FoilTest{
   Window window;
 
   FoilTest( int resolution, int xLengths, int yLengths, int xStart, float zoom, float heaveAmp, float pitchAmp) {
-    n = xLengths*resolution+2;
-    m = yLengths*resolution+2;
-
-    int w = int(zoom*(n-2)), h = int(zoom*(m-2));
-    size(w,h);
+    n = xLengths*resolution;
+    m = yLengths*resolution;
     window = new Window(n,m);
 
     foil = new NACA(xStart*resolution,m/2,resolution,0.2,window);
@@ -63,4 +63,3 @@ class FoilTest{
     flood.displayTime(t);
   }
 }
-

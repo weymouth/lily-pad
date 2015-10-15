@@ -12,7 +12,7 @@ CircleBody body;
 Swarm streaks;
 
 void setup(){
-  int n=(int)pow(2,6)+2; size(400,400);
+  int n=(int)pow(2,6); size(400,400);
   Window view = new Window(n,n);
   body = new CircleBody(n/3,n/2,n/8,view);
   flow = new BDIM(n,n,1,body);
@@ -44,8 +44,6 @@ class Swarm{
   Swarm( Window window ){ 
     pSet = new ArrayList();
     this.window = window;
-    this.imax = imax; 
-    this.lifeSpan = lifeSpan;
   }
 
   void update(VectorField u, VectorField u0 , float dt){
@@ -181,5 +179,3 @@ class StreakSwarm extends SourceSwarm{
     endShape(OPEN);
   }
 }
-
-

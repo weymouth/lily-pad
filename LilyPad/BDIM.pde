@@ -19,19 +19,15 @@ solve the BDIM equation for velocity and pressure
 Example code:
 
 BDIM flow;
-CircleBody body;
 void setup(){
   size(400,400); 
-  int n=(int)pow(2,6)+2; // multigrid solver needs n = power of 2 
-  Window view = new Window(n,n);
-  body = new CircleBody(n/3,n/2,n/8,view);
-  flow = new BDIM(n,n,1.5,body);
+  int n=(int)pow(2,6);
+  flow = new BDIM(n,n,1.5,new CircleBody(n/3,n/2,n/8,new Window(n,n)));
 }
 void draw(){
   flow.update();  // project
   flow.update2(); // correct
   flow.u.vorticity().display(-0.75,0.75);
-  body.display();
 }
 *********************************************************/
 class BDIM{
@@ -42,11 +38,11 @@ class BDIM{
   Field p;
   boolean QUICK, mu1=true, adaptive=false;
 
-  BDIM( int n, int m, float dt, Body body, VectorField uinit, float nu, boolean QUICK ){
-    this.n = n; this.m = m;
-    this.dt = dt;
-    this.nu=nu;
-    this.QUICK=QUICK;
+  BDIM( int n_, int m_, float dt_, Body body, VectorField uinit, float nu_, boolean QUICK_ ){
+    n = n_+2; m = m_+2;
+    dt = dt_;
+    nu=nu_;
+    QUICK=QUICK_;
 
     u = uinit;
     if(u.x.bval!=0) u.x.gradientExit = true;
@@ -66,15 +62,15 @@ class BDIM{
   }
   
   BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, int u_inf){
-    this(n,m,dt,body,new VectorField(n,m,u_inf,0),nu,QUICK);}
+    this(n,m,dt,body,new VectorField(n+2,m+2,u_inf,0),nu,QUICK);}
   BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){
-    this(n,m,dt,body,new VectorField(n,m,1,0),nu,QUICK);}
+    this(n,m,dt,body,new VectorField(n+2,m+2,1,0),nu,QUICK);}
   
   // If no body is supplied, create a body outside the domain
   BDIM( int n, int m, float dt, VectorField uinit, float nu, boolean QUICK ){
     this(n,m,dt,new CircleBody(-n/2,-m/2,n/10,new Window(0,0,n,m)),uinit,nu,QUICK);}
   
-  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n,m,1,0),1,false);}
+  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),1,false);}
   
   void update(){
     // O(dt,dx^2) BDIM projection step:

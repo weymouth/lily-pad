@@ -7,11 +7,15 @@ InlineFoilTest test;
 SaveData dat;
 float maxT;
 String datapath = "saved/";
-  
+
+int Re = 6000, nflaps = 2;
+float stru = .45, stk = -135*PI/180, hc = 1, dAoA = 25*PI/180, uAoA = 0;
+int resolution = 32, xLengths=7, yLengths=7, xStart = 3, zoom = 3;
+
+void settings(){
+  size(zoom*xLengths*resolution, zoom*yLengths*resolution);  
+}
 void setup() {
-  int Re = 6000, nflaps = 2;
-  float stru = .45, stk = -135*PI/180, hc = 1, dAoA = 25*PI/180, uAoA = 0;
-  int resolution = 32, xLengths=7, yLengths=7, xStart = 3, zoom = 3;
   maxT = (int)(2*hc/stru*resolution*nflaps);
 
   test = new InlineFoilTest(resolution, xLengths, yLengths, xStart, zoom, Re, true);
@@ -33,7 +37,6 @@ void keyPressed() {
   dat.finish();
   exit();
 }
-
 ***********************/
 
 class InlineFoilTest {
@@ -57,11 +60,8 @@ class InlineFoilTest {
 
   InlineFoilTest( int resolution, int xLengths, int yLengths, int xStart, float zoom, int Re, boolean QUICK) {
     this.resolution = resolution;
-    n = xLengths*resolution+2;
-    m = yLengths*resolution+2;
-
-    int w = int(zoom*(n-2)), h = int(zoom*(m-2));
-    size(w, h);
+    n = xLengths*resolution;
+    m = yLengths*resolution;
     window = new Window(n, m);
 
     foil = new NACA(xStart*resolution, m/2, resolution*chord, .15, window);
@@ -133,7 +133,7 @@ class InlineFoilTest {
     computeVelocity(t);
     AoF = atan2(veloy, 1.+velox);
     
-    float delt = resolution*0.5;
+    //float  = resolution*0.5;
     //AoF = atan2((heaveAmp*cos(omega*t)-heaveAmp*cos(omega*(t-delt)))/delt,(delt+inlineAmp*cos(omega*t)-inlineAmp*cos(omega*(t-delt)))/delt);
     
     v2 = (1+velox)*(1+velox)+veloy*veloy;
@@ -215,7 +215,6 @@ class InlineFoilTest {
       if (upstroke) {
         pitchAmp = -uAoA;
       }
-      float AoAgain = a;
       Fd = a*v2*(pitchAmp/2-pitchAmp/2*cos(2*omega/(2*dfrac)*t));
       return controller(F/v2, Fd/v2);
     }
@@ -300,4 +299,3 @@ class InlineFoilTest {
     foil.displayVector(foil.pressForce(flow.p));
   }
 }
-

@@ -10,7 +10,7 @@ CircleBody body;
 Particle marker;
 
 void setup(){
-  int n=(int)pow(2,6)+2; size(400,400);
+  int n=(int)pow(2,6); size(400,400);
   Window view = new Window(n,n);
   body = new CircleBody(n/3,n/2,n/8,view);
   flow = new BDIM(n,n,1,body);
@@ -42,7 +42,7 @@ class Particle {
   Particle( float x0, float y0, color _color, Window _window, int _lifeSpan ) { this(x0,y0,_color,_window,_lifeSpan,0); }
   
   void update( VectorField u, VectorField u0, float dt ){
-    x0 = x.get();
+    x0 = x.copy();
     float px = x.x+dt*u0.x.quadratic( x.x, x.y ); // forward
     float py = x.y+dt*u0.y.quadratic( x.x, x.y ); //   projection
     float p0x = px-dt*u.x.quadratic( px, py );    // backward 

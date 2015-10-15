@@ -17,11 +17,12 @@ int Re = 100;                     // Reynolds number
 float mr = 2;                     // mass ratio = (body mass)/(mass of displaced fluid)
 //_______________________________________________________________________________________
 
-void setup() {
+void settings(){
   // set window view area 
   float s = sqrt(area*xLengths/yLengths);
   size((int)s, (int)s*yLengths/xLengths);
-  
+}
+void setup() {
   // create FreeCylinder object
   test = new FreeCylinder(resolution, Re, xLengths, yLengths, mr);
 }
@@ -32,7 +33,6 @@ void draw() {
 }
 
 void keyPressed(){exit();}
- 
 ***********************/
 
 
@@ -48,8 +48,8 @@ class FreeCylinder {
   FreeCylinder(int resolution, int Re, int xLengths, int yLengths, float mr) {
     this.resolution = resolution;
     this.mr = mr;
-    n=xLengths*resolution+2;
-    m=yLengths*resolution+2;
+    n=xLengths*resolution;
+    m=yLengths*resolution;
     Window view = new Window(0, 0, n, m);
     D = resolution;
     
@@ -88,5 +88,3 @@ class FreeCylinder {
     body.display();
   }
 }
-
-

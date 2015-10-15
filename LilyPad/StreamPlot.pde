@@ -9,8 +9,8 @@ CircleBody body;
 StreamPlot flood;
 
 void setup(){
-  int n=(int)pow(2,6)+2; // number of grid points
-  int nlines = 15;        // number of streamlines
+  int n=(int)pow(2,6);   // number of grid points
+  int nlines = 15;       // number of streamlines
   size(400,400);         // display window size
   Window view = new Window(n,n);
 
@@ -81,4 +81,3 @@ class StreamPlot extends FloodPlot {
       legend.display(minv, maxv);
   }
 }
-

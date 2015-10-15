@@ -14,7 +14,7 @@ void setup(){
   VectorField c = new VectorField(N,N,0,0);
   c.x.eq(1); c.y.eq(1); c.setBC();
   Field p = new Field(N,N);
-  u.project(c,p);
+//  u.project(c,p);  // uncomment to see the effect of projection on the divergence.
   u.divergence().display(-.1,.1);
 }
 ***********************************/
@@ -283,4 +283,3 @@ class VectorField{
   void advect( float dt, VectorField b, VectorField b0 ){ x.advect(dt,b,b0); y.advect(dt,b,b0);}
   void invEq(){ x.invEq(); y.invEq();}  
 }
-

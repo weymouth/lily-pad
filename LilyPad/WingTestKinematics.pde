@@ -10,44 +10,41 @@ It can also be used to draw pretty pictures...
 Example code:
 
 WingTestKinematics wing1;
-
-void setup() {
-
-//Initialise the object - define starting values of variables.
-
 int windowsize = 4;
+
+void settings(){
+  size(windowsize*300, windowsize*200); //The window size always represents 2m by 3m  
+}
+void setup() {
+//Initialise the object - define starting values of variables.
  
-float phasesurge = 0; //phase difference between heave and surge
-float strokeplaneangle = 0; //stroke plane angle, clockwise from vertical
+  float phasesurge = 0; //phase difference between heave and surge
+  float strokeplaneangle = 0; //stroke plane angle, clockwise from vertical
 
 
-float chordm = 0.1; //Chord length of foil in m
-float chord = 100 * chordm * windowsize;// Chord length of foil in pixels
+  float chordm = 0.1; //Chord length of foil in m
+  float chord = 100 * chordm * windowsize;// Chord length of foil in pixels
 
-float xampm = 0.10; //surge amplitude in m
-float yampm = 0.50; //heave amplitude in m
+  float xampm = 0.10; //surge amplitude in m
+  float yampm = 0.50; //heave amplitude in m
 
-float xamp = 100*xampm*windowsize; //surge amplitude in pixels
-float yamp = 100*yampm*windowsize; //heave amplitude in pixels
+  float xamp = 100*xampm*windowsize; //surge amplitude in pixels
+  float yamp = 100*yampm*windowsize; //heave amplitude in pixels
 
-float xpos0 = 0.5; //Starting xpos of foil in percentage of screen
-float ypos0 = 0.5; //Starting ypos of foil in percentage of screen
+  float xpos0 = 0.5; //Starting xpos of foil in percentage of screen
+  float ypos0 = 0.5; //Starting ypos of foil in percentage of screen
 
-float frequency = 1; // Number of revolutions per second
-float omega = 2 * PI * frequency;  //radians per second
+  float frequency = 1; // Number of revolutions per second
+  float omega = 2 * PI * frequency;  //radians per second
 
-size(windowsize*300, windowsize*200); //The window size always represents 2m by 3m
-background(255);
+  background(255);
   wing1 = new WingTestKinematics(xamp, yamp, xpos0, ypos0, chord, phasesurge, strokeplaneangle, 2, windowsize, omega);
-
 }
 
 void draw() {
-  
 // Call methods on the object
   wing1.fly();
   wing1.display();
-
 }
 
 *********************************************************/
