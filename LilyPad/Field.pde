@@ -177,18 +177,19 @@ class Field{
   float interp( float x0, float y0 ){return linear(x0,y0);}
   
   void display( float low, float high ){
-    PImage img = createImage(n,m,RGB);
+    PImage img = createImage(n-2,m-2,RGB);
     img.loadPixels();
-    for ( int i=0 ; i<n ; i++ ) {
-      for ( int j=0 ; j<m ; j++ ) {
-        float f = a[i][j];
-        int k = i+j*n;
+    for ( int i=0 ; i<n-2 ; i++ ) {
+      for ( int j=0 ; j<m-2 ; j++ ) {
+        float f = a[i+1][j+1];
+        int k = i+j*(n-2);
         f = map(f,low,high,0,255);
         img.pixels[k] = color(f);
       }
     }
     img.updatePixels();
-    image(img,0,0,width,height);
+    int x0 = width/(n-2), y0 = height/(m-2);
+    image(img,x0,y0,width,height);
   }
 
   void setBC (){

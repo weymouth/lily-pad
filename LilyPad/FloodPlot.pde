@@ -32,6 +32,11 @@ class FloodPlot{
   Scale bri = new Scale(1,1);
   boolean sequential=false,legendOn=false,dark=false,sharp=false;
 
+  FloodPlot( Window window, String title, float low, float high ){
+    this.window = window;
+    img = new PImage(window.dx,window.dy,HSB);
+    setLegend(title, low, high);
+  }
   FloodPlot( Window window ){
     this.window = window;
     img = new PImage(window.dx,window.dy,HSB);
@@ -163,4 +168,3 @@ class FloodPlot{
       text("t = "+ nfs(t,2,2),0.5*(x0+x1),y1);
     }
 }
-
