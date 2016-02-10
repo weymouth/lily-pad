@@ -44,11 +44,10 @@ class Body {
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
   float phi=0, dphi=0, mass=1, I0=1, area=0;
-  int hx, hy;
-  ArrayList<PVector> coords;
+  ArrayList<PVector> coords, path;
   int n;
   boolean unsteady, pressed, xfree=true, yfree=true, updated=true;
-  PVector xc, dxc;
+  PVector xc, dxc, handle;
   OrthoNormal orth[];
   Body box;
 
@@ -57,6 +56,8 @@ class Body {
     xc = new PVector(x, y);
     dxc = new PVector(0, 0);
     coords = new ArrayList();
+    path = new ArrayList();
+    handle = new PVector(0, 0);
   }
 
   void add( float x, float y ) {
@@ -145,6 +146,12 @@ class Body {
     beginShape();
     for ( PVector x: coords ) vertex(window.px(x.x), window.py(x.y));
     endShape(CLOSE);
+
+    noFill();
+    stroke(bodyOutline,0.33); strokeWeight(5); strokeCap(ROUND);
+    beginShape();
+    for ( PVector x: path ) vertex(window.px(x.x), window.py(x.y));
+    endShape(OPEN);
   }
   void displayVector(PVector V) {
     displayVector(vectorColor, window, V, "Force", true);
@@ -245,27 +252,38 @@ class Body {
 
   void updatePositionOnly() {updated=true; update(); }
   void update() {
-    if (pressed) {
-      this.translate( window.idx(mouseX-hx), window.idy(mouseY-hy) );
-      hx = mouseX;
-      hy = mouseY;
-    }
+    pathTranslate();
     unsteady = (dxc.mag()!=0)|(dphi!=0);
     if(updated){ dxc = new PVector(0,0); dphi = 0; }
     updated = true;
   }
 
+  void pathTranslate() {
+    // If mouse is pressed, add current position to path list
+    if(pressed) path.add(new PVector(window.ix(mouseX),window.ix(mouseY)));
+
+    // Loop through path
+    Iterator<PVector> points = path.iterator();
+    PVector d=new PVector(0,0);
+    float m=0;
+    while(points.hasNext() && m<1){
+      d.add(points.next().copy().sub(xc.copy().add(handle))); // vector to point
+      m = 2*d.mag();             // step magnitude
+      if(m<1) points.remove();   // remove points we can reach in this time step 
+    }
+    if(m>0) translate(d.x/max(1.,m),d.y/max(1.,m));      // translate
+    if(path.size()>0) path.add(0,xc.copy().add(handle)); // reset path origin
+  }
+
   void mousePressed() {
     if (distance( mouseX, mouseY )<1) {
       pressed = true;
-      hx = mouseX;
-      hy = mouseY;
+      handle = new PVector(window.ix(mouseX),window.ix(mouseY)).sub(xc);
+      path = new ArrayList();
     }
   }
   void mouseReleased() {
     pressed = false;
-    dxc.set(0, 0, 0);
-    dphi = 0;
   }
 
   PVector pressForce ( Field p ) {
