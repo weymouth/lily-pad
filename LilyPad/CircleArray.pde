@@ -1,10 +1,6 @@
 /*********************************
-CircleArray class creats a single circle ring of cylinders.
 The input arguments are center coordinates X, Y; diameter of each cylinder D; 
 Radius of circle array; division n; Angle of Attack rad; window.
-
-CircleArrangement class extends CircleArray class to create circle arrangement 
-for many times.
 
 SaveDrag class saves drag coefficient by two methods: 
 1. saves the total drag coefficient; 
@@ -12,11 +8,11 @@ SaveDrag class saves drag coefficient by two methods:
 
 Example code: 
 
-SaveDrag dat;
+SaveArray dat;
 CircleArrangement body;
 BDIM flow;
 FloodPlot flood;
-int n=(int)pow(2,6)+2;
+int n=(int)pow(2,7);
 float DG = float(n-2)/2;   // Bundle diameter
 float d = DG/21.;          // Cylinder's diameter
 float R = DG/2;            //Bundle radius 
@@ -28,11 +24,10 @@ void setup(){
   Window view = new Window(n,n);
   float x = (float)n/2., y = (float)n/2.;  //central position 
   body = new CircleArrangement(x, y, d, R, 20, PI/2, view); 
-  dat = new SaveDrag("saved/test.txt",body);   
+  dat = new SaveArray("saved/test.txt");   
   flow = new BDIM(n,n,0,body,(float)1./Reh,true);
   flood = new FloodPlot(view);
-  flood.range = new Scale(-.75,.75);
-  flood.setLegend("vorticity");
+  flood.setLegend("vorticity",-.75,.75);
 }
 
 void draw(){
@@ -41,61 +36,11 @@ void draw(){
   flow.update2();
   flood.display(flow.u.vorticity());
   body.display();
-  dat.addDataT(flow.p, DG);
+  dat.printPressForce(flow.p, body, DG);
 }
 **********************************/
 
-class CircleArray extends Body{
-  ArrayList<CircleBody> circleList = new ArrayList<CircleBody>();          //This is a container for all bodies
-
-  CircleArray(float x, float y, Window window){ 
-    super(x, y, window);
-  }
-
-  void add(float X, float Y, float d){
-    circleList.add(new CircleBody(X, Y, d, window));
-  }
-  
-  void display(color C, Window window ){
-    for ( CircleBody circle : circleList ){
-        circle.display(C, window);
-    }   
-  }
-  
-  Body closest (float x, float y){
-    float dmin = 1e5;
-    Body body = circleList.get(0);
-    for (CircleBody circle: circleList){
-      if(circle.distance(x, y) < dmin){
-        dmin = circle.distance(x, y);
-        body = circle;
-      }
-    }
-    return body;
-  }
-  
-  float distance(float x, float y){
-    Body c = closest(x,y);
-    return c.distance(x,y); 
-  }  
-  
-  PVector WallNormal(float x, float y){
-     Body c = closest(x,y);
-     return c.WallNormal(x,y); 
-  }
-  
-  float velocity( int d, float dt, float x, float y ){
-    Body c = closest(x,y);
-    return c.velocity(d,dt,x,y);
-  }
-}
-
-
-/*================================================
-            CircleArrangement class 
-================================================*/
-
-class CircleArrangement extends CircleArray {
+class CircleArrangement extends BodyUnionArray {
   CircleArrangement(float x, float y, float d, float R, int n, float rad, Window window) {
     super(x, y, window);
     
@@ -127,72 +72,26 @@ class CircleArrangement extends CircleArray {
 //  the middle parts are arranged separately with specific AoA.
     if (N==1){
       if(n>1){
-        ring( x, y, d, R, n-1, rad );
+        ring( x, y, d, R, n-1, rad, window );
       }
-      ring( x, y, d, 0, 1, rad );
+      ring( x, y, d, 0, 1, rad, window );
     } else{
       int temp;
       temp = n-1;
       for (int i=1; i<N; i++){ //loop in the different ring; i is current ring.
-        ring( x, y, d, R/N*i, ring[i], rad );
+        ring( x, y, d, R/N*i, ring[i], rad, window );
         temp = temp - ring[i];
       }
-      ring( x, y, d, R, temp, rad );
-      ring( x, y, d, 0, 1, rad );
+      ring( x, y, d, R, temp, rad, window );
+      ring( x, y, d, 0, 1, rad, window );
     }
   }
   
-  void ring(float x, float y, float d, float R, int n, float rad){
+  void ring(float x, float y, float d, float R, int n, float rad, Window window){
     for ( int i = 1; i <= n; i++ ){
       float X = x+R*cos(TWO_PI/n*i+rad);
       float Y = y+R*sin(TWO_PI/n*i+rad);
-      add(X, Y, d);
+      add(new CircleBody(X, Y, d, window));
     }    
   }
 }
-
-/*================================================
-            SaveDrag class 
-================================================*/
-
-class SaveDrag{
-  PrintWriter output;
-  ArrayList<CircleBody> bodys = new ArrayList<CircleBody>();
-  int n;
-  
-  SaveDrag(String name, CircleArrangement body){
-    output = createWriter(name);
-    n = 0;
-    for(CircleBody circle : body.circleList){
-      bodys.add(circle);
-      n++; 
-    }
-    this.bodys = bodys;
-    this.n = n;
-  }
-  
-  // add total drag coefficient of array
-  void addDataT(Field a, float L){
-      PVector pressure=new PVector(0, 0);
-      for(CircleBody circle : bodys){
-         pressure.add(circle.pressForce(a));
-      }
-        output.println(2*pressure.x/L + " ");
-      }
-  // add single drag coefficient of each cylinder of array
-  void addDataS(Field a, float L){
-      for(CircleBody circle : bodys){
-         output.print(2*circle.pressForce(a).x/L+" ");
-      }
-        output.println();
-      }
-  
-    void finish(){
-    output.flush(); // Writes the remaining data to the file
-    output.close(); // Finishes the file
-  }
-  
-}
-
-
-
