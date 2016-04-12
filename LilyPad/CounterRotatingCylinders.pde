@@ -15,7 +15,7 @@ float xi;
 void setup(){
 
   // --input parameters-------
-  int n=(int)pow(2,7)+2;  // number of grid points along a side of domain
+  int n=(int)pow(2,7);  // number of grid points along a side of domain
   float Re = 100;  // Reynolds number by main cylinder diameter
   float dR = 0.15;  // (Control cylinder diameter)/(Main cylinder diameter)
   float theta = 60*PI/180;  // Angular location of control cylinders from downstream stream stagnation point
