@@ -43,6 +43,10 @@ class BDIM{
     dt = dt_;
     nu=nu_;
     QUICK=QUICK_;
+    if(!QUICK && nu!=0) {
+      println("Semi-lagrangian advection cannot include explicit value for `nu`.");
+      exit();
+    }
 
     u = uinit;
     if(u.x.bval!=0) u.x.gradientExit = true;
@@ -70,7 +74,7 @@ class BDIM{
   BDIM( int n, int m, float dt, VectorField uinit, float nu, boolean QUICK ){
     this(n,m,dt,new CircleBody(-n/2,-m/2,n/10,new Window(0,0,n,m)),uinit,nu,QUICK);}
   
-  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),1,false);}
+  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),0,false);}
   
   void update(){
     // O(dt,dx^2) BDIM projection step:
