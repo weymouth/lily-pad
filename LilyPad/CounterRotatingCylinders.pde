@@ -68,9 +68,8 @@ void update(float dt){
   unsteady = true;
 
   // Rotate the control cylinders
-  this.a.rotate(-xi*dt*2/(dR*D));
-  this.b.rotate(xi*dt*2/(dR*D));
+  this.bodyList.get(0).rotate(-xi*dt*2/(dR*D));
+  this.bodyList.get(1).rotate( xi*dt*2/(dR*D));
 }
 
 }
-

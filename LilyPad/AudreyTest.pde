@@ -14,7 +14,7 @@ void settings(){
 void setup(){
   float xStart = 1, yDist = 0.06;        // choose the initial horizontal position of the cylinder and vertical separation between the foil and the cylinder
   test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
-  dat = new SaveData("saved/pressure.txt",test.body.a.coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
+  dat = new SaveData("saved/pressure.txt",test.body.bodyList.get(0).coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
 }
 void draw(){
   if(test.t<2){  // run simulation until t<Time
@@ -72,7 +72,7 @@ class AudreyTest{
   void update(){
     for ( int i=0 ; i<NT ; i++ ) {
     if (QUICK){dt = flow.dt;}
-     body.b.translate(dt,0);    // translate the cylinder of dt*velocity. here the cylinder moves one chord length per unit time
+     body.bodyList.get(1).translate(0.5*dt,0);    // translate the cylinder of dt*velocity. here the cylinder moves one chord length per unit time
      body.update();
      flow.update(body);
      if (order2) {flow.update2(body);}

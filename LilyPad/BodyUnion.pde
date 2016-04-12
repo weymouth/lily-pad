@@ -1,43 +1,43 @@
 /********************************
-BodyUnionArray & BodyUnion class
+BodyUnion class
 
 This class combines an array of body instances by a union operator
-which `adds` bodies to the flow. 
+which `adds` bodies to the flow. If two bodies are given, they are added
+automatically. Bodies can also be 'add'ed individually. 
 
 Other operations are possible but haven't been coded up yet.
 
+SaveArray is a writer class that outputs all the values for the array 
+in one line. At this point, only the pressure forces have been coded.
 
 Example code:
 
-BodyUnion bodyU;
-BodyUnionArray bodyA;
+BodyUnion body;
 void setup(){
   size(400,400);
   Window view = new Window(100,100);
-  bodyU = new BodyUnion( new NACA(30,30,20,0.2,view),
-                         new CircleBody(70,30,15,view));
-  bodyA = new BodyUnionArray( 30,30,view ); 
-  bodyA.add(new NACA(30,30,20,0.2,view));
-  bodyA.add(new CircleBody(70,30,15,view));
-  bodyA.add(new CircleBody(30,70,15,view));
+  body = new BodyUnion( new NACA(30,30,20,0.2,view),
+                        new CircleBody(70,30,15,view));
+  body.add(new CircleBody(30,70,15,view));
 }
 void draw(){
   background(0);
-  //bodyU.update();
-  //bodyU.display();
-  bodyA.update();
-  bodyA.display();
+  body.update();
+  body.display();
 }
-//void mousePressed(){bodyU.mousePressed();}
-//void mouseReleased(){bodyU.mouseReleased();}
-void mousePressed(){bodyA.mousePressed();}
-void mouseReleased(){bodyA.mouseReleased();}
+void mousePressed(){body.mousePressed();}
+void mouseReleased(){body.mouseReleased();}
 ********************************/
-class BodyUnionArray extends Body{
+class BodyUnion extends Body{
   ArrayList<Body> bodyList = new ArrayList<Body>();  //This is a container for all bodies
 
-  BodyUnionArray(float x, float y, Window window){ 
+  BodyUnion(float x, float y, Window window){ 
     super(x, y, window);
+  }
+
+  BodyUnion(Body a, Body b){
+    super(a.xc.x,a.xc.y,a.window);  
+    add(a); add(b);
   }
 
   void add(Body body){
@@ -78,23 +78,18 @@ class BodyUnionArray extends Body{
   }
 
   void update(){
-    for (Body body : bodyList){body.update();}
+    unsteady = false;
+    for (Body body : bodyList){
+      body.update(); 
+      unsteady = unsteady | body.unsteady;
+    }
+    updated = true;
   }
   void mousePressed(){
     for (Body body : bodyList){body.mousePressed();}
   }  
   void mouseReleased(){
     for (Body body : bodyList){body.mouseReleased();}
-  }
-}
-
-class BodyUnion extends BodyUnionArray{
-  Body a,b;
-  
-  BodyUnion(Body a, Body b){
-    super(a.xc.x,a.xc.y,a.window);  
-    add(a); add(b);
-    this.a = a; this.b = b;
   }
 }
 
@@ -107,7 +102,7 @@ class SaveArray{
     output = createWriter(name);
   }
   
-  void printPressForce(Field pressure, BodyUnionArray bodies, float L){
+  void printPressForce(Field pressure, BodyUnion bodies, float L){
     for(Body body: bodies.bodyList){
         PVector force = body.pressForce(pressure);
         output.print(2.*force.x/L+" "+2.*force.y/L+" ");

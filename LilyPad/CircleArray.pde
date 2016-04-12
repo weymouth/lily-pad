@@ -1,10 +1,7 @@
 /*********************************
+Sets up an array of circles of the same diameter into a ringed arrangement.
 The input arguments are center coordinates X, Y; diameter of each cylinder D; 
 Radius of circle array; division n; Angle of Attack rad; window.
-
-SaveDrag class saves drag coefficient by two methods: 
-1. saves the total drag coefficient; 
-2. saves each cylinder's drag coefficient.
 
 Example code: 
 
@@ -40,7 +37,7 @@ void draw(){
 }
 **********************************/
 
-class CircleArrangement extends BodyUnionArray {
+class CircleArrangement extends BodyUnion {
   CircleArrangement(float x, float y, float d, float R, int n, float rad, Window window) {
     super(x, y, window);
     
