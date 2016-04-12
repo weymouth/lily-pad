@@ -46,7 +46,7 @@ class Body {
   float phi=0, dphi=0, mass=1, I0=1, area=0;
   ArrayList<PVector> coords, path;
   int n;
-  boolean unsteady, pressed, xfree=true, yfree=true, updated=true;
+  boolean unsteady, pressed, xfree=true, yfree=true, updated=true, limit=true;
   PVector xc, dxc, handle;
   OrthoNormal orth[];
   Body box;
@@ -57,7 +57,7 @@ class Body {
     dxc = new PVector(0, 0);
     coords = new ArrayList();
     path = new ArrayList();
-    handle = new PVector(0, 0);
+    handle = new PVector();
   }
 
   void add( float x, float y ) {
@@ -264,15 +264,27 @@ class Body {
 
     // Loop through path
     Iterator<PVector> points = path.iterator();
-    PVector d=new PVector(0,0);
+    PVector d=new PVector();
     float m=0;
     while(points.hasNext() && m<1){
-      d.add(points.next().copy().sub(xc.copy().add(handle))); // vector to point
-      m = 2*d.mag();             // step magnitude
-      if(m<1) points.remove();   // remove points we can reach in this time step 
+      d = points.next().copy();        // next point on path
+      d.sub(xc.copy().add(handle));    // distance to point
+      d.z = (d.z-phi);                 // arc length to angle
+      m = (limit)?2*d.mag():1;         // (limited?) step magnitude
+      if(m<=1) points.remove();        // remove reachable points
     }
-    if(m>0) translate(d.x/max(1.,m),d.y/max(1.,m));      // translate
-    if(path.size()>0) path.add(0,xc.copy().add(handle)); // reset path origin
+    if(m>0) translate(d.x/max(1.,m),d.y/max(1.,m));   // translate
+    if(m>0) rotate(d.z/max(1.,m));                    // rotate
+    d = xc.copy().add(handle); d.z = phi;             // current position
+    if(path.size()>0) path.add(0,d);                  // add as path origin
+  }
+  void setPath(PVector p, Boolean limit) {
+    this.limit = limit;
+    PVector d = p.copy().sub(xc.copy().add(handle)); // vector to point
+    d.z = p.z-phi;
+    translate(d.x,d.y);   // translate
+    rotate(d.z);          // rotate
+    update();
   }
 
   void mousePressed() {
@@ -284,6 +296,9 @@ class Body {
   }
   void mouseReleased() {
     pressed = false;
+  }
+  void mouseWheel(MouseEvent event) {
+    rotate(event.getCount()/PI/100);
   }
 
   PVector pressForce ( Field p ) {
