@@ -10,7 +10,7 @@ This screen has two examples. You can comment/uncomment to run.
 Other exmaples are found at the top of each tab.
 
 *********************************************************/
-// Interactive example...
+// Circle that follows the mouse
 BDIM flow;
 Body body;
 FloodPlot flood;
@@ -27,7 +27,7 @@ void setup(){
   flood.setLegend("vorticity",-.5,.5);       // and label a flood plot
 }
 void draw(){
-  body.update();                             // update the body
+  body.follow();                             // update the body
   flow.update(body); flow.update2();         // 2-step fluid update
   flood.display(flow.u.vorticity());         // compute and display vorticity
   body.display();                            // display the body
@@ -35,7 +35,7 @@ void draw(){
 void mousePressed(){body.mousePressed();}    // user mouse...
 void mouseReleased(){body.mouseReleased();}  // interaction methods
 
-// Prescribed motion example
+// Foil that follow prescribed kinematics
 /*
 BDIM flow;
 Body body;
@@ -50,7 +50,7 @@ void setup(){
   size(800,800);         // display window size
   Window view = new Window(n,n);
   body = new NACA(x0,y0,L,0.2,view);         // define the geometry...
-  body.setPath(kinematics(t),false);         //     and its path
+  body.initPath(kinematics(t));              //     and its starting point
 
   flow = new BDIM(n,n,0.,body,L/Re,true);    // BDIM+QUICK
   
@@ -59,8 +59,7 @@ void setup(){
 }
 void draw(){
   t += flow.dt;
-  body.path.add(kinematics(t));
-  body.update();                             // update the body
+  body.follow(kinematics(t));                // update the body
   flow.update(body); flow.update2();         // 2-step fluid update
   plot.display(flow.u.vorticity());
   body.display();                            // display the body

@@ -15,29 +15,27 @@
  CirculationFinder cf;
  
  void setup(){
- int n=(int)pow(2,7);
- float d = n/12;
- size(800,400);
- Window view = new Window(n,n/2);
+   int n=(int)pow(2,7);
+   float d = n/12;
+   size(800,400);
+   Window view = new Window(n,n/2);
  
- body = new CircleBody(n/4,n/4,d,view);
- flow = new BDIM(n,n/2,1.5,body);
+   body = new CircleBody(n/4,n/4,d,view);
+   flow = new BDIM(n,n/2,1.5,body);
  
- cf = new CirculationFinder(flow,body,view);
- cf.setAnnotate(true,1.0/d);
+   cf = new CirculationFinder(flow,body,view);
+   cf.setAnnotate(true,1.0/d);
  
- flood = new FloodPlot(view);
- flood.setLegend("vorticity",-0.5,0.5);
+   flood = new FloodPlot(view);
+   flood.setLegend("vorticity",-0.5,0.5);
  }
  void draw(){
- body.update();
- flow.update(body);
- flow.update2();
- cf.update();
+   flow.update();flow.update2();
+   cf.update();
  
- flood.display(flow.u.vorticity());
- body.display();
- cf.display();
+   flood.display(flow.u.vorticity());
+   body.display();
+   cf.display();
  }
  ***********************************/
 

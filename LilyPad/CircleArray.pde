@@ -5,35 +5,30 @@ Radius of circle array; division n; Angle of Attack rad; window.
 
 Example code: 
 
-SaveArray dat;
-CircleArrangement body;
+CircleArrangement body; 
 BDIM flow;
 FloodPlot flood;
-int n=(int)pow(2,7);
-float DG = float(n-2)/2;   // Bundle diameter
+int n = (int)pow(2,8), m = n/2;
+float DG = m/2;            // Bundle diameter
 float d = DG/21.;          // Cylinder's diameter
-float R = DG/2;            //Bundle radius 
-float ReG = 2100;          //physical Reynolds number
-float Reh = ReG/DG;        //grid-based Reynolds number
+float ReG = 2100;          // physical Reynolds number
 
 void setup(){
-  size(600,600);            // display window size
-  Window view = new Window(n,n);
-  float x = (float)n/2., y = (float)n/2.;  //central position 
-  body = new CircleArrangement(x, y, d, R, 20, PI/2, view); 
-  dat = new SaveArray("saved/test.txt");   
-  flow = new BDIM(n,n,0,body,(float)1./Reh,true);
+  size(1000,500);           // display window size
+  float Reh = ReG/DG;       // grid-based Reynolds number
+  float x = m/2, y = m/2.;  // central position 
+  Window view = new Window(n,m);
+  body = new CircleArrangement(x, y, d, DG/2, 20, PI/2, view); 
+  flow = new BDIM(n,m,0,body,(float)1./Reh,true);
   flood = new FloodPlot(view);
   flood.setLegend("vorticity",-.75,.75);
 }
 
 void draw(){
-  body.update();
-  flow.update(body);
+  flow.update();
   flow.update2();
   flood.display(flow.u.vorticity());
   body.display();
-  dat.printPressForce(flow.p, body, DG);
 }
 **********************************/
 

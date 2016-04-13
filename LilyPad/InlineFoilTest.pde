@@ -286,11 +286,7 @@ class InlineFoilTest {
     computeVelocity(t-dt/2.0); //Recompute velocity for mid-timestep, fixes Euler drift
     foil.translate(velox*dt, -veloy*dt);
 
-     
-    foil.update();
-    foil.unsteady = true;
-    flow.update(foil);
-    flow.update2(foil);
+    flow.update(foil);flow.update2();
     t += dt;
   }
   void display() {

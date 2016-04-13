@@ -123,7 +123,7 @@ class BDIM{
   void updateUP( VectorField R, VectorField coeff){updateUP( R, coeff, R.minus(ub));}
 
   void update( Body body ){
-    if(body.unsteady){get_coeffs(body);}else{ub.eq(0.);}
+    if(body.unsteady()){get_coeffs(body);}else{ub.eq(0.);}
     update();
   }
   void update2( Body body ){update2();} // don't need to get coeffs again

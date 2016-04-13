@@ -5,14 +5,13 @@
  
  it defines the position and motion of a convex body. 
  
- points added to the body shape must be added clockwise 
- so that the convexity can be tested.
+ points added to the body shape must be added counter
+ clockwise so that the convexity can be tested.
  
- basic operations such as translations and rotations are
- applied to the centroid and the array of points. 
- 
- the update function checks for mouse user interaction and
- updates the `unsteady' flag.
+ the easiest way to include dynamics is to use follow()
+ which follows the path variable (or mouse) or to use
+ react() which integrates the rigid body equations.
+ You can also translate() and rotate() directly.
  
 Example code:
  
@@ -29,11 +28,12 @@ void setup(){
 }
 void draw(){
   background(0);
-  body.update();
+  body.follow();
   body.display();
 }
 void mousePressed(){body.mousePressed();}
 void mouseReleased(){body.mouseReleased();}
+void mouseWheel(MouseEvent event){body.mouseWheel(event);}
 
 ********************************/
 
@@ -44,9 +44,9 @@ class Body {
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
   float phi=0, dphi=0, mass=1, I0=1, area=0;
-  ArrayList<PVector> coords, path;
+  ArrayList<PVector> coords;
   int n;
-  boolean unsteady, pressed, xfree=true, yfree=true, updated=true, limit=true;
+  boolean pressed=false, xfree=true, yfree=true;
   PVector xc, dxc, handle;
   OrthoNormal orth[];
   Body box;
@@ -56,7 +56,6 @@ class Body {
     xc = new PVector(x, y);
     dxc = new PVector(0, 0);
     coords = new ArrayList();
-    path = new ArrayList();
     handle = new PVector();
   }
 
@@ -146,12 +145,6 @@ class Body {
     beginShape();
     for ( PVector x: coords ) vertex(window.px(x.x), window.py(x.y));
     endShape(CLOSE);
-
-    noFill();
-    stroke(bodyOutline,0.33); strokeWeight(5); strokeCap(ROUND);
-    beginShape();
-    for ( PVector x: path ) vertex(window.px(x.x), window.py(x.y));
-    endShape(OPEN);
   }
   void displayVector(PVector V) {
     displayVector(vectorColor, window, V, "Force", true);
@@ -217,7 +210,6 @@ class Body {
     return wnormal;
   }
 
-
   float velocity( int d, float dt, float x, float y ) {
     // add the rotational velocity to the translational
     PVector r = new PVector(x, y);
@@ -226,13 +218,14 @@ class Body {
     else     return (dxc.y+r.x*dphi)/dt;
   }
 
+  boolean unsteady(){return (dxc.mag()!=0)|(dphi!=0);}
+
   void translate( float dx, float dy ) {
     dxc = new PVector(dx, dy);
     xc.add(dxc);
     for ( PVector x: coords ) x.add(dxc);
     for ( OrthoNormal o: orth   ) o.translate(dx, dy);
     if (n>4) box.translate(dx, dy);
-    updated = false;
   }
 
   void rotate( float dphi ) {
@@ -242,63 +235,40 @@ class Body {
     for ( PVector x: coords ) rotate( x, sa, ca ); 
     getOrth(); // get new orthogonal projection
     if (n>4) box.rotate(dphi);
-    updated = false;
   }
   void rotate( PVector x, float sa, float ca ) {
     PVector z = PVector.sub(x, xc);
     x.x = ca*z.x-sa*z.y+xc.x;
     x.y = sa*z.x+ca*z.y+xc.y;
   }
-
-  void updatePositionOnly() {updated=true; update(); }
-  void update() {
-    pathTranslate();
-    unsteady = (dxc.mag()!=0)|(dphi!=0);
-    if(updated){ dxc = new PVector(0,0); dphi = 0; }
-    updated = true;
+  
+  // Move body to path=(x,y,phi)
+  void follow(PVector path) {
+    PVector d = path.copy().sub(xc.copy().add(handle)); // distance to point;
+    d.z = (d.z-phi);                                    // arc length to angle
+    translate(d.x,d.y); rotate(d.z);                    // translate & rotate
+  }
+  void follow() {
+    if(pressed) follow(new PVector(window.ix(mouseX),window.ix(mouseY)));
   }
 
-  void pathTranslate() {
-    // If mouse is pressed, add current position to path list
-    if(pressed) path.add(new PVector(window.ix(mouseX),window.ix(mouseY)));
-
-    // Loop through path
-    Iterator<PVector> points = path.iterator();
-    PVector d=new PVector();
-    float m=0;
-    while(points.hasNext() && m<1){
-      d = points.next().copy();        // next point on path
-      d.sub(xc.copy().add(handle));    // distance to point
-      d.z = (d.z-phi);                 // arc length to angle
-      m = (limit)?2*d.mag():1;         // (limited?) step magnitude
-      if(m<=1) points.remove();        // remove reachable points
-    }
-    if(m>0) translate(d.x/max(1.,m),d.y/max(1.,m));   // translate
-    if(m>0) rotate(d.z/max(1.,m));                    // rotate
-    d = xc.copy().add(handle); d.z = phi;             // current position
-    if(path.size()>0) path.add(0,d);                  // add as path origin
+  void initPath(PVector p){
+    follow(p);
+    dxc = new PVector(); dphi = 0; // Don't include velocity
   }
-  void setPath(PVector p, Boolean limit) {
-    this.limit = limit;
-    PVector d = p.copy().sub(xc.copy().add(handle)); // vector to point
-    d.z = p.z-phi;
-    translate(d.x,d.y);   // translate
-    rotate(d.z);          // rotate
-    update();
-  }
-
+  
   void mousePressed() {
     if (distance( mouseX, mouseY )<1) {
       pressed = true;
       handle = new PVector(window.ix(mouseX),window.ix(mouseY)).sub(xc);
-      path = new ArrayList();
     }
   }
   void mouseReleased() {
     pressed = false;
+    dxc = new PVector(); dphi = 0; // Don't include velocity
   }
   void mouseWheel(MouseEvent event) {
-    rotate(event.getCount()/PI/100);
+    if (distance( mouseX, mouseY )<1) rotate(event.getCount()/PI/100);
   }
 
   PVector pressForce ( Field p ) {
@@ -367,7 +337,6 @@ class CircleBody extends EllipseBody {
   void rotate(float _dphi) {
     dphi = _dphi;
     phi = phi+dphi;
-    updated = false;
   }
   
 }

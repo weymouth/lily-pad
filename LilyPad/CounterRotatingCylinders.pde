@@ -41,7 +41,6 @@ void setup(){
 }
 
 void draw(){
-  body.update();
   controlCylinders.update(flow.dt);
   flow.update(body);
   flow.update2();
@@ -65,8 +64,6 @@ CounterRotatingCylinders(float xc, float yc, float dR, float theta, float gR, fl
 }
 
 void update(float dt){
-  unsteady = true;
-
   // Rotate the control cylinders
   this.bodyList.get(0).rotate(-xi*dt*2/(dR*D));
   this.bodyList.get(1).rotate( xi*dt*2/(dR*D));

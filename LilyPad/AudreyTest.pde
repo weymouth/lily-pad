@@ -73,7 +73,6 @@ class AudreyTest{
     for ( int i=0 ; i<NT ; i++ ) {
     if (QUICK){dt = flow.dt;}
      body.bodyList.get(1).translate(0.5*dt,0);    // translate the cylinder of dt*velocity. here the cylinder moves one chord length per unit time
-     body.update();
      flow.update(body);
      if (order2) {flow.update2(body);}
     print("t="+nfs(t,2,2)+";  ");

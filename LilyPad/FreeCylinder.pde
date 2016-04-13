@@ -75,8 +75,7 @@ class FreeCylinder {
     // translate body according to pressure force, previous dt, current dt
     PVector forceP = body.pressForce(flow.p);
     body.react(forceP, dto, dt);
-    
-    body.update();
+
     flow.update(body);
     if (order2) {
       flow.update2();

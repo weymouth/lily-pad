@@ -22,7 +22,7 @@ void setup(){
 }
 void draw(){
   background(0);
-  body.update();
+  body.follow();
   body.display();
 }
 void mousePressed(){body.mousePressed();}
@@ -77,19 +77,26 @@ class BodyUnion extends Body{
     return c.velocity(d,dt,x,y);
   }
 
-  void update(){
-    unsteady = false;
-    for (Body body : bodyList){
-      body.update(); 
-      unsteady = unsteady | body.unsteady;
-    }
-    updated = true;
+  void follow(){
+    for (Body body : bodyList){body.follow();}
   }
+
+  boolean unsteady(){ 
+    boolean unsteady = false;
+    for (Body body : bodyList){
+      unsteady = unsteady | body.unsteady();
+    }
+    return unsteady;
+  }
+
   void mousePressed(){
     for (Body body : bodyList){body.mousePressed();}
   }  
   void mouseReleased(){
     for (Body body : bodyList){body.mouseReleased();}
+  }
+  void mouseWheel(MouseEvent event){
+    for (Body body : bodyList){body.mouseWheel(event);}
   }
 }
 

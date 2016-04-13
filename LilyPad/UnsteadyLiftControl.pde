@@ -169,8 +169,6 @@ class UnsteadyLiftControl {
     flow.u.x.a[mouseX/zoom][mouseY/zoom+2] += 1;
     }
      
-    foil.update();
-    foil.unsteady = true;
     flow.update(foil);
     flow.update2(foil);
     t += dt;

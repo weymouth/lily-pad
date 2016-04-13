@@ -91,8 +91,8 @@ class FlexNACA extends NACA{
     this.time = time;
     for ( PVector x: coords ) x.y += h(x.x);
     getOrth();
-    unsteady = true;
   }
+  boolean unsteady(){return true;}
   
 
 /* The wave is given by h = A(x)*sin(k*x-omega*t)
