@@ -97,13 +97,15 @@ class BDIM{
       if(adaptive) dt = checkCFL();
     }
     else{
-      F.eq(u0.minus(p.gradient().times(rhoi.times(0.5*dt))));
-      F.advect(dt,us,u0); 
-      updateUP( F, c.times(0.5) );
+      F.eq(u0); 
+      F.advect(dt,us,u0);
+      VectorField dp = p.gradient().times(rhoi.times(0.5*dt));
+      dp.advect(dt,us,u0);
+      updateUP( F.minus(dp), c.times(0.5), F.minus(ub) );
     }
   }
   
-  void updateUP( VectorField R, VectorField coeff ){
+  void updateUP( VectorField R, VectorField coeff, VectorField du ){
 /*  Seperate out the pressure from the forcing
       del*F = del*R+coeff*gradient(p)
     Approximate update (dropping ddn(grad(p))) which doesn't affect the accuracy of the velocity
@@ -114,10 +116,11 @@ class BDIM{
 */
     R.plusEq(PVector.mult(g,dt));
     u.eq(del.times(R).minus(ub.times(del.plus(-1))));
-    if(mu1) u.plusEq(del1.times((R.minus(ub)).normalGrad(wnx,wny)));
+    if(mu1) u.plusEq(del1.times(du.normalGrad(wnx,wny)));
     u.setBC();
     p = u.project(coeff,p);    
   }
+  void updateUP( VectorField R, VectorField coeff){updateUP( R, coeff, R.minus(ub));}
 
   void update( Body body ){
     if(body.unsteady){get_coeffs(body);}else{ub.eq(0.);}
@@ -213,7 +216,7 @@ class BDIM{
   float checkCFL() { 
     return min(u.CFL(nu), 1);
   }
-  
+
   void setDt(){
     dt = checkCFL();
     if(QUICK) adaptive = true;
