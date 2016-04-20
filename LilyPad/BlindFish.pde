@@ -1,11 +1,11 @@
 /*************************
-Audrey Test Class
-Example test case in which a cylinder passes by a foil
+Audrey's Blind Cave Fish Test Class
+  Example test case in which a cylinder passes by a foil
 
 Example code:
 
 SaveData dat;
-AudreyTest test;
+BlindFish test;
 int resolution = 64, xLengths=5, yLengths=3, zoom = 2;    // choose the number of grid points per chord, the size of the domain in chord units and the zoom of the display
 
 void settings(){
@@ -13,7 +13,7 @@ void settings(){
 }
 void setup(){
   float xStart = 1, yDist = 0.06;        // choose the initial horizontal position of the cylinder and vertical separation between the foil and the cylinder
-  test = new AudreyTest(resolution, xLengths, yLengths, xStart , yDist, zoom);
+  test = new BlindFish(resolution, xLengths, yLengths, xStart , yDist, zoom);
   dat = new SaveData("saved/pressure.txt",test.body.bodyList.get(0).coords,resolution,xLengths,yLengths,zoom);    // initialize the output data file with header information
 }
 void draw(){
@@ -34,13 +34,13 @@ void keyPressed(){   // close and save everything when the space bar is pressed
 }
 ***********************/
 
-class AudreyTest{
+class BlindFish{
   final int n,m, resolution, NT=2;  //nXm domain with resolution grid points per chord. displays and saves every NT computational time step
   float dt = 0, t, t0, Re=50000, cDiameter = 0.5; //choose time step if using semi-lagrangian, Reynolds number if using QUICK, and cylinder diameter in chord units
   boolean QUICK = true, order2 = true; // choose whether to use QUICK and second order time integration
   BodyUnion body; BDIM flow; FloodPlot flood, flood2; Window window, window2;
   
-  AudreyTest( int resolution, int xLengths, int yLengths, float xStart , float yDist, float zoom){
+  BlindFish( int resolution, int xLengths, int yLengths, float xStart , float yDist, float zoom){
     n = xLengths*resolution;
     m = yLengths*resolution;
     this.resolution = resolution;
@@ -72,7 +72,7 @@ class AudreyTest{
   void update(){
     for ( int i=0 ; i<NT ; i++ ) {
     if (QUICK){dt = flow.dt;}
-     body.bodyList.get(1).translate(0.5*dt,0);    // translate the cylinder of dt*velocity. here the cylinder moves one chord length per unit time
+     body.bodyList.get(1).translate(dt,0);    // translate the cylinder of dt*velocity. here the cylinder moves one chord length per unit time
      flow.update(body);
      if (order2) {flow.update2(body);}
     print("t="+nfs(t,2,2)+";  ");
