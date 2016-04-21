@@ -23,7 +23,7 @@ void setup(){
   Window view = new Window(n,n/2);                    // mapping from grid to display
   plesiosaur = new AncientSwimmer(1.25*L,n/4,L,3*L,   // define the geometry...
                                   1.75*PI,St,view);   //    and motion
-  flow = new BDIM(n,n/2,0.,plesiosaur);               // BDIM+QUICK
+  flow = new BDIM(n,n/2,1.5,plesiosaur);              // define fluid
   plot = new FloodPlot( view );                       // define plot...
   plot.setLegend("Vorticity",-0.5,0.5);               //    and legend
   output = createWriter("plesiosaur/out.csv");        // open output file
@@ -36,7 +36,7 @@ void draw(){
   plot.display(flow.u.vorticity());                   // display the vorticity
   plesiosaur.display();                               // display the geometry
   
-  PVector[] forces = plesiosaur.pressForces(flow.p);  // get pressure force on each foil
+  PVector[] forces = plesiosaur.pressForces(flow.p);  // pressure force on both bodies
   float ts = St*t/(2.*L);                             // time coefficient
   float front = 2.*forces[0].x/L;                     // thrust coefficient on front
   float back = 2.*forces[1].x/L;                      // thrust coefficient on back
@@ -82,12 +82,13 @@ class AncientSwimmer extends BodyUnion{
   
 // define the foil motion
   PVector kinematics(float s, float lead, float t){    
-    float phase = PI*St*t/L+lead;   // phase
+    float phase = PI*St*t/L+lead;          // phase
     return new PVector(x0+s,               // x position
                        y0-L*sin(phase),    // y position
                        pamp*cos(phase));   // pitch position
   }
-  
+
+// get pressure force of both foils
   PVector[] pressForces(Field p){
     PVector f0 = bodyList.get(0).pressForce(p);
     PVector f1 = bodyList.get(1).pressForce(p);
