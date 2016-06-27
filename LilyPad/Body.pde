@@ -69,7 +69,7 @@ class Body {
       PVector t1 = PVector.sub(x1, x2);
       PVector t2 = PVector.sub(x2, x3);
       float a = atan2(t1.y, t1.x)-atan2(t2.y, t2.x);
-      if (sin(a)<0) {
+      if (sin(a)<-1e-6) {
         coords.remove((i+1)%coords.size());
         i=0;
       }
@@ -145,7 +145,7 @@ class Body {
     beginShape();
     for ( PVector x: coords ) vertex(window.px(x.x), window.py(x.y));
     endShape(CLOSE);
-  }
+}
   void displayVector(PVector V) {
     displayVector(vectorColor, window, V, "Force", true);
   }

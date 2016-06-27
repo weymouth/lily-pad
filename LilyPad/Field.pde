@@ -58,7 +58,8 @@ class Field{
   }
 
   Field laplacian (){
-    Field d = new Field( n, m );
+    Field d = new Field( n, m ); 
+    d.btype = btype;
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
       d.a[i][j] = -4*a[i][j]+a[i+1][j]

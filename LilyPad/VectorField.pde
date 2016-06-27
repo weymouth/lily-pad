@@ -65,12 +65,12 @@ class VectorField{
   }
 
   Field ke (){
-    // returns {this}.{this} for unit cells
+    // returns 0.5*{this-bval}^2 for unit cells
     Field d = new Field( n, m );
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
-      d.a[i][j] = (sq(x.a[i+1][j]+x.a[i][j]-2.0)+
-                   sq(y.a[i][j+1]+y.a[i][j]))*0.25;
+      d.a[i][j] = (sq(x.a[i+1][j]+x.a[i][j]-2.*x.bval)+
+                   sq(y.a[i][j+1]+y.a[i][j]-2.*y.bval))*0.25;
     }}
     return d;
   }
@@ -269,6 +269,10 @@ class VectorField{
     VectorField g = new VectorField(this);
     g.invEq();
     return g;
+  }
+
+  VectorField laplacian(){
+    return new VectorField(x.laplacian(),y.laplacian());
   }
   
   void eq( VectorField b ){ x.eq(b.x); y.eq(b.y);}
