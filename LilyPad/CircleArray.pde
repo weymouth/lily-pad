@@ -27,7 +27,7 @@ void setup(){
 void draw(){
   flow.update();
   flow.update2();
-  flood.display(flow.u.vorticity());
+  flood.display(flow.u.curl());
   body.display();
 }
 **********************************/

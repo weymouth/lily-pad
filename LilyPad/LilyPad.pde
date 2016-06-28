@@ -30,7 +30,7 @@ void setup(){
 void draw(){
   body.follow();                             // update the body
   flow.update(body); flow.update2();         // 2-step fluid update
-  flood.display(flow.u.vorticity());         // compute and display vorticity
+  flood.display(flow.u.curl());              // compute and display vorticity
   body.display();                            // display the body
 }
 void mousePressed(){body.mousePressed();}    // user mouse...

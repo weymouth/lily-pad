@@ -69,6 +69,7 @@ class Field{
   }
 
   VectorField gradient(){
+    mismatch(btype,0);
     VectorField g = new VectorField(n,m,0,0);
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
@@ -76,6 +77,18 @@ class Field{
       g.y.a[i][j] = a[i][j]-a[i][j-1];
     }}
     g.setBC(); // issues?
+    return g;
+  }
+  
+  VectorField curl (){
+    // returns curl{this \hat z}
+    mismatch(btype,3);
+    VectorField g = new VectorField(n,m,0,0);
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+      g.x.a[i][j] = a[i][j+1]-a[i][j];
+      g.y.a[i][j] = a[i][j]-a[i+1][j];
+    }}
     return g;
   }
 
@@ -128,8 +141,8 @@ class Field{
       for( int j=1; j<m-1; j++){
         float x = i;
         float y = j;
-        if(btype==1) x -= 0.5;
-        if(btype==2) y -= 0.5;
+        if(btype==1|btype==3) x -= 0.5;
+        if(btype==2|btype==3) y -= 0.5;
         float ax = -step*u.linear( x, y );
         float ay = -step*v.linear( x, y );
         a[i][j] = a0.quadratic( x+ax, y+ay );
@@ -140,8 +153,8 @@ class Field{
 
   float quadratic( float x0, float y0){
     float x = x0, y = y0;
-    if(btype==1) x += 0.5;
-    if(btype==2) y += 0.5;
+    if(btype==1|btype==3) x += 0.5;
+    if(btype==2|btype==3) y += 0.5;
     int i = round(x), j = round(y);
     if( i>n-2 || i<1 || j>m-2 || j<1 )
       return linear( x0, y0 );
@@ -161,11 +174,11 @@ class Field{
   }  
   float linear( float x0, float y0 ){
     float x  = min(max(0.5,x0), n-1.5);
-    if(btype==1) x += 0.5;
+    if(btype==1|btype==3) x += 0.5;
     int i = min( (int)x, n-2 ); 
     float s = x-i;
     float y  = min(max(0.5,y0), m-1.5);
-    if(btype==2) y += 0.5;
+    if(btype==2|btype==3) y += 0.5;
     int j = min( (int)y, m-2 );
     float t = y-j;
     if(s==0 && t==0){

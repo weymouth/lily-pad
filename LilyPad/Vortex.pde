@@ -129,6 +129,6 @@ class Vortex {
   }
 
   void display() {
-    flood.display(flow.u.vorticity());
+    flood.display(flow.u.curl());
   }
 }

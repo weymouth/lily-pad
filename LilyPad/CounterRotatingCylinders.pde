@@ -45,7 +45,7 @@ void draw(){
   controlCylinders.update(flow.dt);
   flow.update(body);
   flow.update2();
-  flood.display(flow.u.vorticity());
+  flood.display(flow.u.curl());
   body.display();
   fill(0); text("Xi = " + controlCylinders.xi,width/2,height-30);
 }

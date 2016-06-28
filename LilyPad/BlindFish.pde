@@ -81,7 +81,7 @@ class BlindFish{
   }
   
   void display(){
-//    flood.display(flow.u.vorticity());
+//    flood.display(flow.u.curl());
 //    body.display();
 //    flood.displayTime(t);
     flood2.display(flow.p);

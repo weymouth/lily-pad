@@ -75,14 +75,13 @@ class VectorField{
     return d;
   }
 
-  Field vorticity (){
-    Field d = new Field( n, m );
+  Field curl (){
+    // returns curl{this} located at cell corner (btype=3)
+    Field d = new Field( n, m, 3, 0 );
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
-      d.a[i][j] = 0.25*(x.a[i  ][j-1]-x.a[i  ][j+1]+
-                        x.a[i+1][j-1]-x.a[i+1][j+1]+
-                        y.a[i+1][j  ]-y.a[i-1][j  ]+
-                        y.a[i+1][j+1]-y.a[i-1][j+1]);
+      d.a[i][j] = x.a[i][j-1]-x.a[i][j]+
+                  y.a[i][j]-y.a[i-1][j];
     }}
     return d;
   }

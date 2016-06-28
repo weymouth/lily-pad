@@ -27,7 +27,7 @@ void draw(){
   body.update();
   flow.update(body);
   flow.update2();
-  flood.display(flow.u.vorticity());
+  flood.display(flow.u.curl());
   body.display();
 }
 void mousePressed(){body.mousePressed();}

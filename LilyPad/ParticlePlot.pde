@@ -23,7 +23,7 @@ void setup(){
 void draw(){
   flow.update(body); flow.update2();
   plot.update(flow); // !NOTE!
-  plot.display(flow.u.vorticity());
+  plot.display(flow.u.curl());
   body.display();
 }
 ********************************************/

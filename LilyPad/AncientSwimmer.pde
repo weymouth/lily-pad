@@ -33,7 +33,7 @@ void draw(){
   t += flow.dt;                                       // update the time
   plesiosaur.update(t);                               // update the geometry
   flow.update(plesiosaur); flow.update2();            // 2-step fluid update
-  plot.display(flow.u.vorticity());                   // display the vorticity
+  plot.display(flow.u.curl());                        // display the vorticity
   plesiosaur.display();                               // display the geometry
   
   PVector[] forces = plesiosaur.pressForces(flow.p);  // pressure force on both bodies

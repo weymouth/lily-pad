@@ -174,7 +174,7 @@ class UnsteadyLiftControl {
     t += dt;
   }
   void display() {
-    flood.display(flow.u.vorticity());
+    flood.display(flow.u.curl());
     foil.display();
     foil.displayVector(foil.pressForce(flow.p));
     

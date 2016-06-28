@@ -33,7 +33,7 @@
    flow.update();flow.update2();
    cf.update();
  
-   flood.display(flow.u.vorticity());
+   flood.display(flow.u.curl());
    body.display();
    cf.display();
  }
@@ -72,7 +72,7 @@ class CirculationFinder {
     //Updates the vortex cores
 
     // +++++++++++++++ Step 1 - Finds local maxima in vorticity that also satisfy requirements of minimum vorticity, Qcriterion, and distance from body
-    vorticity = flow.u.vorticity();
+    vorticity = flow.u.curl();
     float[][] w = vorticity.a;
     cores.clear();
     for ( int i=1 ; i<flow.n-1 ; i++ ) {

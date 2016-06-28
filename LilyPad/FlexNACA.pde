@@ -30,7 +30,7 @@ void draw(){
   fish.update(time);
   flow.update(fish);
   flow.update2();
-  flood.display(flow.u.vorticity());
+  flood.display(flow.u.curl());
   fish.display();
 }
 

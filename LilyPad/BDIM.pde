@@ -27,7 +27,7 @@ void setup(){
 void draw(){
   flow.update();  // project
   flow.update2(); // correct
-  flow.u.vorticity().display(-0.75,0.75);
+  flow.u.curl().display(-0.75,0.75);
 }
 *********************************************************/
 class BDIM{
