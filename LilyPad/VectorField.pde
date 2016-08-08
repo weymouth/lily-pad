@@ -70,7 +70,7 @@ class VectorField{
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
       d.a[i][j] = (sq(x.a[i+1][j]+x.a[i][j]-2.*x.bval)+
-                   sq(y.a[i][j+1]+y.a[i][j]-2.*y.bval))*0.25;
+                   sq(y.a[i][j+1]+y.a[i][j]-2.*y.bval))*0.125;
     }}
     return d;
   }
