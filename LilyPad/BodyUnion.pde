@@ -22,7 +22,8 @@ void setup(){
 }
 void draw(){
   background(0);
-  body.follow();
+  body.follow(); // uncomment to move as a group
+  //for (Body child : body.bodyList) child.follow(); // uncomment to move individually
   body.display();
 }
 void mousePressed(){body.mousePressed();}
@@ -33,6 +34,7 @@ class BodyUnion extends Body{
 
   BodyUnion(float x, float y, Window window){ 
     super(x, y, window);
+    xc = new PVector();
   }
 
   BodyUnion(Body a, Body b){
@@ -42,6 +44,12 @@ class BodyUnion extends Body{
 
   void add(Body body){
     bodyList.add(body);
+    xc = new PVector(); area = 0;
+    for (Body b : bodyList){
+      xc.add(b.xc.copy().mult(b.area));
+      area += b.area;
+    }
+    xc = xc.div(area);
   }
   
   void display(color C, Window window ){
@@ -77,8 +85,14 @@ class BodyUnion extends Body{
     return c.velocity(d,dt,x,y);
   }
 
-  void follow(){
-    for (Body body : bodyList){body.follow();}
+  void translate(float dx, float dy){
+    xc.add(new PVector(dx, dy));
+    for (Body body : bodyList) body.translate(dx,dy);
+  }
+  void rotate(float dphi){
+    this.dphi = dphi;
+    phi = phi+dphi;
+    for (Body body : bodyList) body.rotate(dphi);
   }
 
   boolean unsteady(){ 
