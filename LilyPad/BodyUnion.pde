@@ -58,31 +58,31 @@ class BodyUnion extends Body{
     }
   }
   
-  Body closest (float x, float y){
-    float dmin = 1e5;
-    Body closest = bodyList.get(0);
-    for (Body body : bodyList){
-      if(body.distance(x, y) < dmin){
-        dmin = body.distance(x, y);
-        closest = body;
-      }
-    }
-    return closest;
-  }
-  
   float distance(float x, float y){
-    Body c = closest(x,y);
-    return c.distance(x,y); 
+    float d = 1e6;
+    for ( Body body : bodyList )
+      d = min(d,body.distance(x,y));
+    return d;
   }  
   
   PVector WallNormal(float x, float y){
-     Body c = closest(x,y);
-     return c.WallNormal(x,y); 
+    float w[] = get_weights(x,y);
+    PVector m = new PVector(0,0);
+    for ( int i = 0; i<bodyList.size(); i++ ) {
+      PVector n = bodyList.get(i).WallNormal(x,y);
+      m.add(n.mult(w[i]));
+    }
+    return m;
   }
   
   float velocity( int d, float dt, float x, float y ){
-    Body c = closest(x,y);
-    return c.velocity(d,dt,x,y);
+    float w[] = get_weights(x,y);
+    float v = 0;
+    for ( int i = 0; i<bodyList.size(); i++ ) {
+      float u = bodyList.get(i).velocity(d,dt,x,y);
+      v += u*w[i];
+    }
+    return v;
   }
 
   void translate(float dx, float dy){
@@ -111,6 +111,35 @@ class BodyUnion extends Body{
   }
   void mouseWheel(MouseEvent event){
     for (Body body : bodyList){body.mouseWheel(event);}
+  }
+
+// weight the body influences at point x,y
+  float[] get_weights(float x, float y){
+    int n = bodyList.size(),m=1;
+    float s=0, dm = 1e6, weights[]=new float[n];
+    for ( int i = 0; i<n; i++ ){
+      float d = bodyList.get(i).distance(x,y);
+      if(d<dm){m=i;dm=d;}         // closest?
+      weights[i] = delta0(-d/2.); // kernel weight
+      s += weights[i];
+    }
+    if(s>0) {                   // at least one body nearby
+      for ( int i = 0; i<n; i++) 
+        weights[i] /= s;          // normalize weights
+    } else {                    // no bodies near x,y
+      weights[m] = 1;             // all weight on closest
+    }
+    return weights;
+  }
+  
+  float delta0( float d ){
+    if( d <= -1 ){
+      return 0;
+    } else if( d >= 1 ){
+      return 1;
+    } else{
+      return 0.5*(1.+d+sin(PI*d)/PI);
+    } 
   }
 }
 
