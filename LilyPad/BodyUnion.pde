@@ -116,19 +116,14 @@ class BodyUnion extends Body{
 // weight the body influences at point x,y
   float[] get_weights(float x, float y){
     int n = bodyList.size(),m=1;
-    float s=0, dm = 1e6, weights[]=new float[n];
+    float s=0, weights[]=new float[n];
     for ( int i = 0; i<n; i++ ){
       float d = bodyList.get(i).distance(x,y);
-      if(d<dm){m=i;dm=d;}         // closest?
-      weights[i] = delta0(-d/2.); // kernel weight
+      weights[i] = delta0(-d/3.); // kernel weight
       s += weights[i];
     }
-    if(s>0) {                   // at least one body nearby
-      for ( int i = 0; i<n; i++) 
+    for ( int i = 0; i<n & s>0; i++) 
         weights[i] /= s;          // normalize weights
-    } else {                    // no bodies near x,y
-      weights[m] = 1;             // all weight on closest
-    }
     return weights;
   }
   
