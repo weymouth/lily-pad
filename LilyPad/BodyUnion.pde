@@ -94,6 +94,12 @@ class BodyUnion extends Body{
     phi = phi+dphi;
     for (Body body : bodyList) body.rotate(dphi);
   }
+  void initPath(PVector p){
+    follow(p);
+    for (Body body : bodyList) {
+      body.dxc = new PVector(); body.dphi = 0;
+    }
+  }
 
   boolean unsteady(){ 
     boolean unsteady = false;
