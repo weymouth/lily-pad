@@ -27,29 +27,26 @@ class TwoPhase extends BDIM{
 
   TwoPhase( int n, int m, float dt, Body body, float nu, boolean QUICK, float g, float gamma ){
     super( n, m, dt, body, nu, QUICK);
-    f  = new FreeInterface( n, m, gamma );
-    f0 = new FreeInterface( n, m, gamma );
+    f  = new FreeInterface( this.n, this.m, gamma );
+    f0 = new FreeInterface( this.n, this.m, gamma );
     this.g.y = g;
   }
   TwoPhase( int n, int m, float dt, float g ){
-    this( n, m, dt, new CircleBody(-10.,-10.,0.,new Window()), 1, false, g, 0.1);
+    this( n, m, dt, new CircleBody(-10.,-10.,0.,new Window()), 0, false, g, 0.1);
   }
 
   void update(){
     f.strang = (f.strang+1)%2; // strang operator splitting
-    getRhoCoeffs();
+    rhoi.eq(f.rho().inv());
     f0.eq(f);
     f.advect( dt, u0 );
     super.update();
   }
   void update2(){
-    getRhoCoeffs();
+    rhoi.eq(f.rho().inv());
+    c.eq(del.times(rhoi.times(dt))); // need to recompute
     f.eq(f0);
     f.advect( dt, u0, u );
     super.update2();
-  }
-  void getRhoCoeffs(){
-    rhoi.eq(f.rho().inv());
-    c.eq(del.times(rhoi.times(dt)));    
   }
 }
