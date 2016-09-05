@@ -42,7 +42,7 @@ class Swarm{
   boolean points=false, lines=true;
 
   Swarm( Window window ){ 
-    pSet = new ArrayList();
+    pSet = new ArrayList<Particle>();
     this.window = window;
   }
 

@@ -55,7 +55,7 @@ class Body {
     this.window = window;
     xc = new PVector(x, y);
     dxc = new PVector(0, 0);
-    coords = new ArrayList();
+    coords = new ArrayList<PVector>();
     handle = new PVector();
   }
 
@@ -313,7 +313,7 @@ class EllipseBody extends Body {
   EllipseBody( float x, float y, float _h, float _a, Window window) {
     super(x, y, window);
     h = _h; 
-    a = _a;
+    a = 1./_a;
     float dx = 0.5*h*a, dy = 0.5*h;
     for ( int i=0; i<m; i++ ) {
       float theta = -TWO_PI*i/((float)m);

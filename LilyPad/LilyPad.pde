@@ -17,7 +17,7 @@ Body body;
 FloodPlot flood;
 
 void setup(){
-  size(800,800);                             // display window size
+  size(700,700);                             // display window size
   int n=(int)pow(2,7);                       // number of grid points
   float L = n/8.;                            // length-scale in grid units
   Window view = new Window(n,n);
@@ -35,3 +35,4 @@ void draw(){
 }
 void mousePressed(){body.mousePressed();}    // user mouse...
 void mouseReleased(){body.mouseReleased();}  // interaction methods
+void mouseWheel(MouseEvent event){body.mouseWheel(event);}
