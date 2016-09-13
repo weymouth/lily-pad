@@ -1,8 +1,7 @@
 /******************************************
 ParticlePlot
 
-Draws streamlines on top of a regular plot, by calculating the stream function
-example code:
+Draw tracer particles and color them in based on a scalar field
 
 BDIM flow;
 Body body;
