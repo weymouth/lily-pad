@@ -138,7 +138,7 @@ class Body {
   }
   void display( color C, Window window ) { // note: can display while adding
     //    if(n>4) box.display(#FFCC00);
-    fill(C); 
+    fill(C);
     //noStroke();
     stroke(bodyOutline);
     strokeWeight(1);
@@ -287,6 +287,18 @@ class Body {
       mom += pdl*(o.ny*(o.cen.x-xc.x)-o.nx*(o.cen.y-xc.y));
     }
     return mom;
+  }
+
+  float pressPower ( Field p, float dt ) {
+    float power = 0;
+    for ( OrthoNormal o: orth ) {
+      float x = o.cen.x, y = o.cen.y,
+            u = velocity( 1, dt, x, y ),
+            v = velocity( 2, dt, x, y ),
+            pdl = p.linear( x, y )*o.l;
+      power += pdl*(u*o.nx+v*o.ny);
+    }
+    return power;
   }
 
   // compute body reaction to applied force using 1st order Euler 
