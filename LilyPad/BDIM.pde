@@ -23,16 +23,25 @@ void setup(){
   size(400,400); 
   int n=(int)pow(2,6);
   flow = new BDIM(n,n,1.5,new CircleBody(n/3,n/2,n/8,new Window(n,n)));
+  
+  //flow.resume("resume.dat"); // to resume from a file, write it into the data folder
+
 }
 void draw(){
   flow.update();  // project
   flow.update2(); // correct
   flow.u.curl().display(-0.75,0.75);
+  
+  //if( flow.t > 80 ){ // save flow state and exit
+  //  flow.write("data/resume.dat");
+  //  exit();
+  //}
+
 }
 *********************************************************/
 class BDIM{
   int n,m; // number of cells in uniform grid
-  float dt, nu, eps=2.0;
+  float t, dt, nu, eps=2.0;
   PVector g= new PVector(0,0);
   VectorField u,del,del1,c,u0,ub,wnx,wny,distance,rhoi;
   Field p;
@@ -63,6 +72,7 @@ class BDIM{
     wnx = new VectorField(n,m,0,0);
     wny = new VectorField(n,m,0,0);
     get_coeffs(body);
+    t = 0;
   }
   
   BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, float u_inf){
@@ -103,6 +113,7 @@ class BDIM{
       dp.advect(dt,us,u0);
       updateUP( F.minus(dp), c.times(0.5), F.minus(ub) );
     }
+    t += dt;
   }
   
   void updateUP( VectorField R, VectorField coeff, VectorField du ){
@@ -220,5 +231,32 @@ class BDIM{
   void setDt(){
     dt = checkCFL();
     if(QUICK) adaptive = true;
+  }
+
+  void write( String name ){
+    PrintWriter output;
+    output = createWriter(name);
+    output.println(t);
+    output.println(dt);
+    for ( int i=0; i<n; i++ ){
+    for ( int j=0; j<n; j++ ){
+      output.println(""+u.x.a[i][j]+", "+u.y.a[i][j]+", "+p.a[i][j]);
+    }}
+    output.flush(); 
+    output.close();
+  }
+
+  void resume( String name ){
+    float[] data;
+    String[] stuff = loadStrings(name);
+    flow.t = float(stuff[0]);
+    flow.dt = float(stuff[1]);
+    for ( int i=0; i<n; i++ ){
+    for ( int j=0; j<n; j++ ){
+      data = float(split(stuff[2+i*n+j],','));
+      u.x.a[i][j] = data[0];
+      u.y.a[i][j] = data[1];
+      p.a[i][j] = data[2];
+    }}
   }
 }
