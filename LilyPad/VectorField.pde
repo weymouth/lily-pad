@@ -132,7 +132,7 @@ class VectorField{
          div{coeffs*grad{p}} = div{u}  (1)
          u -= coeffs*grad{p}           (2)
        and returns the field p. all FDs are on unit cells */
-    p = MGsolver( 20, new PoissonMatrix(coeffs), p , s );
+    p = MGsolver( 2, new PoissonMatrix(coeffs), p , s );
     p.plusEq(-1*p.sum()/(float)((n-2)*(m-2)));
     VectorField dp = p.gradient();
     x.plusEq(coeffs.x.times(dp.x.times(-1)));

@@ -39,7 +39,7 @@ Field MGsolver( float itmx, PoissonMatrix A, Field x, Field b ){
 class MG{
   PoissonMatrix A;
   Field r,x;
-  int iter=0;
+  int iter=0,level=0;
   float tol=1e-4;
 
   MG( PoissonMatrix A, Field x, Field b ){
@@ -63,16 +63,18 @@ class MG{
   void update(){ update( 1 );}
  
   Field vCycle( PoissonMatrix A, Field r){
+    level++;
     PoissonMatrix B = restrict(A);
     Field psi = restrict(r), phi = smooth( 1, B, psi );
-    if(divisible(phi)) phi.plusEq(vCycle( B, psi ));
+    if(divisible(phi) && level<1 ) phi.plusEq(vCycle( B, psi ));
     Field del = prolongate(phi);
-    r.plusEq(A.times(del).times(-1));
+    r.minusEq(A.times(del));
+    level--;
     return del.plus(smooth(4,A,r));
   }
 
   boolean divisible( Field x ){
-    boolean flag = (x.n-2)%2==0 && (x.m-2)%2==0 ;
+    boolean flag = (x.n-2)%2==0 && (x.m-2)%2==0;
     if( !flag && x.n>9 && x.m>9 ) {
       println("MultiGrid requires the size in each direction be a large factor of two (2^p) times a small number (N=1..9) plus 2.");
       exit(); 
@@ -134,8 +136,7 @@ class MG{
                      -r.a[i][j])*A.inv.a[i][j];
     }}}
     del.setBC();
-    r.plusEq(A.times(del).times(-1));
+    r.minusEq(A.times(del));
     return del;
   }
 }
-

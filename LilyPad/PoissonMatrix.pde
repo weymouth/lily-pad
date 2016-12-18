@@ -64,6 +64,6 @@ public class PoissonMatrix {
   }
 
   Field residual( Field b, Field x ){
-    return b.plus(this.times(x).times(-1));
+    return b.minus(this.times(x));
   }
 }
