@@ -148,13 +148,10 @@ class FloodPlot{
       if(low<0&&high>0)text("0",x.out(0),y0);
       textAlign(CENTER,TOP);
       stroke(0);
-      fill(colorScale(minv)); 
-      String a = ""+minv;
-      text(a.substring(0,min(a.length(),5)),x.out(minv),y1);
-      fill(colorScale(maxv)); 
-      a = ""+maxv;
-      text(a.substring(0,min(a.length(),5)),x.out(maxv),y1);
-      
+      fill(colorScale(minv));
+      text(nf(minv,ceil(log(abs(minv))/log(10)),2),x.out(minv),y1);
+      fill(colorScale(maxv));
+      text(nf(maxv,ceil(log(abs(maxv))/log(10)),2),x.out(maxv),y1);
     }
   }
   
