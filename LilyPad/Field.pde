@@ -301,12 +301,12 @@ class Field{
   void invEq(){ eq(inv()); }
   float inner( Field b ){
     mismatch(this.btype,b.btype); 
-    float s = 0;
+    double s = 0;
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
       s += a[i][j]*b.a[i][j];
     }} 
-    return s;
+    return (float)s;
   }
   float sum(){
     float s = 0;
@@ -335,5 +335,14 @@ class Field{
       println("You can't add or multiple fields of different types.");
       exit();
     }     
+  }
+  
+  float L_inf(){
+    float mx = 0;
+    for( int i=0; i<n; i++){
+    for( int j=0; j<m; j++){
+      mx = max(mx,abs(a[i][j]));
+    }}
+    return mx;
   }
 }
