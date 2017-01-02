@@ -21,22 +21,13 @@ Example code:
 BDIM flow;
 void setup(){
   size(400,400); 
-  int n=(int)pow(2,6);
-  flow = new BDIM(n,n,1.5,new CircleBody(n/3,n/2,n/8,new Window(n,n)));
-  
-  //flow.resume("resume.dat"); // to resume from a file, write it into the data folder
-
+  int n=(int)pow(2,7);
+  flow = new BDIM(n,n,0.,new CircleBody(n/3,n/2,n/8,new Window(n,n)),n/8000.,true);
 }
 void draw(){
-  flow.update();  // project
-  flow.update2(); // correct
-  flow.u.curl().display(-0.75,0.75);
-  
-  //if( flow.t > 80 ){ // save flow state and exit
-  //  flow.write("data/resume.dat");
-  //  exit();
-  //}
-
+  flow.update();        // project
+  flow.update2();       // correct
+  flow.p.display(-1,1); // display pressure
 }
 *********************************************************/
 class BDIM{
@@ -249,8 +240,8 @@ class BDIM{
   void resume( String name ){
     float[] data;
     String[] stuff = loadStrings(name);
-    flow.t = float(stuff[0]);
-    flow.dt = float(stuff[1]);
+    t = float(stuff[0]);
+    dt = float(stuff[1]);
     for ( int i=0; i<n; i++ ){
     for ( int j=0; j<n; j++ ){
       data = float(split(stuff[2+i*n+j],','));
