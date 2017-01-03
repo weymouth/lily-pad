@@ -23,7 +23,7 @@ void setup(){
   Window view = new Window(n,n/2);                    // mapping from grid to display
   plesiosaur = new AncientSwimmer(1.25*L,n/4,L,3*L,   // define the geometry...
                                   1.75*PI,St,view);   //    and motion
-  flow = new BDIM(n,n/2,1.5,plesiosaur);              // define fluid
+  flow = new BDIM(n,n/2,1.0,plesiosaur);              // define fluid
   plot = new FloodPlot( view );                       // define plot...
   plot.setLegend("Vorticity",-0.5,0.5);               //    and legend
   output = createWriter("plesiosaur/out.csv");        // open output file
@@ -31,7 +31,7 @@ void setup(){
 
 void draw(){
   t += flow.dt;                                       // update the time
-  plesiosaur.update(t);                               // update the geometry
+  plesiosaur.update(t,flow.dt);                       // update the geometry
   flow.update(plesiosaur); flow.update2();            // 2-step fluid update
   plot.display(flow.u.curl());                        // display the vorticity
   plesiosaur.display();                               // display the geometry
@@ -67,17 +67,17 @@ class AncientSwimmer extends BodyUnion{
     pamp = atan(PI*St)-PI/18.;               
     
 // set initial state
-    bodyList.get(0).initPath(kinematics(0,0,0));
-    bodyList.get(1).initPath(kinematics(s,lead,0));
+    bodyList.get(0).follow(kinematics(0,0,0),new PVector());
+    bodyList.get(1).follow(kinematics(s,lead,0),new PVector());
 
 // set color
     bodyColor=color(255);
   }
 
 // update the position of the two foils
-  void update(float t){
-    bodyList.get(0).follow(kinematics(0,0,t));
-    bodyList.get(1).follow(kinematics(s,lead,t));    
+  void update(float t, float dt){
+    bodyList.get(0).follow(kinematics(0,0,t),dkinematics(0,t,dt));
+    bodyList.get(1).follow(kinematics(s,lead,t),dkinematics(lead,t,dt));
   }
   
 // define the foil motion
@@ -87,7 +87,13 @@ class AncientSwimmer extends BodyUnion{
                        y0-L*sin(phase),    // y position
                        pamp*cos(phase));   // pitch position
   }
-
+  PVector dkinematics(float lead, float t, float dt){
+    float phase = PI*St*t/L+lead;          // phase
+    return new PVector(0,                  // dx
+                       -cos(phase)*PI*St*dt,   // dy
+                       -pamp*sin(phase)*PI*St/L*dt); // dphi
+  }
+  
 // get pressure force of both foils
   PVector[] pressForces(Field p){
     PVector f0 = bodyList.get(0).pressForce(p);

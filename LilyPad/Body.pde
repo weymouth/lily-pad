@@ -251,10 +251,10 @@ class Body {
   void follow() {
     if(pressed) follow(new PVector(window.ix(mouseX),window.ix(mouseY)));
   }
-
-  void initPath(PVector p){
-    follow(p);
-    dxc = new PVector(); dphi = 0; // Don't include velocity
+  void follow(PVector path, PVector dpath){
+    follow(path);
+    dxc = new PVector(dpath.x, dpath.y);
+    dphi = dpath.z;
   }
   
   void mousePressed() {
