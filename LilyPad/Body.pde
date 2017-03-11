@@ -43,20 +43,19 @@ class Body {
   final color bodyOutline = #000000;
   final color vectorColor = #000000;
   PFont font = loadFont("Dialog.bold-14.vlw");
-  float phi=0, dphi=0, mass=1, I0=1, area=0;
-  ArrayList<PVector> coords;
+  float phi=0, dphi=0, dotphi=0, ddotphi=0;
+  float mass=1, I0=1, area=0;
+  ArrayList<PVector> coords=new ArrayList<PVector>();
   int n;
-  boolean pressed=false, xfree=true, yfree=true;
-  PVector xc, dxc, handle;
+  boolean pressed=false, xfree=true, yfree=true, pfree=true;
+  PVector xc, dxc=new PVector(), dotxc=new PVector(), ddotxc=new PVector();
+  PVector handle=new PVector(), ma=new PVector();
   OrthoNormal orth[];
   Body box;
 
   Body( float x, float y, Window window ) {
     this.window = window;
     xc = new PVector(x, y);
-    dxc = new PVector(0, 0);
-    coords = new ArrayList<PVector>();
-    handle = new PVector();
   }
 
   void add( float x, float y ) {
@@ -232,15 +231,16 @@ class Body {
     this.dphi = dphi;
     phi = phi+dphi;
     float sa = sin(dphi), ca = cos(dphi);
-    for ( PVector x: coords ) rotate( x, sa, ca ); 
+    for ( PVector x: coords ) rotate( x, xc, sa, ca ); 
     getOrth(); // get new orthogonal projection
     if (n>4) box.rotate(dphi);
   }
-  void rotate( PVector x, float sa, float ca ) {
+  void rotate( PVector x, PVector xc, float sa, float ca ) {
     PVector z = PVector.sub(x, xc);
     x.x = ca*z.x-sa*z.y+xc.x;
     x.y = sa*z.x+ca*z.y+xc.y;
   }
+  void rotate( PVector x, float sa, float ca ) {rotate(x,new PVector(),sa,ca);}
   
   // Move body to path=(x,y,phi)
   void follow(PVector path) {
@@ -301,16 +301,55 @@ class Body {
     return power;
   }
 
-  // compute body reaction to applied force using 1st order Euler 
-  void react (PVector force, float moment, float dt1, float dt2) {
-    float dx,dy,dp;
-    dx = -dt2*(dt1+dt2)/2*force.x/mass + dt2/dt1*dxc.x;
-    dy = -dt2*(dt1+dt2)/2*force.y/mass + dt2/dt1*dxc.y; 
-    dp = -dt2*(dt1+dt2)/2*moment/I0 + dt2/dt1*dphi;
-    translate(xfree?dx:0, yfree?dy:0); 
-    rotate(dp);
+  // compute body reaction to applied force and moment
+  void react (PVector force, float moment, float dt) {
+    /* X,Y */
+    if(xfree|yfree){
+      // rotate to body-fixed axis
+      float sa = sin(phi), ca = cos(phi);
+      rotate(force,-sa,ca);
+      rotate(ddotxc,-sa,ca);
+      // compute acceleration (in global axis)
+      ddotxc.x = (force.x+ma.x*ddotxc.x)/(mass+ma.x);
+      ddotxc.y = (force.y+ma.y*ddotxc.y)/(mass+ma.y);
+      rotate(ddotxc,sa,ca);
+      // compute velocity and delta
+      dotxc.add(ddotxc.copy().mult(dt));
+      dxc = dotxc.copy().mult(dt);
+      // translate
+      if(!xfree) {dxc.x=0; dotxc.x=0; ddotxc.x=0;}
+      if(!yfree) {dxc.y=0; dotxc.y=0; ddotxc.y=0;}
+      translate(dxc.x+0.5*ddotxc.x*sq(dt),dxc.y+0.5*ddotxc.y*sq(dt));
+    } else{
+      dxc=new PVector(); dotxc=new PVector(); ddotxc=new PVector();
+    }
+    /* Phi */
+    if(pfree){
+      // compute acceleration & velocity
+      ddotphi = (moment+ma.z*ddotphi)/(I0+ma.z);
+      dotphi += ddotphi*dt;
+      // compute delta and position
+      dphi = dotphi*dt;
+      rotate(dphi+0.5*ddotphi*sq(dt));
+    } else{
+      dphi=0; dotphi=0; ddotphi=0;
+    }
   }
-  void react (PVector force, float dt1, float dt2) {react(force, 0, dt1, dt2);}
+  void react (BDIM flow) {
+    PVector f = pressForce(flow.p).mult(-1);
+    float m = pressMoment(flow.p)*(-1);
+    react(f,m,flow.dt);
+  }
+
+  // check if motion is within box limits
+  boolean check_phi_free(float m, float phi_high, float phi_low){
+    return !(phi<phi_low & (m<0 | dotphi<0)) & 
+           !(phi>phi_high & (m>0 | dotphi>0));
+  }
+  boolean check_y_free(float fy, float y_high, float y_low){
+    return !(xc.y<y_low & (fy<0 | dotxc.y<0)) & 
+           !(xc.y>y_high & (fy>0 | dotxc.y>0));
+  }
 
 }
 /********************************
@@ -332,6 +371,8 @@ class EllipseBody extends Body {
       add(xc.x+dx*cos(theta), xc.y+dy*sin(theta));
     }
     end(); // finalize shape
+
+    ma = new PVector(PI*sq(dy),PI*sq(dx),0.125*PI*sq(sq(dx)-sq(dy)));
   }
 }
 /* CircleBody

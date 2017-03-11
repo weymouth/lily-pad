@@ -33,7 +33,11 @@ class NACA extends Body{
     }
     end(); // finalizes shape
     this.c = c;
-     FoilArea = t*c*0.685084;    //crossectional area of NACA foil
+    FoilArea = t*c*0.685084;    //crossectional area of NACA foil
+    
+    float dx = c/2, dy = t*c/2;
+    ma = new PVector(PI*sq(dy),PI*sq(dx),0.125*PI*sq(sq(dx)-sq(dy)));
+    ma.z += sq(c*(0.5-pivot))*ma.y;
   }
   
   NACA( float x, float y, float c, float t, Window window ){
@@ -59,9 +63,4 @@ class NACA extends Body{
   float offset( float x ){
     return 5*(0.2969*sqrt(x)-0.1260*x-0.3516*pow(x,2)+0.2843*pow(x,3)-0.1015*pow(x,4));
   }
-
-//  PVector pressForce ( Field p ){
-//    PVector pv = super.pressForce(p);
-//    return PVector.div(pv,c);
-//  }
 }
