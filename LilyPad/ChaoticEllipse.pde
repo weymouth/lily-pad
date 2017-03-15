@@ -46,8 +46,8 @@ class ChaoticEllipse extends EllipseBody{
     this(x,y,h,a,0.5,example,window);
   }
   
-  void display(){
-    super.display();
+  void display(color C, Window window ){
+    super.display( C, window );
     fill(255);
     ellipse(window.px(xc.x),window.py(xc.y),5,5);
   }
@@ -64,8 +64,9 @@ class ChaoticEllipse extends EllipseBody{
       xfree = false; yfree=false; pfree=true;
       super.react(flow);
       float St = 0.2, amp = 0.5*L;
-      follow(new PVector(x0,y0+amp*sin(TWO_PI*St/L*flow.t),phi),
-             new PVector(0,amp*cos(TWO_PI*St/L*flow.t)*TWO_PI*St/L,dphi));  
+      float y = amp*sin(TWO_PI*St/L*flow.t),
+            dy = amp*cos(TWO_PI*St/L*flow.t)*TWO_PI*St/L*flow.dt;
+      follow(new PVector(x0,y0+y,phi), new PVector(0,dy,dphi));  
     } else if(example==3){
     // Example 3: free pitch and heave, no actuation, heave limits
     //    Compute f.y and use to `check_y_free` and in `react`.
