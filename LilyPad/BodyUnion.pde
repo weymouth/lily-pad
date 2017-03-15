@@ -109,6 +109,13 @@ class BodyUnion extends Body{
     return unsteady;
   }
 
+  void react(BDIM flow){
+    for (Body body : bodyList) body.react(flow);
+  }
+  void react(PVector f, float m, float dt){
+    for (Body body : bodyList) body.react(f,m,dt);
+  }
+
   void mousePressed(){
     for (Body body : bodyList){body.mousePressed();}
   }  
