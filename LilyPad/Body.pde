@@ -47,6 +47,7 @@ class Body {
   float mass=1, I0=1, area=0;
   ArrayList<PVector> coords=new ArrayList<PVector>();
   int n;
+  boolean convex=false;
   boolean pressed=false, xfree=true, yfree=true, pfree=true;
   PVector xc, dxc=new PVector(), dotxc=new PVector(), ddotxc=new PVector();
   PVector handle=new PVector(), ma=new PVector();
@@ -60,19 +61,6 @@ class Body {
 
   void add( float x, float y ) {
     coords.add( new PVector( x, y ) );
-    // remove concave points
-    for ( int i = 0; i<coords.size() && coords.size()>3; i++ ) {
-      PVector x1 = coords.get(i);
-      PVector x2 = coords.get((i+1)%coords.size());
-      PVector x3 = coords.get((i+2)%coords.size());
-      PVector t1 = PVector.sub(x1, x2);
-      PVector t2 = PVector.sub(x2, x3);
-      float a = atan2(t1.y, t1.x)-atan2(t2.y, t2.x);
-      if (sin(a)<-1e-6) {
-        coords.remove((i+1)%coords.size());
-        i=0;
-      }
-    }
   }
 
   void end(Boolean closed) {
@@ -97,6 +85,15 @@ class Body {
       box.add(mx.x, mn.y);
       box.end();
     }
+    
+    // check for convexity
+    convex = true;
+    double_loop: for ( OrthoNormal oi : orth ) {
+      for ( OrthoNormal oj : orth ){
+        if(oi.distance(oj.cen.x,oj.cen.y)>0.001) {
+          convex = false; 
+          break double_loop;
+    }}}
   }
   void end() {
     end(true);
@@ -175,19 +172,44 @@ class Body {
   }
 
   float distance( float x, float y ) { // in cells
-    float dis = -1e10;
-    if (n>4) { // check distance to bounding box
+    float dis;
+    if (n>4) { // distance to bounding box
       dis = box.distance(x, y);
       if (dis>3) return dis;
     }
-    // check distance to each line, choose max
-    for ( OrthoNormal o : orth ) dis = max(dis, o.distance(x, y));
-    return dis;
+    
+    if(convex){ // distance to convex body
+      // check distance to each line, choose max
+      dis = -1e10;
+      for ( OrthoNormal o : orth ) dis = max(dis, o.distance(x, y));
+      return dis;
+    } else {   // distance to non-convex body
+      // check distance to each line segment, choose min
+      dis = 1e10;
+      for( OrthoNormal o: orth ) dis = min(dis,o.distance(x,y,false));
+      return (wn(x,y)==0)?dis:-dis; // use winding to set inside/outside
+    }
   }
   int distance( int px, int py) {     // in pixels
     float x = window.ix(px);
     float y = window.iy(py);
     return window.pdx(distance( x, y ));
+  }
+
+  int wn( float x, float y){
+    // Winding number. If wn==0 the point is inside the body
+    int wn=0;
+    for ( int i = 0; i<coords.size()-1; i++ ){      
+      float yi = coords.get(i).y;    // y value of point i
+      float yi1 = coords.get(i+1).y; // y value of point i+1
+      OrthoNormal o = orth[i];       // segment from i to i+1
+      if(yi <= y){                   // check for positive crossing
+        if(yi1 > y && o.distance(x,y)>0) wn++;
+      }else{                         // check for negative crossing
+        if(yi1 <= y && o.distance(x,y)<0) wn--;
+      }
+    }
+    return wn;
   }
 
   PVector WallNormal(float x, float y  ) {
