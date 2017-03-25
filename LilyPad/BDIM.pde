@@ -32,7 +32,7 @@ void draw(){
 *********************************************************/
 class BDIM{
   int n,m; // number of cells in uniform grid
-  float t, dt, nu, eps=2.0;
+  float t=0, dt, nu, eps=2.0;
   PVector g= new PVector(0,0);
   VectorField u,del,del1,c,u0,ub,wnx,wny,distance,rhoi;
   Field p;
@@ -63,7 +63,6 @@ class BDIM{
     wnx = new VectorField(n,m,0,0);
     wny = new VectorField(n,m,0,0);
     get_coeffs(body);
-    t = 0;
   }
   
   BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, float u_inf){
@@ -230,7 +229,7 @@ class BDIM{
     output.println(t);
     output.println(dt);
     for ( int i=0; i<n; i++ ){
-    for ( int j=0; j<n; j++ ){
+    for ( int j=0; j<m; j++ ){
       output.println(""+u.x.a[i][j]+", "+u.y.a[i][j]+", "+p.a[i][j]);
     }}
     output.flush(); 
@@ -243,8 +242,8 @@ class BDIM{
     t = float(stuff[0]);
     dt = float(stuff[1]);
     for ( int i=0; i<n; i++ ){
-    for ( int j=0; j<n; j++ ){
-      data = float(split(stuff[2+i*n+j],','));
+    for ( int j=0; j<m; j++ ){
+      data = float(split(stuff[2+i*m+j],','));
       u.x.a[i][j] = data[0];
       u.y.a[i][j] = data[1];
       p.a[i][j] = data[2];
