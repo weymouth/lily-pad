@@ -76,4 +76,3 @@ class SaveVectorField {
     output.close(); // Closes the file
   }
 } 
-

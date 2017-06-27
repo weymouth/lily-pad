@@ -90,4 +90,3 @@ class ReadData {
     return data[index][column]+(t%(dt*rows)-index*dt)*slope;
   }
 } 
-
