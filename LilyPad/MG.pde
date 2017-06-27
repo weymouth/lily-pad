@@ -69,7 +69,7 @@ class MG {
     smooth(0);
     MG coarse = new MG(restrict(A), restrict(r), level+1, iter);
     //println("  level:"+level+"->"+coarse.level);
-    if (coarse.divisible() && coarse.level<iter) coarse.vCycle();
+    if (coarse.divisible()) coarse.vCycle();
     coarse.smooth(its);
     //println("  level:"+coarse.level+"->"+level);
     d = prolongate(coarse.x);
