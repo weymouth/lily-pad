@@ -6,7 +6,7 @@
 
 Follow these [simple instructions to install and run Lily Pad](INSTALL_AND_RUN.md).
 
-Here is the [guideline for contributing](CONTRIBUTING) to the project.
+Here is the [guideline for contributing](CONTRIBUTING.md) to the project.
 
 The [wiki](https://github.com/weymouth/lily-pad/wiki) has further information such as:
 * [Documentation on the solver](https://github.com/weymouth/lily-pad/wiki/documentation).
