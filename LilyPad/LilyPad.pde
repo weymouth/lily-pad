@@ -3,8 +3,8 @@
 
 Click the "Run" button to Run the simulation.
 
-Change the geometry, flow conditions, numercial parameters
-visualizations and measurments from this window.
+Change the geometry, flow conditions, numerical parameters
+visualizations and measurements from this window.
 
 This screen has an example. Other examples are found at 
 the top of each tab. Copy/paste them here to run, but you 
@@ -24,7 +24,7 @@ void setup(){
 
   body = new CircleBody(n/3,n/2,L,view);     // define geom
   flow = new BDIM(n,n,1.5,body);             // solve for flow using BDIM
-  flood = new FloodPlot(view);               // intialize a flood plot...
+  flood = new FloodPlot(view);               // initialize a flood plot...
   flood.setLegend("vorticity",-.5,.5);       //    and its legend
 }
 void draw(){
