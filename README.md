@@ -1,6 +1,6 @@
 # ![LilyPad](http://weymouth.github.io/img/lily.png) Lily Pad
 
-###Test platform for real-time two-dimensional fluid/structure interaction simulations written in Processing.
+### Test platform for real-time two-dimensional fluid/structure interaction simulations written in Processing.
 [![DOI](https://zenodo.org/badge/10940/weymouth/lily-pad.svg)](http://dx.doi.org/10.5281/zenodo.16065)
 
 
