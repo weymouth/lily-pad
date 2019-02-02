@@ -90,10 +90,16 @@ class BodyUnion extends Body{
     xc.add(new PVector(dx, dy));
     for (Body body : bodyList) body.translate(dx,dy);
   }
-  void rotate(float dphi){
-    this.dphi = dphi;
+  void rotate(float dphi){ // rotate around _union_ xc
+    float sa = sin(dphi), ca = cos(dphi)-1;
     phi = phi+dphi;
-    for (Body body : bodyList) body.rotate(dphi);
+    for (Body body : bodyList){
+      PVector z = PVector.sub(body.xc,xc);
+      float dx = ca*z.x-sa*z.y;
+      float dy = sa*z.x+ca*z.y;
+      body.translate(dx,dy);
+      body.rotate(dphi);
+    }
   }
   void initPath(PVector p){
     follow(p);
