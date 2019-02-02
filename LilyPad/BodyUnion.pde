@@ -34,23 +34,24 @@ class BodyUnion extends Body{
 
   BodyUnion(float x, float y, Window window){ 
     super(x, y, window);
-    xc = new PVector();
   }
 
   BodyUnion(Body a, Body b){
-    super(a.xc.x,a.xc.y,a.window);  
+    super(a.xc.x,a.xc.y,a.window);
     add(a); add(b);
   }
 
   void add(Body body){
     bodyList.add(body);
-    xc = new PVector(); area = 0;
-    for (Body b : bodyList){
-      xc.add(b.xc.copy().mult(b.area));
-      area += b.area;
-    }
+    area += body.area;
+  }
+  
+  void recenter(){
+    xc = new PVector(); 
+    for (Body b : bodyList){xc.add(b.xc.copy().mult(b.area));}
     xc = xc.div(area);
   }
+  void recenter(float x, float y){xc = new PVector(x,y);}
   
   void display(color C, Window window ){
     for ( Body body : bodyList ){
