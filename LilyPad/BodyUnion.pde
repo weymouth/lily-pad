@@ -117,18 +117,21 @@ class BodyUnion extends Body{
   }
 
   void mousePressed(){
+    super.mousePressed();
     for (Body body : bodyList){body.mousePressed();}
   }  
   void mouseReleased(){
+    super.mouseReleased();
     for (Body body : bodyList){body.mouseReleased();}
   }
   void mouseWheel(MouseEvent event){
+    super.mouseWheel(event);
     for (Body body : bodyList){body.mouseWheel(event);}
   }
 
 // weight the body influences at point x,y
   float[] get_weights(float x, float y){
-    int n = bodyList.size(),m=1;
+    int n = bodyList.size();
     float s=0, weights[]=new float[n];
     for ( int i = 0; i<n; i++ ){
       float d = bodyList.get(i).distance(x,y);
