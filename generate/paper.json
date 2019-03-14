@@ -1,0 +1,23 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+    {
+      "@id": "http://orcid.org/0000-0002-3957-2474",
+      "@type": "Person",
+      "email": "arfon@github.com",
+      "name": "Arfon Smith",
+      "affiliation": "GitHub Inc."
+    }
+  ],
+  "identifier": "http://dx.doi.org/10.6084/m9.figshare.828487",
+  "codeRepository": "https://github.com/arfon/fidgit",
+  "datePublished": "2016-01-28",
+  "dateModified": "2016-01-28",
+  "dateCreated": "2016-01-28",
+  "description": "An ungodly union of GitHub and figshare",
+  "keywords": "software, archiving, credit for code",
+  "license": "MIT",
+  "title": "fidgit",
+  "version": "v0.1.0"
+}

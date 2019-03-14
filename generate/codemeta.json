@@ -1,0 +1,44 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+    {
+      "@id": "0000-0001-5080-5016",
+      "@type": "Person",
+      "email": "G.D.Weymouth@soton.ac.uk",
+      "name": "Gabriel Weymouth",
+      "affiliation": "University of Southampton"
+    },
+    {
+      "@id": "",
+      "@type": "Person",
+      "email": "audrey.maertens@epfl.ch",
+      "name": "Audrey",
+      "affiliation": "École Polytechnique Fédérale de Lausanne"
+    },
+    {
+      "@id": "",
+      "@type": "Person",
+      "email": "jsi@mit.edu",
+      "name": "Jacob Izraelevitz",
+      "affiliation": "Massachusetts Institute of Technology"
+    },
+    {
+      "@id": "",
+      "@type": "Person",
+      "email": "jschul@mit.edu ",
+      "name": "James Schulmeister",
+      "affiliation": ""
+    }
+  ],
+  "identifier": "https://doi.org/10.5281/zenodo.16065",
+  "codeRepository": "https://github.com/weymouth/lily-pad",
+  "datePublished": "2017-07-17",
+  "dateModified": "2017-07-17",
+  "dateCreated": "2017-07-17",
+  "description": "Real-time two-dimensional fluid dynamics simulations in Processing",
+  "keywords": "computational fluid dynamics, fluid structure interaction, Processing language",
+  "license": "MIT",
+  "title": "Lily Pad",
+  "version": ""
+}
