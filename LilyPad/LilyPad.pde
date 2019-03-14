@@ -1,38 +1,50 @@
-/*********************************************************
-                  Main Window!
-
-Click the "Run" button to Run the simulation.
-
-Change the geometry, flow conditions, numerical parameters
-visualizations and measurements from this window.
-
-This screen has an example. Other examples are found at 
-the top of each tab. Copy/paste them here to run, but you 
-can only have one setup & run at a time.
-
-*********************************************************/
-// Circle that can be dragged by the mouse
-BDIM flow;
 Body body;
-FloodPlot flood;
+Tabs tabs;
+Window view;
+BDIM flow;
+ParticlePlot plot;
+int n;
 
 void setup(){
-  size(700,700);                             // display window size
-  int n=(int)pow(2,7);                       // number of grid points
-  float L = n/8.;                            // length-scale in grid units
-  Window view = new Window(n,n);
-
-  body = new CircleBody(n/3,n/2,L,view);     // define geom
-  flow = new BDIM(n,n,1.5,body);             // solve for flow using BDIM
-  flood = new FloodPlot(view);               // initialize a flood plot...
-  flood.setLegend("vorticity",-.5,.5);       //    and its legend
+  fullScreen();
+  n = 3*int(pow(2,6));
+  view = new Window(1,1,n-1,n-1,width/2-height/3,0,height,height);
+  tabs = new Tabs();
+  body = new Body(0,0,view);
 }
 void draw(){
-  body.follow();                             // update the body
-  flow.update(body); flow.update2();         // 2-step fluid update
-  flood.display(flow.u.curl());              // compute and display vorticity
-  body.display();                            // display the body
+  if(tabs.running.active) {
+    colorMode(RGB,1);
+    flow.update();//flow.update2();
+    plot.update(flow); // !NOTE!
+    plot.display(flow.u.curl());
+  }else {
+    colorMode(RGB,1);
+    background(1);
+    noFill(); stroke(0.8);
+    rect((width-height)/2+height/4,height/4,height/2,height/2);
+  }
+  body.display();
+  colorMode(RGB,1);
+  tabs.display();
 }
-void mousePressed(){body.mousePressed();}    // user mouse...
-void mouseReleased(){body.mouseReleased();}  // interaction methods
-void mouseWheel(MouseEvent event){body.mouseWheel(event);}
+void mousePressed(){
+  if(tabs.mouseInput(mouseX,mouseY)){
+    if(tabs.drawing.active){body = new Body(view.ix(mouseX),view.iy(mouseY),view);}
+    if(tabs.running.active){
+      body.end();
+      flow = new BDIM(n,n,0.,body);
+      plot = new ParticlePlot(view,5000);
+      plot.setLegend("Vorticity",-0.5,0.5);
+      plot.setColorMode(4);
+    }
+  body.mousePressed();
+  }
+}
+void mouseDragged(){
+  if(tabs.drawing.active){body.add(view.ix(mouseX),view.iy(mouseY));}
+}
+
+void mouseReleased(){
+  body.mouseReleased();
+}

@@ -76,6 +76,21 @@ class BDIM{
   
   BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),0,false);}
   
+  // If an image is supplied, call the image version of get_coeffs()
+  BDIM( int n, int m, float dt, ImageBody img, VectorField uinit, float nu, boolean QUICK ){
+    this(n,m,dt,uinit,nu,QUICK);
+    get_coeffs(img);
+  }
+  BDIM( int n, int m, float dt, ImageBody img, float nu, boolean QUICK ){
+    this(n,m,dt,new VectorField(n+2,m+2,1,0),nu,QUICK);
+    get_coeffs(img);
+  }
+  BDIM( int n, int m, float dt, ImageBody img){
+    this(n,m,dt,new CircleBody(-n/2,-m/2,n/10,new Window(0,0,n,m)));
+    get_coeffs(img);
+  }
+
+
   void update(){
     // O(dt,dx^2) BDIM projection step:
     c.eq(del.times(rhoi.times(dt))); 
@@ -127,6 +142,10 @@ class BDIM{
     if(body.unsteady()){get_coeffs(body);}else{ub.eq(0.);}
     update();
   }
+  void update( ImageBody img ){
+    get_coeffs(img);
+    update();
+  }
   void update2( Body body ){update2();} // don't need to get coeffs again
 
   void get_coeffs( Body body ){
@@ -137,6 +156,35 @@ class BDIM{
     get_wn(body);
   }
   
+  void get_coeffs( ImageBody img ){
+    for ( int i=1 ; i<n-1 ; i++ ) {
+    for ( int j=1 ; j<m-1 ; j++ ) {
+        // zeroth order moment
+        del.x.a[i][j] = img.b((float)(i-0.5),j);
+        del.y.a[i][j] = img.b(i,(float)(j-0.5));
+        // first order moment and normal on x face
+        PVector nx = img.db((float)(i-0.5),j);
+        float mx = nx.mag();
+        if(mx>1e-8){
+          del1.x.a[i][j] = mx/eps;
+          wnx.x.a[i][j] = nx.x/mx;
+          wny.x.a[i][j] = nx.y/mx;
+        }
+        // first order moment and normal on y face
+        PVector ny = img.db(i,(float)(j-0.5));
+        float my = ny.mag();
+        if(my>1e-8){
+          del1.y.a[i][j] = my/eps;
+          wnx.y.a[i][j] = ny.x/my;
+          wny.y.a[i][j] = ny.y/my;
+        }
+    }}
+    del.setBC();
+    del1.setBC();
+    wnx.setBC();
+    wny.setBC();
+  }
+
   void get_ub( Body body ){
     /* Immersed Velocity Field
           ub(x) = U(x)*(1-del(x))
