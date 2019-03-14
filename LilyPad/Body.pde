@@ -271,7 +271,7 @@ class Body {
     translate(d.x,d.y); rotate(d.z);                    // translate & rotate
   }
   void follow() {
-    if(pressed) follow(new PVector(window.ix(mouseX),window.ix(mouseY)));
+    if(pressed) follow(new PVector(window.ix(mouseX),window.iy(mouseY)));
   }
   void follow(PVector path, PVector dpath){
     follow(path);
@@ -282,7 +282,7 @@ class Body {
   void mousePressed() {
     if (distance( mouseX, mouseY )<1) {
       pressed = true;
-      handle = new PVector(window.ix(mouseX),window.ix(mouseY)).sub(xc);
+      handle = new PVector(window.ix(mouseX),window.iy(mouseY)).sub(xc);
     }
   }
   void mouseReleased() {

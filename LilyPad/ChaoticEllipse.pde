@@ -52,7 +52,7 @@ class ChaoticEllipse extends EllipseBody{
     ellipse(window.px(xc.x),window.py(xc.y),5,5);
   }
 
-  // Specilaized body reaction functions
+  // Specialized body reaction functions
   void react(BDIM flow){
     if(example==1){
     // Example 1: free pitch, no actuation, no limits

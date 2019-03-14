@@ -104,7 +104,6 @@ class FloodPlot{
 
   class LegendPlot extends FloodPlot{
     String title;
-    PFont font;
     Field levels;
     boolean box = false;
 
@@ -115,7 +114,6 @@ class FloodPlot{
       window = new Window(1,1,n-2,m-2,a.window.x0+a.window.dx/4,a.window.y0+14,a.window.dx/2,16);
       img = new PImage(window.dx,window.dy);
 
-      font = loadFont("Dialog.bold-14.vlw"); // load text stuff
       title = _title;
 
       levels = new Field(n,m);  // generate data to plot
@@ -138,7 +136,7 @@ class FloodPlot{
       float low = range.outS, high = range.outE;
       Scale x = new Scale(low,high,x0,x1);
 
-      textFont(font);
+      textSize(15);
       fill((sequential |!dark )?0:360);
       textAlign(RIGHT,CENTER);
       text(title,x0,0.5*(y0+y1));
@@ -156,10 +154,8 @@ class FloodPlot{
   }
   
       void displayTime(float t){
-      PFont font = loadFont("Dialog.bold-14.vlw");
       int x0 = window.x0, x1 = window.x0+window.dx;
       int y0 = window.y0, y1 = window.y0+window.dy;
-      textFont(font);
       textAlign(CENTER,BASELINE);
       fill(255);
       text("t = "+ nfs(t,2,2),0.5*(x0+x1),y1);
