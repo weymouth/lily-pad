@@ -11,7 +11,11 @@ PImage pic, bck;
 void setup() {
   size(1280, 720);
   String[] cameras = Capture.list();
-  cam = new Capture(this, width, height, cameras[13]);
+  //for(String camera : cameras){
+  //  println(camera);
+  //}
+  //cam = new Capture(this, width, height, cameras[13]);
+  cam = new Capture(this, width, height, cameras[0]);
   cam.start();
   bck = createImage(width, height, RGB); 
   pic = createImage(width, height, RGB); 
@@ -42,4 +46,14 @@ void draw() {
   flow.update(body);
   plot.update(flow);
   plot.display(flow.u.x);
+  if(body.area>1){
+    PVector force = body.pressForce(flow.p).div(0.5*sqrt(body.area));
+    float spacing=20;
+    int x0 = view.x0, y1 = view.y0+view.dy;
+    textAlign(LEFT,BASELINE);
+    String ax = ""+force.x;
+    String ay = ""+force.y;
+    text(" Drag coefficient: " + ax.substring(0,min(ax.length(),5)),x0+spacing,y1-2*spacing);
+    text(" Lift coefficient: " + ay.substring(0,min(ay.length(),5)),x0+spacing,y1-spacing);
+  }
 }

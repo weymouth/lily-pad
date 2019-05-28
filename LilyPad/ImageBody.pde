@@ -29,6 +29,7 @@ void draw(){
 *********************************************************************************/
 class ImageBody{
   PImage img;
+  float area,mass;
 
   // Makes an ImageBody from an image
   ImageBody(int n, int m, PImage src){
@@ -71,6 +72,14 @@ class ImageBody{
     } else{
       return 0.5*(1.+d/eps+sin(PI*d/eps)/PI);
     } 
+  }
+  
+  void getArea() {    // get the body image area
+    area=0;
+    for ( int i=0 ; i<img.width*img.height; i++ ) {
+      area += brightness(img.pixels[i]);
+    }
+    mass = area; // default unit density
   }
   
   // get/interpolate the local brightness value
