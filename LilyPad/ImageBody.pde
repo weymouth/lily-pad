@@ -36,6 +36,7 @@ class ImageBody{
     img = src.copy();
     img.resize(n,m);
     setAlpha();
+    getArea();
   }
   
   // set alpha to (near) zero where there is no body for displaying
@@ -62,6 +63,7 @@ class ImageBody{
     }}
     img.updatePixels();
     setAlpha();
+    getArea();
   }
   float delta0( float d ){
     float eps = 2;
@@ -77,7 +79,7 @@ class ImageBody{
   void getArea() {    // get the body image area
     area=0;
     for ( int i=0 ; i<img.width*img.height; i++ ) {
-      area += brightness(img.pixels[i]);
+      area += 1-brightness(img.pixels[i]);
     }
     mass = area; // default unit density
   }
