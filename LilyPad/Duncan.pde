@@ -24,7 +24,7 @@
  ***********************/
 
 class Duncan {
-  float t=0, U=1, ratio=0.001;
+  float t=0, U=1, ratio=0.001, fill=.4;
   NACA wing;
   TwoPhase flow;
   PVector state;
@@ -33,7 +33,7 @@ class Duncan {
   Duncan( int n, int m, float xstart, float ystart, float AoA, float Re, float Fr) {
     // set up wing
     L = n/8; 
-    state = new PVector(xstart*L, (m/2/L + ystart)*L, radians(AoA));
+    state = new PVector(xstart*L, fill*m + ystart*L, radians(AoA));
     wing = new NACA(0, 0, L, 0.16, new Window(n, m));
     wing.follow(state, new PVector());
     wing.bodyColor=color(255);
@@ -42,7 +42,7 @@ class Duncan {
     float g = pow(U, 2)/pow(Fr, 2)/L;
     float nu = U*L/Re;
     flow = new TwoPhase(n, m, 0, wing, nu, true, g, ratio); // define fluid
-    flow.f.eq(0, 0, n+2, 0, m/2);                           // define initial water region
+    flow.f.eq(0, 0, n+2, 0, int(fill*m));                           // define initial water region
   }
 
   void update() {
