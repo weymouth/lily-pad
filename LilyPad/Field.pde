@@ -223,7 +223,7 @@ class Field{
       a[i][0]   = a[i][1];
       a[i][m-1] = a[i][m-2];
       if(btype==2){
-        if(!waveInlet) a[i][1] = bval;  
+        a[i][1] = bval;
         a[i][m-1] = bval;
       }   
     }
