@@ -24,25 +24,26 @@
  ***********************/
 
 class Duncan {
-  float t=0, U=1, ratio=0.001, fill=.4;
+  float density=0.001, fill=.5; // air/water density and domain fill ratios
   NACA wing;
   TwoPhase flow;
   PVector state;
-  float L;
+  float t=0, U=1, L, y0, g;
 
   Duncan( int n, int m, float xstart, float ystart, float AoA, float Re, float Fr) {
     // set up wing
-    L = n/8; 
+    L = m/4; 
     state = new PVector(xstart*L, fill*m + ystart*L, radians(AoA));
     wing = new NACA(0, 0, L, 0.16, new Window(n, m));
     wing.follow(state, new PVector());
     wing.bodyColor=color(255);
 
     // set up two phase fluid
-    float g = pow(U, 2)/pow(Fr, 2)/L;
     float nu = U*L/Re;
-    flow = new TwoPhase(n, m, 0, wing, nu, true, g, ratio); // define fluid
-    flow.f.eq(0, 0, n+2, 0, int(fill*m));                   // define initial water region
+    g = pow(U, 2)/pow(Fr, 2)/L;
+    flow = new TwoPhase(n, m, 0, wing, nu, true, g, density); // define two phase fluid
+    flow.f.eq(0, 0, n+2, 0, int(fill*m));                     // define initial water region
+    y0 = int((1-fill)*flow.m+0.5);
   }
 
   void update() {
@@ -58,19 +59,58 @@ class Duncan {
   }
 
   void pressForce(PrintWriter w) {
+    // measure pressure forces on wing and print to writer
     PVector forces = wing.pressForce(flow.p);
     float drag = 2.*forces.x/L, lift = 2.*forces.y/L, ts = t*U/L;
     w.println(""+ts+","+drag+","+lift+"");
   }
 
   void height(PrintWriter w) {
+    // measure fluid height for each x and print to writer
     for ( int i=1; i<flow.f.n-1; i++) {
       float h = 0;
       for ( int j=1; j<flow.f.m-1; j++) {
         h+=flow.f.a[i][j];
       }
-      float x = (i-state.x)/L, y = (h-int((1-fill)*flow.m+0.5))/L, ts = t*U/L;
+      float x = (i-state.x)/L, y = (h-y0)/L, ts = t*U/L;
       w.println(""+ts+","+x+","+y);
+    }
+  }
+}
+
+class WaveyDuncan extends Duncan {
+  float k, a, omega;
+  WaveyDuncan( int n, int m, float xstart, float ystart, float AoA, float Re, float Fr, float kL, float ak) {
+    super(n, m, xstart, ystart, AoA, Re, Fr);
+    //flow.u = new VectorField(n+2, m+2, 0, 0);     // define zero initial velocity field
+    flow.u.x.waveInlet = true;                    // wave inlet
+    k = kL/L;
+    a = ak/k;
+    omega = sqrt(g*k);
+  }
+
+  void update() {
+    t += flow.dt;   // update the time
+    set_BC();       // set inlet wave BCs
+    flow.update();  // 2-step fluid update
+    flow.update2();
+  }
+
+  void set_BC() {
+    float eta = a*cos(-omega*flow.t);  // inlet interface height
+    for (int j=1; j<flow.m-1; j++ ) {
+      float y=flow.m-j-0.5-y0;          // vertical position
+
+      if (y<eta-0.5) {       // under the wave
+        float u = -a*omega*cos(-omega*flow.t)*exp(y*k);
+        flow.u.x.a[1][j] = flow.u.x.bval+u;
+      } else if (y<=eta+0.5) { // at the interface
+        float f = eta-y+0.5;
+        float u = -f*a*omega*cos(-omega*flow.t)*exp(y*k);
+        flow.u.x.a[1][j] = flow.u.x.bval+u;
+      } else {                // above the wave
+        flow.u.x.a[1][j] = flow.u.x.bval;
+      }
     }
   }
 }
