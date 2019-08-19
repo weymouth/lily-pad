@@ -79,14 +79,17 @@ class Duncan {
 }
 
 class WaveyDuncan extends Duncan {
-  float k, a, omega;
+  float k, a, omega, omega_e;
   WaveyDuncan( int n, int m, float xstart, float ystart, float AoA, float Re, float Fr, float kL, float ak) {
     super(n, m, xstart, ystart, AoA, Re, Fr);
-    //flow.u = new VectorField(n+2, m+2, 0, 0);     // define zero initial velocity field
-    flow.u.x.waveInlet = true;                    // wave inlet
+    //U=0; // no forward speed test !!
+    flow.u = new VectorField(n+2, m+2, U, 0.); // initial velocity field
+    flow.u.x.waveInlet = true;                 // wave inlet
+    flow.u.y.waveTop = true;                   // volume correcting top boundary
     k = kL/L;
     a = ak/k;
-    omega = sqrt(g*k);
+    omega = sqrt(g*k);                         // wave frequency
+    omega_e = omega+U*k;                       // encounter frequency
   }
 
   void update() {
@@ -97,20 +100,28 @@ class WaveyDuncan extends Duncan {
   }
 
   void set_BC() {
-    float eta = a*cos(-omega*flow.t);  // inlet interface height
+    float eta = a*cos(-omega_e*flow.t);  // inlet interface height
+    float s = 0; // volume flux
+    
+    // apply wavemaker at inlet
     for (int j=1; j<flow.m-1; j++ ) {
       float y=flow.m-j-0.5-y0;          // vertical position
 
       if (y<eta-0.5) {       // under the wave
-        float u = -a*omega*cos(-omega*flow.t)*exp(y*k);
-        flow.u.x.a[1][j] = flow.u.x.bval+u;
+        float u = -omega*eta*exp(y*k);
+        flow.u.x.a[1][j] = U+u;
+        s+= u;
       } else if (y<=eta+0.5) { // at the interface
         float f = eta-y+0.5;
-        float u = -f*a*omega*cos(-omega*flow.t)*exp(y*k);
-        flow.u.x.a[1][j] = flow.u.x.bval+u;
+        float u = -f*omega*eta*exp(y*k);
+        flow.u.x.a[1][j] = U+u;
+        s+= u;
       } else {                // above the wave
-        flow.u.x.a[1][j] = flow.u.x.bval;
+        flow.u.x.a[1][j] = U;
       }
     }
+    
+    // apply uniform volume flux correction to upper boundary
+    flow.u.y.bval_top = -s/float(flow.n-2);
   }
 }
