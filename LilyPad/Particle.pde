@@ -17,7 +17,6 @@ void setup(){
   marker = new Particle( 0, 32, color(0), view, 300 );
 }
 void draw(){
-  body.update();
   flow.update(); flow.update2();
   marker.update(flow.u,flow.u0,flow.dt);
   marker.display();
