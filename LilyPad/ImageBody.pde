@@ -41,7 +41,7 @@ class ImageBody{
   
   // set alpha to (near) zero where there is no body for displaying
   void setAlpha(){
-    colorMode(RGB, 1);
+    colorMode(ARGB, 1);
     img.loadPixels();
     for ( int i=0 ; i<img.height*img.width ; i++ ) {
         float f = brightness(img.pixels[i]);
@@ -52,8 +52,8 @@ class ImageBody{
 
   // Makes an ImageBody from a body
   ImageBody(int n, int m, Body body){
-    colorMode(RGB, 1);                                // define 0->black & 1->white
-    img = createImage(n,m,RGB);                       // empty image
+    colorMode(ARGB, 1);                               // define 0->black & 1->white
+    img = createImage(n,m,ARGB);                      // empty image
     img.loadPixels();                                 // load pixels
     for ( int i=0 ; i<n ; i++ ) {                     // loop through...
     for ( int j=0 ; j<m ; j++ ) {                     // ... the cells
