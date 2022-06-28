@@ -1,20 +1,31 @@
 /*********************************************************
-ImageBody Class
-                  
-Use an image to define a BDIM body instead of a set of points.
+PixelBody Class
+            
+Use an array of pixels to define a BDIM body 
+
+The standard Body type uses an array of points to define the 
+boundary of a body, with everything inside that boundary being solid.
+PixelBody uses an alternative representation: the fraction of each 
+grid cell taken up by the solid. This is a very general approach
+to representing the topolgy and should allow for some fun studies.
+
+This class is a work in progress: ideally, the two body representations
+should have identical interfaces with the BDIM solver. That will require
+moving the stuff that is currently Body into a new type (BoundBody??) and
+writing some more utility functions for PixelBody. 
 
 Example code:
 
 BDIM flow;
 FloodPlot flood;
-ImageBody img;
+PixelBody img;
 
 void setup(){
   size(700,700);                             // display window size
   int n=(int)pow(2,7);                       // number of grid points
   Window view = new Window(n,n);
   Body body = new CircleBody(n/3.,n/2.,n/6.,view);
-  img = new ImageBody(n, n, body);
+  img = new PixelBody(n, n, body);
   flow = new BDIM(n,n,0.,img);               // solve for flow using BDIM
   //flow = new BDIM(n,n,0., body);             // for comparison
   flood = new FloodPlot(view);               // initialize a flood plot...
@@ -27,13 +38,13 @@ void draw(){
   img.display();                             // display the BodyImage
 }
 *********************************************************************************/
-class ImageBody{
+class PixelBody{
   PImage img;
   float[][] pix;
   float area,mass;
 
-  // Makes an ImageBody from an image
-  ImageBody(int n, int m, PImage src){
+  // Makes an PixelBody from an image
+  PixelBody(int n, int m, PImage src){
     img = createImage(n,m,ARGB);
     pix = new float[n][m];
     update(src);
@@ -59,8 +70,8 @@ class ImageBody{
     img.updatePixels();
   }
 
-  // Makes an ImageBody from a body
-  ImageBody(int n, int m, Body body){
+  // Makes an PixelBody from a body
+  PixelBody(int n, int m, Body body){
     colorMode(ARGB, 1);                               // define 0->black & 1->white
     pix = new float[n][m];
     img = createImage(n,m,ARGB);                      // empty image
@@ -120,7 +131,7 @@ class ImageBody{
     image(img,x0,y0,width,height);
   }
 
-  // Compute the pressure force on an ImageBody
+  // Compute the pressure force on an PixelBody
   PVector pressForce(Field p){
     PVector pv = new PVector(0, 0);
     for ( int i=1 ; i<p.n-1 ; i++ ) {                     // loop through...

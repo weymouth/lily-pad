@@ -1,10 +1,10 @@
 /********************************
 CamBody class
 
-CamBody extends an ImageBody from a camera capture source. 
+CamBody extends an PixelBody from a camera capture source. 
 
 Use `createCamBody(num,n,m)` to create a CamBody from camera(num)
-with ImageBody size n,m. 
+with PixelBody size n,m. 
 
 Method `update` grabs the newest capture and `background` uses 
 that capture as the simulation background.
@@ -33,7 +33,7 @@ void draw() {
 
 import processing.video.*; // need to install "Video Library for Processing" before running 
 
-class CamBody extends ImageBody{
+class CamBody extends PixelBody{
   Capture cam;
   PImage hold;
   int x,y,w,h;

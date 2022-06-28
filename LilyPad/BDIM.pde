@@ -77,15 +77,15 @@ class BDIM{
   BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),0,false);}
   
   // If an image is supplied, call the image version of get_coeffs()
-  BDIM( int n, int m, float dt, ImageBody img, VectorField uinit, float nu, boolean QUICK ){
+  BDIM( int n, int m, float dt, PixelBody img, VectorField uinit, float nu, boolean QUICK ){
     this(n,m,dt,uinit,nu,QUICK);
     get_coeffs(img);
   }
-  BDIM( int n, int m, float dt, ImageBody img, float nu, boolean QUICK ){
+  BDIM( int n, int m, float dt, PixelBody img, float nu, boolean QUICK ){
     this(n,m,dt,new VectorField(n+2,m+2,1,0),nu,QUICK);
     get_coeffs(img);
   }
-  BDIM( int n, int m, float dt, ImageBody img){
+  BDIM( int n, int m, float dt, PixelBody img){
     this(n,m,dt,new CircleBody(-n/2,-m/2,n/10,new Window(0,0,n,m)));
     get_coeffs(img);
   }
@@ -142,7 +142,7 @@ class BDIM{
     if(body.unsteady()){get_coeffs(body);}else{ub.eq(0.);}
     update();
   }
-  void update( ImageBody img ){
+  void update( PixelBody img ){
     get_coeffs(img);
     update();
   }
@@ -156,7 +156,7 @@ class BDIM{
     get_wn(body);
   }
   
-  void get_coeffs( ImageBody img ){
+  void get_coeffs( PixelBody img ){
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
         // zeroth order moment
