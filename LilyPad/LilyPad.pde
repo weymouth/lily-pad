@@ -2,12 +2,20 @@ CamBody body;
 BDIM flow;
 ParticlePlot plot;
 Window view;
-int b = int(pow(2,4)), n=8*b, m=5*b;
 
 void setup() {
-  fullScreen();
+
+  // Adjustable Settings
+  fullScreen();              // set window size - can replace with size(a,b)
+  int num = 0;               // camera number
+  int b = int(pow(2,4));     // resolution (change power only)
+  int n=8*b, m=5*b;          // number of simulation points
+  int x=width/4,w=width/3;   // capture box horizontal start and width
+  int y=height/3,h=height/3; // capture box vertical start and height
+  float cut = 0.5;           // brightness cutoff for solids with the capture box
+  
   view = new Window(n, m);
-  body = createCamBody(0, n, m);
+  body = createCamBody(num, n, m, x, y, w, h, cut);
   flow = new BDIM(n, m, 0., body);
   plot = new ParticlePlot(view, 5000);
   plot.setLegend("Flow speed", -0.5, 1.5);
