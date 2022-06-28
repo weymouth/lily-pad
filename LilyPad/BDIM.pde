@@ -156,14 +156,14 @@ class BDIM{
     get_wn(body);
   }
   
-  void get_coeffs( PixelBody img ){
+  void get_coeffs( PixelBody body ){
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
         // zeroth order moment
-        del.x.a[i][j] = img.b((float)(i-0.5),j);
-        del.y.a[i][j] = img.b(i,(float)(j-0.5));
+        del.x.a[i][j] = body.pix.interp(i-0.5,j);
+        del.y.a[i][j] = body.pix.interp(i,j-0.5);
         // first order moment and normal on x face
-        PVector nx = img.db((float)(i-0.5),j);
+        PVector nx = body.norm(i-0.5,j);
         float mx = nx.mag();
         if(mx>1e-8){
           del1.x.a[i][j] = mx/eps;
@@ -171,7 +171,7 @@ class BDIM{
           wny.x.a[i][j] = nx.y/mx;
         }
         // first order moment and normal on y face
-        PVector ny = img.db(i,(float)(j-0.5));
+        PVector ny = body.norm(i,j-0.5);
         float my = ny.mag();
         if(my>1e-8){
           del1.y.a[i][j] = my/eps;

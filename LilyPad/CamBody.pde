@@ -35,14 +35,14 @@ import processing.video.*; // need to install "Video Library for Processing" bef
 
 class CamBody extends PixelBody{
   Capture cam;
-  PImage hold;
   int x,y,w,h;
   float cut;
 
-  CamBody(int n, int m, PImage hold, Capture cam, int x, int y, int w, int h, float cut){
-    super(n,m,hold);
-    this.cam=cam; this.hold=hold;
-    this.x=x; this.y=y; this.w=w; this.h=h; this.cut=cut;
+  CamBody(int n, int m, Capture cam, int x, int y, int w, int h, float cut){
+    super(n,m);
+    this.cam=cam;
+    this.x=x; this.y=y; this.w=w; this.h=h; 
+    this.cut=cut;
   }
 
   void update(){
@@ -59,18 +59,26 @@ class CamBody extends PixelBody{
   }
   
   void solidify(){
+    // apply box and threshold to buffer
     colorMode(ARGB, 1);
-    hold = cam.get();
+    PImage hold = new PImage(width,height,ALPHA);
     hold.loadPixels();
     for (int i=0; i<width; i++) {
     for (int j=0; j<height; j++){
-      float b = brightness(hold.pixels[i+width*j]);
+      float b = brightness(cam.get(i,j));
       boolean c = b<cut && i>x && i<x+w && j>y && j<y+h;
       if(c){b=0;}else{b=1;}
-      hold.pixels[i+width*j]=color(b,1-b);
+      hold.pixels[i+width*j]=color(b);
     }}
     hold.updatePixels();
-    update(hold);
+    
+    // resize buffer and use to update PixBody
+    hold.resize(pix.n,pix.m);
+    hold.loadPixels();
+    for (int i=0; i<pix.n; i++){
+    for (int j=0; j<pix.m; j++){
+      pix.a[i][j] = brightness(hold.pixels[i+pix.n*j]);
+    }}
   }
 }
 
@@ -84,8 +92,7 @@ CamBody createCamBody(int num, int n, int m, int x, int y, int w, int h, float c
   println("Using "+cameras[num]);
   Capture cam = new Capture(this, width, height, cameras[num]);
   cam.start();
-  PImage hold = createImage(width,height,ARGB);
-  CamBody body = new CamBody(n,m,hold,cam,x,y,w,h,cut);
+  CamBody body = new CamBody(n,m,cam,x,y,w,h,cut);
   return body;
 }
 
