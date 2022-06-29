@@ -44,6 +44,8 @@ class CamBody extends PixelBody{
     this.x=x; this.y=y; this.w=w; this.h=h; 
     this.cut=cut;
   }
+  
+  boolean unsteady(){return true;} // force update
 
   void update(){
     if (cam.available() == true) {
@@ -92,8 +94,7 @@ CamBody createCamBody(int num, int n, int m, int x, int y, int w, int h, float c
   println("Using "+cameras[num]);
   Capture cam = new Capture(this, width, height, cameras[num]);
   cam.start();
-  CamBody body = new CamBody(n,m,cam,x,y,w,h,cut);
-  return body;
+  return new CamBody(n,m,cam,x,y,w,h,cut);
 }
 
 CamBody createCamBody(int num, int n, int m){ // Default capture box and cutoff
