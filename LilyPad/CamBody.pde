@@ -1,7 +1,7 @@
 /********************************
 CamBody class
 
-CamBody extends an PixelBody from a camera capture source. 
+CamBody creates a PixelBody from a camera capture source. 
 
 Use `createCamBody(num,n,m)` to create a CamBody from camera(num)
 with PixelBody size n,m. 

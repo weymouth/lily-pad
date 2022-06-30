@@ -9,10 +9,7 @@ PixelBody uses an alternative representation: the fraction of each
 grid cell taken up by the solid. This is a very general approach
 to representing the topolgy and should allow for some fun studies.
 
-This class is a work in progress: ideally, the two body representations
-should have identical interfaces with the BDIM solver. That will require
-moving the stuff that is currently Body into a new type (BoundBody??) and
-writing some more utility functions for PixelBody. 
+This class is a work in progress.
 
 Example code:
 
