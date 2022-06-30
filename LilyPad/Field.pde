@@ -24,8 +24,8 @@ void draw(){
 class Field{
   float[][] a;  
   int n,m,btype=0;
-  float bval=0;
-  boolean gradientExit=false;
+  float bval=0,bval_top=0;
+  boolean gradientExit=false,waveInlet=false,waveTop=false;
   
   Field( int n, int m, int btype, float bval ){
     this.n = n;
@@ -213,8 +213,8 @@ class Field{
       a[0][j]   = a[1][j];  
       a[n-1][j] = a[n-2][j];      
       if(btype==1){
-        if(gradientExit){
-          a[1][j]   = bval;  
+        if(gradientExit || waveInlet){
+          if(gradientExit) a[1][j] = bval;
           if(j>0 & j<m-1) s += a[n-1][j];          
         } else {
           a[1][j]   = bval;  
@@ -224,11 +224,15 @@ class Field{
       a[i][0]   = a[i][1];
       a[i][m-1] = a[i][m-2];
       if(btype==2){
-        a[i][1]   = bval;  
+        if(waveTop){
+          a[i][1] = bval_top;
+        }else{
+          a[i][1] = bval;
+        }
         a[i][m-1] = bval;
       }   
     }
-    if(gradientExit){
+    if(gradientExit || waveInlet){
       s /= float(m-2);
       for( int j=1; j<m-1; j++ ) a[n-1][j] += bval-s;
     }
