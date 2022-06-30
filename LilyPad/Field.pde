@@ -192,12 +192,13 @@ class Field{
   
   void display( float low, float high ){
     PImage img = createImage(n-2,m-2,RGB);
+    colorMode(RGB,1);
     img.loadPixels();
     for ( int i=0 ; i<n-2 ; i++ ) {
       for ( int j=0 ; j<m-2 ; j++ ) {
         float f = a[i+1][j+1];
         int k = i+j*(n-2);
-        f = map(f,low,high,0,255);
+        f = map(f,low,high,0,1);
         img.pixels[k] = color(f);
       }
     }

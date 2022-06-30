@@ -34,11 +34,11 @@ class BDIM{
   int n,m; // number of cells in uniform grid
   float t=0, dt, nu, eps=2.0;
   PVector g= new PVector(0,0);
-  VectorField u,del,del1,c,u0,ub,wnx,wny,distance,rhoi;
+  VectorField u,del,del1,c,u0,ub,wnx,wny,rhoi;
   Field p;
   boolean QUICK, mu1=true, adaptive=false;
 
-  BDIM( int n_, int m_, float dt_, Body body, VectorField uinit, float nu_, boolean QUICK_ ){
+  BDIM( int n_, int m_, float dt_, AbstractBody body, VectorField uinit, float nu_, boolean QUICK_ ){
     n = n_+2; m = m_+2;
     dt = dt_;
     nu=nu_;
@@ -55,7 +55,6 @@ class BDIM{
     if(dt==0) setDt(); // adaptive time stepping for O(2) QUICK
 
     ub  = new VectorField(n,m,0,0);
-    distance =  new VectorField(n, m, 10, 10);    
     del = new VectorField(n,m,1,1);
     del1 = new VectorField(n,m,0,0);
     rhoi = new VectorField(del);
@@ -65,17 +64,17 @@ class BDIM{
     get_coeffs(body);
   }
   
-  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK, float u_inf){
+  BDIM( int n, int m, float dt, AbstractBody body, float nu, boolean QUICK, float u_inf){
     this(n,m,dt,body,new VectorField(n+2,m+2,u_inf,0),nu,QUICK);}
-  BDIM( int n, int m, float dt, Body body, float nu, boolean QUICK ){
+  BDIM( int n, int m, float dt, AbstractBody body, float nu, boolean QUICK ){
     this(n,m,dt,body,new VectorField(n+2,m+2,1,0),nu,QUICK);}
   
   // If no body is supplied, create a body outside the domain
   BDIM( int n, int m, float dt, VectorField uinit, float nu, boolean QUICK ){
     this(n,m,dt,new CircleBody(-n/2,-m/2,n/10,new Window(0,0,n,m)),uinit,nu,QUICK);}
   
-  BDIM( int n, int m, float dt, Body body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),0,false);}
-  
+  BDIM( int n, int m, float dt, AbstractBody body){this(n,m,dt,body,new VectorField(n+2,m+2,1,0),0,false);}
+
   void update(){
     // O(dt,dx^2) BDIM projection step:
     c.eq(del.times(rhoi.times(dt))); 
@@ -123,21 +122,19 @@ class BDIM{
   }
   void updateUP( VectorField R, VectorField coeff){updateUP( R, coeff, R.minus(ub));}
 
-  void update( Body body ){
+  void update( AbstractBody body ){
     if(body.unsteady()){get_coeffs(body);}else{ub.eq(0.);}
     update();
   }
-  void update2( Body body ){update2();} // don't need to get coeffs again
+  void update2( AbstractBody body ){update2();} // don't need to get coeffs again
 
-  void get_coeffs( Body body ){
-    get_dist(body);
-    get_del();
-    get_del1();
+  void get_coeffs( AbstractBody body ){
+    get_del(body);
     get_ub(body);
     get_wn(body);
   }
   
-  void get_ub( Body body ){
+  void get_ub( AbstractBody body ){
     /* Immersed Velocity Field
           ub(x) = U(x)*(1-del(x))
     where U is the velocity of the body */
@@ -148,7 +145,7 @@ class BDIM{
     }}
   }
   
-  void get_wn(Body body){
+  void get_wn(AbstractBody body){
    /* wall normal direction of the closest body point */
    PVector wn;
     for ( int i=1 ; i<n-1 ; i++ ) {
@@ -161,57 +158,23 @@ class BDIM{
       wny.y.a[i][j]=wn.y;
     }}   
   }
-  
-  void get_dist( Body body ) {
-    for ( int i=1 ; i<n-1 ; i++ ) {
-      for ( int j=1 ; j<m-1 ; j++ ) {
-        distance.x.a[i][j] = body.distance((float)(i-0.5), j);
-        distance.y.a[i][j] = body.distance(i, (float)(j-0.5));
-      }
-    }
-  }
-  
-  void get_del( ){
-    /* BDIM zeroth order moment
-          del(x) = delta0(d(x))
-    where d is the distance to the interface from x */
+
+  void get_del( AbstractBody body ){
+    PVector d;
     for ( int i=1 ; i<n-1 ; i++ ) {
     for ( int j=1 ; j<m-1 ; j++ ) {
-        del.x.a[i][j] = delta0(distance.x.a[i][j]);
-        del.y.a[i][j] = delta0(distance.y.a[i][j]);
+      // query x-face
+      d = body.del(i-0.5,j,eps);
+      del.x.a[i][j] = d.x;
+      del1.x.a[i][j] = d.y;
+
+      //query y-face
+      d = body.del(i,j-0.5,eps);
+      del.y.a[i][j] = d.x;
+      del1.y.a[i][j] = d.y;
     }}
     del.setBC();
-  }
-  
-  void get_del1(){
-    /* BDIM first order moment
-          del(x) = delta1(d(x))
-    where d is the distance to the interface from x */
-    for ( int i=1 ; i<n-1 ; i++ ) {
-    for ( int j=1 ; j<m-1 ; j++ ) {
-        del1.x.a[i][j] = delta1(distance.x.a[i][j]);
-        del1.y.a[i][j] = delta1(distance.y.a[i][j]);
-    }}
     del1.setBC();
-  }
-
-  
-  float delta0( float d ){
-    if( d <= -eps ){
-      return 0;
-    } else if( d >= eps ){
-      return 1;
-    } else{
-      return 0.5*(1.+d/eps+sin(PI*d/eps)/PI);
-    } 
-  }
-  
-  float delta1( float d ){
-    if( abs(d) >= eps){
-      return 0;
-    } else{
-        return 0.25*(eps-sq(d)/eps)-1/TWO_PI*(d*sin(d*PI/eps)+eps/PI*(1+cos(d*PI/eps)));
-    } 
   }
   
   float checkCFL() { 

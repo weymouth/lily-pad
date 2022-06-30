@@ -37,7 +37,14 @@ void mouseWheel(MouseEvent event){body.mouseWheel(event);}
 
 ********************************/
 
-class Body {
+class AbstractBody {
+  PVector del(float x, float y, float eps){return new PVector(1,0);}
+  float velocity(int d, float dt, float x, float y ){return 0;}
+  PVector WallNormal(float x, float y){return new PVector(0,0);}
+  boolean unsteady(){return false;}
+}
+
+class Body extends AbstractBody{
   Window window;
   color bodyColor = #993333;
   final color bodyOutline = #000000;
@@ -55,6 +62,7 @@ class Body {
   Body box;
 
   Body( float x, float y, Window window ) {
+    super();
     this.window = window;
     xc = new PVector(x, y);
   }
@@ -195,6 +203,13 @@ class Body {
     float y = window.iy(py);
     return window.pdx(distance( x, y ));
   }
+
+  PVector del(float x, float y, float eps){
+    float d = min(max(distance(x,y)/eps,-1),1);
+    return new PVector(delta0(d),delta1(d)*eps);
+  }
+  float delta0( float d){return 0.5*(1.+d+sin(PI*d)/PI);}  
+  float delta1( float d){return 0.25*(1-sq(d))-1/TWO_PI*(d*sin(d*PI)+1/PI*(1+cos(d*PI)));}
 
   int wn( float x, float y){
     // Winding number. If wn==0 the point is inside the body
